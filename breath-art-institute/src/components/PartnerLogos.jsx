@@ -1,5 +1,6 @@
+import React from 'react';
 import { motion } from 'framer-motion';
-import breathLogo from '../assets/breath.png';
+import breathLogo from '../assets/breath.png?update=2';
 import ignetLogo from '../assets/ignet.png';
 import metaLogo from '../assets/meta.png';
 

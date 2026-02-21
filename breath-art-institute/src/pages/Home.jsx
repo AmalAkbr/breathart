@@ -7,6 +7,7 @@ import Certifications from '../components/Certifications';
 import Placement from '../components/Placement';
 import Mentors from '../components/Mentors';
 import FAQ from '../components/FAQ';
+import Location from '../components/Location';
 
 const Home = () => {
     return (
@@ -20,6 +21,7 @@ const Home = () => {
             <Placement />
             <Mentors />
             <FAQ />
+            <Location />
         </main>
     );
 };

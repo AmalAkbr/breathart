@@ -10,6 +10,11 @@ const ScrollToTop = () => {
   const { pathname } = useLocation();
 
   useEffect(() => {
+    // Prevent the browser from restoring the previous scroll position
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+    // Force scroll to top on every route change and initial load
     window.scrollTo(0, 0);
   }, [pathname]);
 
