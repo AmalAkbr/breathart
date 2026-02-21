@@ -8,11 +8,12 @@ const CourseCard = ({ title, description, delay }) => (
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ delay, duration: 0.5 }}
-        className="bg-gradient-to-br from-tertiary via-blue-950 to-black border border-white/10 p-8 rounded-2xl hover:border-accent-cyan/50 hover:bg-white/5 transition-all group"
+        className="bg-gradient-to-br from-white to-blue-100/40 border border-slate-200 p-8 rounded-2xl hover:border-accent-cyan/50 transition-all shadow-md hover:shadow-xl group relative overflow-hidden"
     >
-        <h3 className="text-xl font-heading font-bold mb-4 text-white group-hover:text-accent-cyan transition-colors">{title}</h3>
-        <p className="text-slate-400 mb-6 text-sm leading-relaxed">{description}</p>
-        <button className="w-full py-3 rounded-lg border border-accent-cyan text-accent-cyan font-medium hover:bg-accent-cyan hover:text-primary transition-all">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-accent-blue/10 blur-3xl -z-0 pointer-events-none"></div>
+        <h3 className="text-xl font-heading font-bold mb-4 text-slate-900 group-hover:text-accent-cyan transition-colors relative z-10">{title}</h3>
+        <p className="text-slate-600 mb-6 text-sm leading-relaxed relative z-10">{description}</p>
+        <button className="w-full py-3 rounded-lg border border-accent-cyan text-accent-cyan font-medium hover:bg-accent-cyan hover:text-white transition-all">
             Enroll Now
         </button>
     </motion.div>
@@ -20,12 +21,12 @@ const CourseCard = ({ title, description, delay }) => (
 
 const Courses = () => {
     return (
-        <section id="courses" className="py-16 md:py-20">
+        <section id="courses" className="py-16 md:py-20 bg-white theme-light-section">
             <div className="container mx-auto px-4 md:px-6">
 
                 {/* Digital Marketing Block */}
                 <div className="grid lg:grid-cols-2 gap-8 md:gap-12 items-center mb-16 md:mb-20">
-                    <div className="relative h-[250px] md:h-[400px] rounded-2xl border border-white/10 overflow-hidden group shadow-2xl shadow-accent-cyan/10 lg:order-2">
+                    <div className="relative h-[250px] md:h-[400px] rounded-2xl border border-slate-200 overflow-hidden group shadow-xl shadow-accent-cyan/10 lg:order-2">
                         <img
                             src={crs1}
                             alt="Advanced Digital Marketing Course"
@@ -40,21 +41,21 @@ const Courses = () => {
                         className="lg:order-1"
                     >
                         <span className="text-accent-cyan font-bold tracking-wider uppercase mb-2 block">Premium Course</span>
-                        <h2 className="text-4xl font-heading font-bold mb-6 text-white">
+                        <h2 className="text-4xl font-heading font-bold mb-6 text-slate-900">
                             Kerala's First AI-Powered <br /> <span className="text-gradient">Digital Marketing</span> & Creative Institute!
                         </h2>
-                        <p className="text-slate-300 mb-6">
+                        <p className="text-slate-600 mb-6">
                             Join BreathArt Institute's 4-Month Advanced Digital Marketing Course in Trivandrum with live online or offline classes. Master the art of digital dominance with AI integration.
                         </p>
                         <ul className="space-y-3 mb-8">
                             {['Live Industry Expert Faculties', '100% Placement Assistance', 'Soft-skill training', 'Latest industry innovations', 'Brand Collaborations'].map((item, i) => (
-                                <li key={i} className="flex items-center gap-3 text-slate-300">
+                                <li key={i} className="flex items-center gap-3 text-slate-700 font-medium">
                                     <span className="w-5 h-5 rounded-full bg-accent-cyan/20 flex items-center justify-center text-accent-cyan text-xs">✓</span>
                                     {item}
                                 </li>
                             ))}
                         </ul>
-                        <button className="bg-gradient-to-r from-accent-cyan to-accent-blue text-white px-8 py-3 rounded-full font-bold hover:shadow-lg hover:shadow-accent-cyan/20 transition-all">
+                        <button className="bg-gradient-to-r from-accent-cyan to-accent-blue text-white px-8 py-3 rounded-full font-bold shadow-lg hover:shadow-accent-cyan/40 transition-shadow transition-transform hover:-translate-y-1">
                             Enroll Now
                         </button>
                     </motion.div>
@@ -62,7 +63,7 @@ const Courses = () => {
 
                 {/* Creative Education Block */}
                 <div className="grid lg:grid-cols-2 gap-8 md:gap-12 items-center mb-16 md:mb-20">
-                    <div className="relative h-[250px] md:h-[400px] rounded-2xl border border-white/10 overflow-hidden group lg:order-1 shadow-2xl shadow-accent-blue/10">
+                    <div className="relative h-[250px] md:h-[400px] rounded-2xl border border-slate-200 overflow-hidden group lg:order-1 shadow-xl shadow-accent-blue/10">
                         <img
                             src={crs2}
                             alt="Creative Education"
@@ -77,21 +78,21 @@ const Courses = () => {
                         className="lg:order-2"
                     >
                         <span className="text-accent-blue font-bold tracking-wider uppercase mb-2 block">Skill Development</span>
-                        <h2 className="text-3xl md:text-4xl font-heading font-bold mb-6 text-white break-words">
+                        <h2 className="text-3xl md:text-4xl font-heading font-bold mb-6 text-slate-900 break-words">
                             CREATIVE <span className="text-gradient">EDUCATION</span>
                         </h2>
-                        <p className="text-slate-300 mb-6 break-words whitespace-normal">
+                        <p className="text-slate-600 mb-6 break-words whitespace-normal">
                             Learn not just how to design, but how to turn your creativity into results. Our curriculum is designed to bridge the gap between artistic talent and market demands.
                         </p>
                         <ul className="space-y-3 mb-8">
                             {['Industry Experts', 'Practical Learning', 'Regular Class Timings', 'Live Industry Exposure'].map((item, i) => (
-                                <li key={i} className="flex items-center gap-3 text-slate-300">
+                                <li key={i} className="flex items-center gap-3 text-slate-700 font-medium">
                                     <span className="w-5 h-5 rounded-full bg-accent-blue/20 flex items-center justify-center text-accent-blue text-xs">✓</span>
                                     {item}
                                 </li>
                             ))}
                         </ul>
-                        <button className="bg-gradient-to-r from-accent-blue to-purple-600 text-white px-8 py-3 rounded-full font-bold hover:shadow-lg hover:shadow-accent-blue/20 transition-all">
+                        <button className="bg-gradient-to-r from-accent-blue to-purple-600 text-white px-8 py-3 rounded-full font-bold shadow-lg hover:shadow-accent-blue/40 transition-shadow transition-transform hover:-translate-y-1">
                             Enroll Now
                         </button>
                     </motion.div>

@@ -39,19 +39,19 @@ const Logo = ({ className }) => {
             <rect width="200" height="200" rx="40" fill="url(#logo-gradient)" />
 
             {/* M / Eye Shape */}
-            <path d="M60 70C60 60 70 50 85 50H115C130 50 140 60 140 70V100H130V70C130 65 125 60 115 60H85C75 60 70 65 70 70V100H60V70Z" fill="white" />
-            <circle cx="100" cy="90" r="15" stroke="white" strokeWidth="8" />
-            <circle cx="100" cy="90" r="5" fill="white" />
+            <path d="M60 70C60 60 70 50 85 50H115C130 50 140 60 140 70V100H130V70C130 65 125 60 115 60H85C75 60 70 65 70 70V100H60V70Z" fill="currentColor" />
+            <circle cx="100" cy="90" r="15" stroke="currentColor" strokeWidth="8" />
+            <circle cx="100" cy="90" r="5" fill="currentColor" />
 
             {/* Text */}
-            <text x="100" y="140" fontFamily="Arial, sans-serif" fontWeight="bold" fontSize="28" fill="white" textAnchor="middle" letterSpacing="2">BICT</text>
-            <text x="100" y="160" fontFamily="Arial, sans-serif" fontSize="8" fill="white" textAnchor="middle" letterSpacing="1" opacity="0.8">LEARN - CREATE - GROW</text>
+            <text x="100" y="140" fontFamily="Arial, sans-serif" fontWeight="bold" fontSize="28" fill="currentColor" textAnchor="middle" letterSpacing="2">BICT</text>
+            <text x="100" y="160" fontFamily="Arial, sans-serif" fontSize="8" fill="currentColor" textAnchor="middle" letterSpacing="1" opacity="0.8">LEARN - CREATE - GROW</text>
 
             {/* Circular Ring Segment */}
-            <path d="M30 100A70 70 0 1 1 150 150" stroke="white" strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.5" />
+            <path d="M30 100A70 70 0 1 1 150 150" stroke="currentColor" strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.5" />
 
             {/* Pen Nib Icon */}
-            <path d="M150 150L160 140L170 150L160 170L150 150ZM160 155V170" stroke="white" strokeWidth="2" fill="none" />
+            <path d="M150 150L160 140L170 150L160 170L150 150ZM160 155V170" stroke="currentColor" strokeWidth="2" fill="none" />
         </svg>
     );
 };

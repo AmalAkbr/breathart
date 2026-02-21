@@ -1,11 +1,16 @@
 import { motion } from 'framer-motion';
+import Silk from './Silk';
 
 const Location = () => {
     return (
-        <section className="py-20 relative overflow-hidden flex flex-col items-center justify-center">
-            {/* Background Effects */}
-            <div className="absolute inset-0 bg-primary z-0" />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-secondary/20 rounded-full blur-[120px] pointer-events-none z-0" />
+        <section className="py-20 relative overflow-hidden flex flex-col items-center justify-center bg-white">
+            {/* Animated Silk Background */}
+            <div className="absolute inset-0 z-0 bg-secondary">
+                <Silk color="#ffffff" color2="#0284c7" opacity={0.65} />
+            </div>
+
+            {/* Subtle Gradient Overlay to ensure map readability */}
+            <div className="absolute inset-0 bg-primary/40 z-0 pointer-events-none" />
 
             <div className="w-full max-w-[1600px] mx-auto px-4 md:px-12 lg:px-16 relative z-10 flex justify-center">
                 <motion.div
@@ -20,7 +25,7 @@ const Location = () => {
                         <div className="absolute inset-0 bg-slate-800 animate-pulse -z-10" />
 
                         <iframe
-                            src="https://www.google.com/maps/embed?origin=mfe&pb=!1m4!2m1!1sBreathart+Institute+of+Creative+Technology+Karthika+Tower,+Opposite+Wedland+Weddings,+Attingal!5e0!6i13"
+                            src="https://maps.google.com/maps?q=BreathArt+Institute+of+Creative+Technology,+Karthika+Tower,+Opposite+Wedland+Weddings,+Attingal&t=k&z=18&output=embed"
                             width="100%"
                             height="100%"
                             style={{ border: 0 }}

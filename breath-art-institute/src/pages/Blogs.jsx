@@ -29,17 +29,17 @@ const blogs = [
 
 const Blogs = () => {
     return (
-        <div className="min-h-screen bg-bg-dark pt-32 pb-24 w-full max-w-[100vw] overflow-x-hidden">
+        <div className="min-h-screen bg-white pt-32 pb-24 w-full max-w-[100vw] overflow-x-hidden theme-light-section">
             <div className="w-full max-w-[1600px] mx-auto px-4 md:px-12 lg:px-16 py-12">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     className="text-center mb-16"
                 >
-                    <h2 className="text-4xl md:text-5xl font-heading font-bold mb-6 text-white">
+                    <h2 className="text-4xl md:text-5xl font-heading font-bold mb-6 text-slate-900">
                         Digital Marketing <span className="text-gradient">Blogs</span>
                     </h2>
-                    <p className="text-xl text-slate-300 max-w-2xl mx-auto">
+                    <p className="text-xl text-slate-600 max-w-2xl mx-auto">
                         Stay updated with the latest trends, tips, and insights from the world of digital marketing.
                     </p>
                 </motion.div>
@@ -52,17 +52,17 @@ const Blogs = () => {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: index * 0.1 }}
-                            className="bg-bg-mid border border-white/10 p-8 rounded-2xl hover:border-accent-cyan/50 transition-all group flex flex-col h-full"
+                            className="bg-slate-50 border border-slate-200 p-8 rounded-2xl hover:border-accent-cyan/50 hover:shadow-xl shadow-md transition-all group flex flex-col h-full"
                         >
                             <div className="flex items-center gap-4 mb-4">
                                 <span className="text-accent-cyan text-sm font-bold uppercase tracking-wider">{blog.category}</span>
-                                <span className="w-1 h-1 bg-slate-600 rounded-full"></span>
-                                <span className="text-slate-400 text-sm">{blog.date}</span>
+                                <span className="w-1 h-1 bg-slate-300 rounded-full"></span>
+                                <span className="text-slate-500 text-sm">{blog.date}</span>
                             </div>
-                            <h3 className="text-2xl font-bold mb-4 text-white group-hover:text-accent-cyan transition-colors">
+                            <h3 className="text-2xl font-bold mb-4 text-slate-900 group-hover:text-accent-cyan transition-colors">
                                 {blog.title}
                             </h3>
-                            <p className="text-slate-400 mb-6 flex-grow">
+                            <p className="text-slate-600 mb-6 flex-grow">
                                 {blog.summary}
                             </p>
                             <div className="mt-auto">

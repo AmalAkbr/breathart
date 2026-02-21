@@ -7,16 +7,39 @@ import Logo from './Logo';
 const Navbar = () => {
     const [menuOpen, setMenuOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
+    const [isWhiteNav, setIsWhiteNav] = useState(false);
     const location = useLocation();
     const navLinks = ['Home', 'About', 'Courses', 'Blogs', 'Careers'];
 
     useEffect(() => {
         const handleScroll = () => {
             setScrolled(window.scrollY > 20);
+
+            // Force white nav for blogs and careers pages
+            const isInternalLightPage = ['/blogs', '/careers'].includes(location.pathname);
+
+            if (isInternalLightPage) {
+                setIsWhiteNav(true);
+                return;
+            }
+
+            const lightSections = document.querySelectorAll('.theme-light-section');
+            const navCenter = window.scrollY + 40;
+
+            let isLight = false;
+            lightSections.forEach(section => {
+                const top = section.offsetTop;
+                const bottom = top + section.offsetHeight;
+                if (navCenter >= top && navCenter <= bottom) {
+                    isLight = true;
+                }
+            });
+            setIsWhiteNav(isLight);
         };
-        window.addEventListener('scroll', handleScroll);
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        handleScroll();
         return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
+    }, [location.pathname]);
 
     useEffect(() => {
         if (location.hash) {
@@ -33,12 +56,14 @@ const Navbar = () => {
     return (
         <>
             <nav
-                className={`fixed top-0 w-full z-50 transition-all duration-300 border-b ${scrolled
-                    ? 'bg-white/10 backdrop-blur-xl border-white/20 py-2'
-                    : 'bg-transparent border-transparent py-4'
+                className={`fixed top-0 w-full z-50 transition-all duration-300 border-b ${isWhiteNav
+                    ? 'bg-white/90 backdrop-blur-xl border-slate-200 shadow-sm py-2'
+                    : scrolled
+                        ? 'bg-white/10 backdrop-blur-xl border-white/20 py-2'
+                        : 'bg-transparent border-transparent py-4'
                     }`}
             >
-                <div className="w-full px-4 md:px-12 flex justify-between items-center text-white">
+                <div className={`w-full px-4 md:px-12 flex justify-between items-center transition-colors duration-300 ${isWhiteNav ? 'text-blue-900' : 'text-white'}`}>
                     {/* Logo */}
                     <Link
                         to="/"
@@ -58,7 +83,7 @@ const Navbar = () => {
                             <Logo className="w-10 h-10 md:w-14 md:h-14" />
                             <div className="flex flex-col">
                                 <span className="text-base md:text-xl font-heading font-bold text-gradient leading-tight">BreathArt Institute</span>
-                                <span className="text-[9px] md:text-xs text-slate-300 tracking-widest hidden sm:block">LEARN | CREATE | GROW</span>
+                                <span className={`text-[9px] md:text-xs tracking-widest hidden sm:block transition-colors duration-300 ${isWhiteNav ? 'text-blue-800' : 'text-slate-300'}`}>LEARN | CREATE | GROW</span>
                             </div>
                         </motion.div>
                     </Link>
@@ -87,18 +112,18 @@ const Navbar = () => {
                                         <Link
                                             to={path}
                                             onClick={handleHomeClick}
-                                            className="text-slate-200 hover:text-white transition-colors duration-300 text-sm uppercase tracking-widest font-medium relative group"
+                                            className={`transition-colors duration-300 text-sm uppercase tracking-widest font-medium relative group ${isWhiteNav ? 'text-blue-900 hover:text-accent-blue' : 'text-slate-200 hover:text-white'}`}
                                         >
                                             {item}
-                                            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent-cyan transition-all duration-300 group-hover:w-full" />
+                                            <span className={`absolute -bottom-1 left-0 w-0 h-0.5 transition-all duration-300 group-hover:w-full ${isWhiteNav ? 'bg-accent-blue' : 'bg-accent-cyan'}`} />
                                         </Link>
                                     ) : (
                                         <a
                                             href={path}
-                                            className="text-slate-200 hover:text-white transition-colors duration-300 text-sm uppercase tracking-widest font-medium relative group"
+                                            className={`transition-colors duration-300 text-sm uppercase tracking-widest font-medium relative group ${isWhiteNav ? 'text-blue-900 hover:text-accent-blue' : 'text-slate-200 hover:text-white'}`}
                                         >
                                             {item}
-                                            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent-cyan transition-all duration-300 group-hover:w-full" />
+                                            <span className={`absolute -bottom-1 left-0 w-0 h-0.5 transition-all duration-300 group-hover:w-full ${isWhiteNav ? 'bg-accent-blue' : 'bg-accent-cyan'}`} />
                                         </a>
                                     )}
                                 </motion.div>
@@ -108,9 +133,9 @@ const Navbar = () => {
 
                     {/* Right side */}
                     <div className="flex items-center gap-2 md:gap-3">
-                        <div className="hidden md:flex gap-3 pr-2 border-r border-white/10">
-                            <Instagram className="w-5 h-5 text-slate-300 hover:text-accent-cyan cursor-pointer transition-colors" />
-                            <Facebook className="w-5 h-5 text-slate-300 hover:text-accent-blue cursor-pointer transition-colors" />
+                        <div className={`hidden md:flex gap-3 pr-2 border-r transition-colors duration-300 ${isWhiteNav ? 'border-blue-200' : 'border-white/10'}`}>
+                            <Instagram className={`w-5 h-5 cursor-pointer transition-colors ${isWhiteNav ? 'text-blue-800 hover:text-accent-blue' : 'text-slate-300 hover:text-accent-cyan'}`} />
+                            <Facebook className={`w-5 h-5 cursor-pointer transition-colors ${isWhiteNav ? 'text-blue-800 hover:text-accent-blue' : 'text-slate-300 hover:text-accent-blue'}`} />
                         </div>
                         <motion.button
                             initial={{ opacity: 0, x: 20 }}
@@ -123,7 +148,7 @@ const Navbar = () => {
                         </motion.button>
                         {/* Mobile hamburger */}
                         <button
-                            className="lg:hidden p-2 text-white rounded-lg hover:bg-white/10 transition-colors"
+                            className={`lg:hidden p-2 rounded-lg transition-colors ${isWhiteNav ? 'text-blue-900 hover:bg-blue-100' : 'text-white hover:bg-white/10'}`}
                             onClick={() => setMenuOpen(!menuOpen)}
                             aria-label="Toggle menu"
                         >
@@ -141,7 +166,7 @@ const Navbar = () => {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -20 }}
                         transition={{ duration: 0.3 }}
-                        className="fixed top-0 left-0 right-0 z-40 bg-[#0a0f1a]/95 backdrop-blur-2xl border-b border-white/10 lg:hidden overflow-hidden pt-24"
+                        className={`fixed top-0 left-0 right-0 z-40 backdrop-blur-2xl border-b lg:hidden overflow-hidden pt-24 ${isWhiteNav ? 'bg-white/95 border-slate-200' : 'bg-[#0a0f1a]/95 border-white/10'}`}
                     >
                         <div className="w-full px-6 pb-12 flex flex-col gap-6">
                             {navLinks.map((item) => {
@@ -161,26 +186,26 @@ const Navbar = () => {
                                         key={item}
                                         to={path}
                                         onClick={handleHomeClick}
-                                        className="text-slate-200 hover:text-accent-cyan text-2xl font-bold py-3 border-b border-white/5 last:border-none transition-colors flex justify-between items-center group"
+                                        className={`text-2xl font-bold py-3 border-b last:border-none transition-colors flex justify-between items-center group ${isWhiteNav ? 'text-blue-900 border-slate-100' : 'text-slate-200 border-white/5'}`}
                                     >
                                         {item}
-                                        <span className="w-2 h-2 rounded-full bg-accent-cyan opacity-0 group-hover:opacity-100 transition-opacity" />
+                                        <span className={`w-2 h-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity ${isWhiteNav ? 'bg-accent-blue' : 'bg-accent-cyan'}`} />
                                     </Link>
                                 ) : (
                                     <a
                                         key={item}
                                         href={path}
                                         onClick={() => setMenuOpen(false)}
-                                        className="text-slate-200 hover:text-accent-cyan text-2xl font-bold py-3 border-b border-white/5 last:border-none transition-colors flex justify-between items-center group"
+                                        className={`text-2xl font-bold py-3 border-b last:border-none transition-colors flex justify-between items-center group ${isWhiteNav ? 'text-blue-900 border-slate-100' : 'text-slate-200 border-white/5'}`}
                                     >
                                         {item}
-                                        <span className="w-2 h-2 rounded-full bg-accent-cyan opacity-0 group-hover:opacity-100 transition-opacity" />
+                                        <span className={`w-2 h-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity ${isWhiteNav ? 'bg-accent-blue' : 'bg-accent-cyan'}`} />
                                     </a>
                                 );
                             })}
                             <div className="flex gap-6 pt-6">
-                                <Instagram className="w-6 h-6 text-slate-400 hover:text-accent-cyan cursor-pointer transition-colors" />
-                                <Facebook className="w-6 h-6 text-slate-400 hover:text-accent-blue cursor-pointer transition-colors" />
+                                <Instagram className={`w-6 h-6 cursor-pointer transition-colors ${isWhiteNav ? 'text-blue-800 hover:text-accent-blue' : 'text-slate-400 hover:text-accent-cyan'}`} />
+                                <Facebook className={`w-6 h-6 cursor-pointer transition-colors ${isWhiteNav ? 'text-blue-800 hover:text-accent-blue' : 'text-slate-400 hover:text-accent-blue'}`} />
                             </div>
                         </div>
                     </motion.div>

@@ -12,14 +12,14 @@ const logos = [
 
 const PartnerLogos = () => {
     return (
-        <section className="py-10 bg-secondary/50 backdrop-blur-md border-y border-white/5 overflow-hidden">
+        <section className="py-10 bg-white border-y border-slate-200 overflow-hidden theme-light-section">
             <div className="w-full max-w-[1600px] mx-auto px-4 md:px-12 lg:px-16">
-                <p className="text-center text-slate-400 text-xs tracking-widest uppercase mb-10 opacity-60">Trusted Partners & Affiliations</p>
+                <p className="text-center text-slate-500 text-xs tracking-widest uppercase mb-10 opacity-80">Trusted Partners & Affiliations</p>
 
                 <div className="w-full max-w-[100vw] overflow-hidden relative">
                     <div className="flex overflow-hidden relative max-w-2xl mx-auto px-4 md:px-12">
-                        <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-secondary/80 to-transparent z-10" />
-                        <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-secondary/80 to-transparent z-10" />
+                        <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-white via-white/80 to-transparent z-10" />
+                        <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-white via-white/80 to-transparent z-10" />
 
                         <motion.div
                             className="flex gap-24 items-center"
@@ -36,9 +36,6 @@ const PartnerLogos = () => {
                                             onError={(e) => { e.target.style.display = 'none'; console.error(`Failed to load logo: ${logo.name}`); }}
                                         />
                                     </div>
-                                    {logo.name === 'Meta' && (
-                                        <span className="text-[10px] text-slate-500 font-medium tracking-[0.2em] mt-1 lg:mt-2 uppercase">meta</span>
-                                    )}
                                 </div>
                             ))}
                         </motion.div>
