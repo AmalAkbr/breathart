@@ -1,0 +1,117 @@
+@import "tailwindcss";
+
+@theme {
+  /* === 80% Dark Blue Palette === */
+  --color-bg-dark: #0a192f;
+  /* Navy Blue – darkest background */
+  --color-bg-mid: #112240;
+  /* Midnight Blue – section bg */
+  --color-bg-light: #1e3a5f;
+  /* Royal Blue – card/element bg */
+
+  /* Legacy aliases (keep for gradual migration) */
+  --color-primary: #0a192f;
+  /* maps primary → darkest bg */
+  --color-secondary: #112240;
+  /* maps secondary → midnight */
+  --color-tertiary: #1e3a5f;
+  /* maps tertiary → royal blue */
+
+  /* === 15% White (text, icons, highlights) === */
+  --color-white: #ffffff;
+
+  /* === 5% Black (borders, shadows, footer) === */
+  --color-black: #0a0f1a;
+  /* near-black with blue tint */
+
+  /* === Accent colors === */
+  --color-accent-cyan: #06b6d4;
+  /* Cyan 500 */
+  --color-accent-blue: #3b82f6;
+  /* Blue 500 */
+
+  /* === Text === */
+  --color-text-primary: #ffffff;
+  /* White – main text on dark bg */
+  --color-text-secondary: #94a3b8;
+  /* Slate 400 – secondary text */
+
+  --font-sans: 'Inter', sans-serif;
+  --font-heading: 'Outfit', sans-serif;
+
+  --animate-float: float 6s ease-in-out infinite;
+
+  @keyframes float {
+
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-20px);
+    }
+  }
+}
+
+/* Custom Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+.animate-slide-down {
+  animation: slideDown 0.3s ease-out forwards;
+}
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: dark;
+  color: #ffffff;
+  background-color: #0a192f;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+  background: linear-gradient(160deg, #0a192f 0%, #112240 50%, #0a192f 100%);
+  color: #ffffff;
+}
+
+@utility text-gradient {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-accent-cyan to-accent-blue;
+}
