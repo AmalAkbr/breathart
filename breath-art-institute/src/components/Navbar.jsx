@@ -134,8 +134,12 @@ const Navbar = () => {
                     {/* Right side */}
                     <div className="flex items-center gap-2 md:gap-3">
                         <div className={`hidden md:flex gap-3 pr-2 border-r transition-colors duration-300 ${isWhiteNav ? 'border-blue-200' : 'border-white/10'}`}>
-                            <Instagram className={`w-5 h-5 cursor-pointer transition-colors ${isWhiteNav ? 'text-blue-800 hover:text-accent-blue' : 'text-slate-300 hover:text-accent-cyan'}`} />
-                            <Facebook className={`w-5 h-5 cursor-pointer transition-colors ${isWhiteNav ? 'text-blue-800 hover:text-accent-blue' : 'text-slate-300 hover:text-accent-blue'}`} />
+                            <a href="https://www.instagram.com/breathart.institute/" target="_blank" rel="noopener noreferrer" className="flex">
+                                <Instagram className={`w-5 h-5 cursor-pointer transition-colors ${isWhiteNav ? 'text-blue-800 hover:text-accent-blue' : 'text-slate-300 hover:text-accent-cyan'}`} />
+                            </a>
+                            <a href="https://www.facebook.com/people/Breathart-institute-of-creative-technology/61579983401340/" target="_blank" rel="noopener noreferrer" className="flex">
+                                <Facebook className={`w-5 h-5 cursor-pointer transition-colors ${isWhiteNav ? 'text-blue-800 hover:text-accent-blue' : 'text-slate-300 hover:text-accent-blue'}`} />
+                            </a>
                         </div>
                         <motion.button
                             initial={{ opacity: 0, x: 20 }}
@@ -204,8 +208,12 @@ const Navbar = () => {
                                 );
                             })}
                             <div className="flex gap-6 pt-6">
-                                <Instagram className={`w-6 h-6 cursor-pointer transition-colors ${isWhiteNav ? 'text-blue-800 hover:text-accent-blue' : 'text-slate-400 hover:text-accent-cyan'}`} />
-                                <Facebook className={`w-6 h-6 cursor-pointer transition-colors ${isWhiteNav ? 'text-blue-800 hover:text-accent-blue' : 'text-slate-400 hover:text-accent-blue'}`} />
+                                <a href="https://www.instagram.com/breathart.institute/" target="_blank" rel="noopener noreferrer" className="flex">
+                                    <Instagram className={`w-6 h-6 cursor-pointer transition-colors ${isWhiteNav ? 'text-blue-800 hover:text-accent-blue' : 'text-slate-400 hover:text-accent-cyan'}`} />
+                                </a>
+                                <a href="https://www.facebook.com/people/Breathart-institute-of-creative-technology/61579983401340/" target="_blank" rel="noopener noreferrer" className="flex">
+                                    <Facebook className={`w-6 h-6 cursor-pointer transition-colors ${isWhiteNav ? 'text-blue-800 hover:text-accent-blue' : 'text-slate-400 hover:text-accent-blue'}`} />
+                                </a>
                             </div>
                         </div>
                     </motion.div>

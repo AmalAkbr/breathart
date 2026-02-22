@@ -12,8 +12,8 @@ const logos = [
 
 const PartnerLogos = () => {
     return (
-        <section className="py-10 bg-white border-y border-slate-200 overflow-hidden theme-light-section">
-            <div className="w-full max-w-[1600px] mx-auto px-4 md:px-12 lg:px-16">
+        <section className="pt-10 pb-16 bg-white overflow-hidden theme-light-section relative z-10">
+            <div className="w-full max-w-[1600px] mx-auto px-4 md:px-12 lg:px-16 relative z-10">
                 <p className="text-center text-slate-500 text-xs tracking-widest uppercase mb-10 opacity-80">Trusted Partners & Affiliations</p>
 
                 <div className="w-full max-w-[100vw] overflow-hidden relative">

@@ -14,8 +14,25 @@ const ScrollToTop = () => {
     if ('scrollRestoration' in window.history) {
       window.history.scrollRestoration = 'manual';
     }
+
+    // If reloading with a hash (like /#about), strip it to force starting at the top Hero section
+    if (window.location.hash) {
+      window.history.replaceState(null, '', window.location.pathname);
+    }
+
     // Force scroll to top on every route change and initial load
     window.scrollTo(0, 0);
+    setTimeout(() => {
+      window.scrollTo(0, 0);
+    }, 50);
+
+    // Also force scroll to top right before the page unloads/reloads
+    const handleBeforeUnload = () => window.scrollTo(0, 0);
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
   }, [pathname]);
 
   return null;
