@@ -15,8 +15,8 @@ const Navbar = () => {
         const handleScroll = () => {
             setScrolled(window.scrollY > 20);
 
-            // Force white nav for blogs and careers pages
-            const isInternalLightPage = ['/blogs', '/careers'].includes(location.pathname);
+            // Force white nav for blogs, careers, and courses pages
+            const isInternalLightPage = ['/blogs', '/careers', '/courses', '/about', '/admission'].includes(location.pathname);
 
             if (isInternalLightPage) {
                 setIsWhiteNav(true);
@@ -91,7 +91,7 @@ const Navbar = () => {
                     {/* Desktop Nav */}
                     <div className="hidden lg:flex items-center space-x-10">
                         {navLinks.map((item, index) => {
-                            const isInternalPage = ['About', 'Blogs', 'Careers'].includes(item);
+                            const isInternalPage = ['About', 'Courses', 'Blogs', 'Careers'].includes(item);
                             const path = isInternalPage ? `/${item.toLowerCase()}` : (item === 'Home' ? '/' : `/#${item.toLowerCase()}`);
 
                             const handleHomeClick = (e) => {
@@ -176,7 +176,7 @@ const Navbar = () => {
                     >
                         <div className="w-full px-6 pb-12 flex flex-col gap-6">
                             {navLinks.map((item) => {
-                                const isInternalPage = ['About', 'Blogs', 'Careers'].includes(item);
+                                const isInternalPage = ['About', 'Courses', 'Blogs', 'Careers'].includes(item);
                                 const path = isInternalPage ? `/${item.toLowerCase()}` : (item === 'Home' ? '/' : `/#${item.toLowerCase()}`);
 
                                 const handleHomeClick = (e) => {

@@ -20,7 +20,7 @@ export const LiquidChrome = ({
         const container = containerRef.current;
         const renderer = new Renderer({ antialias: true, alpha: true });
         const gl = renderer.gl;
-        // Set alpha to true and clear color to transparent
+        // Transparent background
         gl.clearColor(0, 0, 0, 0);
 
         const vertexShader = `
@@ -96,9 +96,8 @@ export const LiquidChrome = ({
         const mesh = new Mesh(gl, { geometry, program });
 
         function resize() {
-            const width = container.offsetWidth;
-            const height = container.offsetHeight;
-            renderer.setSize(width, height);
+            const scale = 1;
+            renderer.setSize(container.offsetWidth * scale, container.offsetHeight * scale);
             const resUniform = program.uniforms.uResolution.value;
             resUniform[0] = gl.canvas.width;
             resUniform[1] = gl.canvas.height;
@@ -153,6 +152,7 @@ export const LiquidChrome = ({
             if (gl.canvas.parentElement) {
                 gl.canvas.parentElement.removeChild(gl.canvas);
             }
+            gl.getExtension('WEBGL_lose_context')?.loseContext();
         };
     }, [baseColor, speed, amplitude, frequencyX, frequencyY, interactive]);
 
