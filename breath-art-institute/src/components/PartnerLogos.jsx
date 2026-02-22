@@ -22,11 +22,11 @@ const PartnerLogos = () => {
                         <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-white via-white/80 to-transparent z-10" />
 
                         <motion.div
-                            className="flex gap-24 items-center"
+                            className="flex gap-24 items-center pr-24 w-max"
                             animate={{ x: ["0%", "-50%"] }}
-                            transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+                            transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
                         >
-                            {[...logos, ...logos].map((logo, index) => (
+                            {[...logos, ...logos, ...logos, ...logos].map((logo, index) => (
                                 <div key={index} className="flex flex-col items-center hover:scale-110 transition-transform duration-500 cursor-pointer flex-shrink-0">
                                     <div className="h-14 w-auto flex items-center justify-center">
                                         <img

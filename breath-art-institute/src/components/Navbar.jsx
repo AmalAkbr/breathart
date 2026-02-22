@@ -91,7 +91,7 @@ const Navbar = () => {
                     {/* Desktop Nav */}
                     <div className="hidden lg:flex items-center space-x-10">
                         {navLinks.map((item, index) => {
-                            const isInternalPage = ['Blogs', 'Careers'].includes(item);
+                            const isInternalPage = ['About', 'Blogs', 'Careers'].includes(item);
                             const path = isInternalPage ? `/${item.toLowerCase()}` : (item === 'Home' ? '/' : `/#${item.toLowerCase()}`);
 
                             const handleHomeClick = (e) => {
@@ -141,15 +141,17 @@ const Navbar = () => {
                                 <Facebook className={`w-5 h-5 cursor-pointer transition-colors ${isWhiteNav ? 'text-blue-800 hover:text-accent-blue' : 'text-slate-300 hover:text-accent-blue'}`} />
                             </a>
                         </div>
-                        <motion.button
-                            initial={{ opacity: 0, x: 20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            className="bg-gradient-to-r from-accent-cyan to-accent-blue text-white px-5 md:px-7 py-2.5 rounded-full font-bold shadow-lg shadow-accent-blue/20 text-sm hover:shadow-accent-cyan/40 transition-shadow"
-                        >
-                            Admission
-                        </motion.button>
+                        <Link to="/admission">
+                            <motion.button
+                                initial={{ opacity: 0, x: 20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                className="bg-gradient-to-r from-accent-cyan to-accent-blue text-white px-5 md:px-7 py-2.5 rounded-full font-bold shadow-lg shadow-accent-blue/20 text-sm hover:shadow-accent-cyan/40 transition-shadow"
+                            >
+                                Admission
+                            </motion.button>
+                        </Link>
                         {/* Mobile hamburger */}
                         <button
                             className={`lg:hidden p-2 rounded-lg transition-colors ${isWhiteNav ? 'text-blue-900 hover:bg-blue-100' : 'text-white hover:bg-white/10'}`}
@@ -174,7 +176,7 @@ const Navbar = () => {
                     >
                         <div className="w-full px-6 pb-12 flex flex-col gap-6">
                             {navLinks.map((item) => {
-                                const isInternalPage = ['Blogs', 'Careers'].includes(item);
+                                const isInternalPage = ['About', 'Blogs', 'Careers'].includes(item);
                                 const path = isInternalPage ? `/${item.toLowerCase()}` : (item === 'Home' ? '/' : `/#${item.toLowerCase()}`);
 
                                 const handleHomeClick = (e) => {

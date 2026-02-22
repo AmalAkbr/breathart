@@ -1,0 +1,55 @@
+.star-border-container {
+    position: relative;
+    display: inline-block;
+    overflow: hidden;
+    border-radius: inherit;
+    width: 100%;
+}
+
+.star-border-container::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    /* thickness */
+    background: transparent;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+}
+
+.border-gradient-bottom,
+.border-gradient-top {
+    position: absolute;
+    inset: -100%;
+    width: 300%;
+    aspect-ratio: 1;
+    opacity: 0.5;
+    pointer-events: none;
+    animation: star-spin linear infinite;
+    z-index: 0;
+}
+
+.border-gradient-bottom {
+    animation-direction: reverse;
+}
+
+.inner-content {
+    position: relative;
+    border-radius: inherit;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+@keyframes star-spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}

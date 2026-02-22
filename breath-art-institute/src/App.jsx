@@ -5,6 +5,8 @@ import Footer from './components/Footer';
 import Home from './pages/Home';
 import Blogs from './pages/Blogs';
 import Careers from './pages/Careers';
+import Admission from './pages/Admission';
+import AboutUs from './pages/AboutUs';
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -46,8 +48,10 @@ function App() {
         <Navbar />
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/about" element={<AboutUs />} />
           <Route path="/blogs" element={<Blogs />} />
           <Route path="/careers" element={<Careers />} />
+          <Route path="/admission" element={<Admission />} />
         </Routes>
         <Footer />
       </div>
