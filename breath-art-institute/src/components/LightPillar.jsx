@@ -61,7 +61,7 @@ const LightPillar = ({
             high: {
                 iterations: 80,
                 waveIterations: 4,
-                pixelRatio: Math.min(window.devicePixelRatio, 2),
+                pixelRatio: Math.min(window.devicePixelRatio, 1.5),
                 precision: 'highp',
                 stepMultiplier: 1.0
             }

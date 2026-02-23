@@ -9,9 +9,10 @@ const CourseCard = ({ title, description, delay }) => (
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ delay, duration: 0.5 }}
+        style={{ willChange: "transform, opacity" }}
         className="bg-gradient-to-br from-white to-blue-100/40 border border-slate-200 p-8 rounded-2xl hover:border-accent-cyan/50 transition-all shadow-md hover:shadow-xl group relative overflow-hidden"
     >
-        <div className="absolute top-0 right-0 w-32 h-32 bg-accent-blue/10 blur-3xl -z-0 pointer-events-none"></div>
+        <div className="absolute top-0 right-0 w-32 h-32 bg-accent-blue/10 blur-3xl -z-0 pointer-events-none transform-gpu will-change-transform"></div>
         <h3 className="text-xl font-heading font-bold mb-4 text-slate-900 group-hover:text-accent-cyan transition-colors relative z-10">{title}</h3>
         <p className="text-slate-600 mb-6 text-sm leading-relaxed relative z-10">{description}</p>
         <button className="w-full py-3 rounded-lg border border-accent-cyan text-accent-cyan font-medium hover:bg-accent-cyan hover:text-white transition-all">
@@ -39,7 +40,7 @@ const Courses = () => {
                         <img
                             src={crs1}
                             alt="Advanced Digital Marketing Course"
-                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 transform-gpu"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                     </div>
@@ -47,6 +48,7 @@ const Courses = () => {
                         initial={{ opacity: 0, x: -50 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
+                        style={{ willChange: "transform, opacity" }}
                         className="lg:order-1"
                     >
                         <span className="text-accent-cyan font-bold tracking-wider uppercase mb-2 block">Premium Course</span>
@@ -64,7 +66,7 @@ const Courses = () => {
                                 </li>
                             ))}
                         </ul>
-                        <button className="bg-gradient-to-r from-accent-cyan to-accent-blue text-white px-8 py-3 rounded-full font-bold shadow-lg hover:shadow-accent-cyan/40 transition-shadow transition-transform hover:-translate-y-1">
+                        <button className="bg-gradient-to-r from-accent-cyan to-accent-blue text-white px-8 py-3 rounded-full font-bold shadow-lg hover:shadow-accent-cyan/40 transition-all transform-gpu hover:-translate-y-1">
                             Enroll Now
                         </button>
                     </motion.div>
@@ -76,7 +78,7 @@ const Courses = () => {
                         <img
                             src={crs2}
                             alt="Creative Education"
-                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 transform-gpu"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                     </div>
@@ -84,6 +86,7 @@ const Courses = () => {
                         initial={{ opacity: 0, x: 50 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
+                        style={{ willChange: "transform, opacity" }}
                         className="lg:order-2"
                     >
                         <span className="text-accent-blue font-bold tracking-wider uppercase mb-2 block">Skill Development</span>
@@ -101,7 +104,7 @@ const Courses = () => {
                                 </li>
                             ))}
                         </ul>
-                        <button className="bg-gradient-to-r from-accent-blue to-purple-600 text-white px-8 py-3 rounded-full font-bold shadow-lg hover:shadow-accent-blue/40 transition-shadow transition-transform hover:-translate-y-1">
+                        <button className="bg-gradient-to-r from-accent-blue to-purple-600 text-white px-8 py-3 rounded-full font-bold shadow-lg hover:shadow-accent-blue/40 transition-all transform-gpu hover:-translate-y-1">
                             Enroll Now
                         </button>
                     </motion.div>

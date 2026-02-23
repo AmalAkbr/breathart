@@ -20,9 +20,9 @@ const Hero = () => {
             </div>
 
             {/* Background Gradient Blobs */}
-            <div className="absolute top-0 right-0 w-[400px] md:w-[600px] h-[400px] md:h-[600px] bg-accent-blue/40 rounded-full blur-[100px] md:blur-[120px] animate-pulse pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-[400px] md:w-[600px] h-[400px] md:h-[600px] bg-accent-cyan/30 rounded-full blur-[100px] md:blur-[120px] animate-pulse delay-1000 pointer-events-none" />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] md:w-[400px] h-[300px] md:h-[400px] bg-blue-700/20 rounded-full blur-[80px] md:blur-[100px] pointer-events-none" />
+            <div className="absolute top-0 right-0 w-[400px] md:w-[600px] h-[400px] md:h-[600px] bg-accent-blue/40 rounded-full blur-[100px] md:blur-[120px] animate-pulse pointer-events-none transform-gpu will-change-transform" />
+            <div className="absolute bottom-0 left-0 w-[400px] md:w-[600px] h-[400px] md:h-[600px] bg-accent-cyan/30 rounded-full blur-[100px] md:blur-[120px] animate-pulse delay-1000 pointer-events-none transform-gpu will-change-transform" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] md:w-[400px] h-[300px] md:h-[400px] bg-blue-700/20 rounded-full blur-[80px] md:blur-[100px] pointer-events-none transform-gpu will-change-transform" />
 
             <div className="w-full px-4 md:px-12 grid lg:grid-cols-2 gap-8 md:gap-12 items-center z-10 py-12 md:py-20">
                 {/* Text Content */}
@@ -31,6 +31,7 @@ const Hero = () => {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8 }}
+                        style={{ willChange: "transform, opacity" }}
                         className="text-accent-cyan font-bold tracking-wider mb-3 uppercase text-xs md:text-sm"
                     >
                         Kerala's Most Advanced Digital Marketing Training Programme
@@ -40,6 +41,7 @@ const Hero = () => {
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8, delay: 0.2 }}
+                        style={{ willChange: "transform, opacity" }}
                         className="text-[2rem] sm:text-4xl md:text-6xl lg:text-7xl font-heading font-bold mb-6 text-white leading-tight break-words"
                     >
                         Kerala's Best <br />
@@ -52,9 +54,10 @@ const Hero = () => {
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8, delay: 0.4 }}
+                        style={{ willChange: "transform, opacity" }}
                         className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start w-full"
                     >
-                        <Link to="/courses" className="bg-gradient-to-r from-accent-cyan to-accent-blue text-white px-8 py-3 rounded-full font-bold hover:shadow-lg hover:shadow-accent-cyan/30 transition-all transform hover:-translate-y-1 w-full sm:w-auto break-words whitespace-normal text-center inline-block">
+                        <Link to="/courses" className="bg-gradient-to-r from-accent-cyan to-accent-blue text-white px-8 py-3 rounded-full font-bold hover:shadow-lg hover:shadow-accent-cyan/30 transition-all transform-gpu hover:-translate-y-1 w-full sm:w-auto break-words whitespace-normal text-center inline-block">
                             Explore Courses
                         </Link>
                         <button className="border border-white/30 text-white px-8 py-3 rounded-full font-bold hover:bg-white/10 transition-colors w-full sm:w-auto break-words whitespace-normal text-center">

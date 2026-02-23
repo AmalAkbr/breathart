@@ -21,8 +21,8 @@ const VisionMission = () => {
             </div>
 
             {/* Background decorative elements */}
-            <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-accent-blue/10 rounded-full blur-[120px] pointer-events-none mix-blend-screen" />
-            <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-accent-cyan/10 rounded-full blur-[120px] pointer-events-none mix-blend-screen" />
+            <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-accent-blue/10 rounded-full blur-[120px] pointer-events-none mix-blend-screen transform-gpu will-change-transform" />
+            <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-accent-cyan/10 rounded-full blur-[120px] pointer-events-none mix-blend-screen transform-gpu will-change-transform" />
 
             <div className="w-full max-w-[1600px] mx-auto px-4 md:px-12 lg:px-16 relative z-10">
                 <div className="text-center mb-16 lg:mb-24">
@@ -38,6 +38,7 @@ const VisionMission = () => {
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true, margin: "-100px" }}
                         transition={{ duration: 1.2, type: "spring", bounce: 0.3 }}
+                        style={{ willChange: "transform, opacity" }}
                         className="w-full h-full lg:min-h-[350px]"
                     >
                         <TiltedCard
@@ -78,6 +79,7 @@ const VisionMission = () => {
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true, margin: "-100px" }}
                         transition={{ duration: 1.2, delay: 0.2, type: "spring", bounce: 0.3 }}
+                        style={{ willChange: "transform, opacity" }}
                         className="w-full h-full lg:min-h-[350px] lg:translate-y-8"
                     >
                         <TiltedCard

@@ -66,8 +66,20 @@ const Footer = () => {
                     <p className="text-slate-500 text-sm">
                         © {new Date().getFullYear()} BreathArt Institute. All rights reserved. Part of BreathArt Group (Dubai/Ajman).
                     </p>
-                    <div className="text-xs text-slate-500 flex items-center gap-2">
+                    <div className="text-xs text-slate-500 flex flex-col md:flex-row items-center gap-2 md:gap-6">
                         <span>📍 Located in Trivandrum, Kerala</span>
+                        <span className="opacity-50 hidden md:block">|</span>
+                        <span>
+                            Developed by{' '}
+                            <a
+                                href="https://www.instagram.com/intellex.web?igsh=MXc4Z2Uwd243OHpqdA=="
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="font-bold text-accent-cyan hover:text-white transition-colors uppercase tracking-wider"
+                            >
+                                INTELLEX
+                            </a>
+                        </span>
                     </div>
                 </div>
             </div>
