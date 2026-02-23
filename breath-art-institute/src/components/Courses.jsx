@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import crs1 from '../assets/crs1.png';
 import crs2 from '../assets/crs2.png';
+import SplitText from './SplitText';
 
 const CourseCard = ({ title, description, delay }) => (
     <motion.div
@@ -23,6 +24,14 @@ const Courses = () => {
     return (
         <section id="courses" className="py-16 md:py-20 bg-white theme-light-section">
             <div className="container mx-auto px-4 md:px-6">
+
+                {/* Section Title */}
+                <div className="text-center mb-16 lg:mb-20 pt-8">
+                    <span className="text-accent-blue font-bold tracking-wider uppercase mb-3 block">Expert-Led Curriculum</span>
+                    <h2 className="text-4xl md:text-5xl lg:text-6xl font-heading font-black text-slate-900 tracking-tight">
+                        <SplitText text="Explore Our Premium Courses" delay={40} splitType="words" duration={0.8} rootMargin="-50px" />
+                    </h2>
+                </div>
 
                 {/* Digital Marketing Block */}
                 <div className="grid lg:grid-cols-2 gap-8 md:gap-12 items-center mb-16 md:mb-20">

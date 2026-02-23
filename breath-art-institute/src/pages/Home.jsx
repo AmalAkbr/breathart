@@ -6,6 +6,7 @@ import Courses from '../components/Courses';
 import Certifications from '../components/Certifications';
 import Placement from '../components/Placement';
 import Mentors from '../components/Mentors';
+import DigitalMarketingCareer from '../components/DigitalMarketingCareer';
 import FAQ from '../components/FAQ';
 import Location from '../components/Location';
 
@@ -20,6 +21,7 @@ const Home = () => {
             <Certifications />
             <Placement />
             <Mentors />
+            <DigitalMarketingCareer />
             <FAQ />
             <Location />
         </main>

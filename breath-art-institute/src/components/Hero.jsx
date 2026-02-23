@@ -2,6 +2,8 @@ import { motion } from 'framer-motion';
 import heroCharacter from '../assets/hero.png';
 import LiquidChrome from './LiquidChrome';
 
+import { Link } from 'react-router-dom';
+
 const Hero = () => {
     return (
         <section id="home" className="min-h-screen flex items-center justify-center relative overflow-hidden bg-primary pt-16">
@@ -52,9 +54,9 @@ const Hero = () => {
                         transition={{ duration: 0.8, delay: 0.4 }}
                         className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start w-full"
                     >
-                        <button className="bg-gradient-to-r from-accent-cyan to-accent-blue text-white px-8 py-3 rounded-full font-bold hover:shadow-lg hover:shadow-accent-cyan/30 transition-all transform hover:-translate-y-1 w-full sm:w-auto break-words whitespace-normal text-center">
+                        <Link to="/courses" className="bg-gradient-to-r from-accent-cyan to-accent-blue text-white px-8 py-3 rounded-full font-bold hover:shadow-lg hover:shadow-accent-cyan/30 transition-all transform hover:-translate-y-1 w-full sm:w-auto break-words whitespace-normal text-center inline-block">
                             Explore Courses
-                        </button>
+                        </Link>
                         <button className="border border-white/30 text-white px-8 py-3 rounded-full font-bold hover:bg-white/10 transition-colors w-full sm:w-auto break-words whitespace-normal text-center">
                             Contact Us
                         </button>

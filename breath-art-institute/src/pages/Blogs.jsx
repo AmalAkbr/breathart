@@ -370,7 +370,7 @@ const Blogs = () => {
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: -50 }}
                             transition={{ duration: 0.4 }}
-                            className="grid md:grid-cols-2 gap-8"
+                            className="grid md:grid-cols-2 gap-8 w-full"
                         >
                             {currentBlogs.map((blog, index) => (
                                 <motion.article

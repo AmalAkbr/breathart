@@ -1,0 +1,68 @@
+.tilted-card-figure {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+    perspective: 1200px;
+    /* Essential for 3D effect */
+}
+
+.tilted-card-mobile-alert {
+    position: absolute;
+    top: -30px;
+    font-size: 0.8rem;
+    color: #ffaa00;
+}
+
+.tilted-card-inner {
+    position: relative;
+    transform-style: preserve-3d;
+    /* Allows children to pop out in 3D */
+    will-change: transform;
+    border-radius: 2.5rem;
+    /* Match the vision mission card */
+}
+
+.tilted-card-img {
+    display: block;
+    object-fit: cover;
+    border-radius: inherit;
+    pointer-events: none;
+}
+
+.tilted-card-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    z-index: 10;
+    transform: translateZ(60px);
+    /* This gives the 3D 'pop' effect to the content */
+    border-radius: inherit;
+    pointer-events: none;
+    /* Let pointer events pass through to the parent figure */
+}
+
+.tilted-card-overlay>* {
+    pointer-events: auto;
+    /* Reactivate pointer events for elements inside */
+}
+
+.tilted-card-caption {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 50;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    white-space: nowrap;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
