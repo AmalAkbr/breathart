@@ -10,12 +10,12 @@ const CourseCard = ({ title, description, delay }) => (
         viewport={{ once: true }}
         transition={{ delay, duration: 0.5 }}
         style={{ willChange: "transform, opacity" }}
-        className="bg-gradient-to-br from-white to-blue-100/40 border border-slate-200 p-8 rounded-2xl hover:border-accent-cyan/50 transition-all shadow-md hover:shadow-xl group relative overflow-hidden"
+        className="bg-gradient-to-br from-secondary via-slate-900/80 to-primary border border-white/10 p-8 rounded-2xl hover:border-accent-cyan/50 transition-all shadow-xl shadow-blue-900/10 hover:shadow-2xl hover:shadow-accent-cyan/20 group relative overflow-hidden"
     >
-        <div className="absolute top-0 right-0 w-32 h-32 bg-accent-blue/10 blur-3xl -z-0 pointer-events-none transform-gpu will-change-transform"></div>
-        <h3 className="text-xl font-heading font-bold mb-4 text-slate-900 group-hover:text-accent-cyan transition-colors relative z-10">{title}</h3>
-        <p className="text-slate-600 mb-6 text-sm leading-relaxed relative z-10">{description}</p>
-        <button className="w-full py-3 rounded-lg border border-accent-cyan text-accent-cyan font-medium hover:bg-accent-cyan hover:text-white transition-all">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-accent-cyan/20 blur-3xl -z-0 pointer-events-none transform-gpu will-change-transform"></div>
+        <h3 className="text-xl font-heading font-bold mb-4 text-white group-hover:text-accent-cyan transition-colors relative z-10">{title}</h3>
+        <p className="text-slate-300 mb-6 text-sm leading-relaxed relative z-10">{description}</p>
+        <button className="w-full py-3 rounded-lg border border-accent-cyan text-accent-cyan font-medium hover:bg-accent-cyan hover:text-white transition-all relative z-10">
             Enroll Now
         </button>
     </motion.div>
@@ -111,6 +111,11 @@ const Courses = () => {
                 </div>
 
                 {/* Specific Course Cards */}
+                <div className="text-center mb-10 md:mb-14">
+                    <h3 className="text-3xl md:text-4xl font-heading font-bold text-slate-900">
+                        Digital Marketing Course In Kerala
+                    </h3>
+                </div>
                 <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
                     <CourseCard
                         title="Master In AI Digital Marketing"

@@ -60,9 +60,6 @@ const Hero = () => {
                         <Link to="/courses" className="bg-gradient-to-r from-accent-cyan to-accent-blue text-white px-8 py-3 rounded-full font-bold hover:shadow-lg hover:shadow-accent-cyan/30 transition-all transform-gpu hover:-translate-y-1 w-full sm:w-auto break-words whitespace-normal text-center inline-block">
                             Explore Courses
                         </Link>
-                        <button className="border border-white/30 text-white px-8 py-3 rounded-full font-bold hover:bg-white/10 transition-colors w-full sm:w-auto break-words whitespace-normal text-center">
-                            Contact Us
-                        </button>
                     </motion.div>
                 </div>
 

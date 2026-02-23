@@ -41,6 +41,8 @@ const ScrollToTop = () => {
   return null;
 };
 
+import WhatsAppButton from './components/WhatsAppButton';
+
 function App() {
   return (
     <Router>
@@ -56,6 +58,7 @@ function App() {
           <Route path="/admission" element={<Admission />} />
         </Routes>
         <Footer />
+        <WhatsAppButton />
       </div>
     </Router>
   )
