@@ -6,11 +6,12 @@ import Logo from './Logo';
 
 const Navbar = () => {
     const [menuOpen, setMenuOpen] = useState(false);
+    const [desktopMenuOpen, setDesktopMenuOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const [isWhiteNav, setIsWhiteNav] = useState(false);
     const [hoveredItem, setHoveredItem] = useState(null);
     const location = useLocation();
-    const navLinks = ['Home', 'About', 'Courses', 'Blogs', 'Careers'];
+    const navLinks = ['Home', 'About', 'Courses', 'Our Services', 'Blogs', 'Careers'];
 
     useEffect(() => {
         const handleScroll = () => {
@@ -50,7 +51,7 @@ const Navbar = () => {
         <>
             <nav
                 onMouseLeave={() => setHoveredItem(null)}
-                className={`fixed top-0 w-full z-50 transition-all duration-300 ${hoveredItem && ['Courses', 'Blogs', 'Careers', 'Contact Us'].includes(hoveredItem)
+                className={`fixed top-0 w-full z-50 transition-all duration-300 ${hoveredItem && ['Courses', 'Our Services', 'Blogs', 'Careers', 'Contact Us'].includes(hoveredItem)
                     ? (isWhiteNav ? 'bg-white/70 backdrop-blur-3xl shadow-lg border-transparent' : 'bg-[#0a0f1a]/60 backdrop-blur-3xl shadow-xl border-transparent')
                     : isWhiteNav
                         ? 'bg-white/90 backdrop-blur-xl border-b border-slate-200 shadow-sm'
@@ -87,8 +88,8 @@ const Navbar = () => {
                     {/* Desktop Nav */}
                     <div className="hidden lg:flex items-center space-x-10">
                         {navLinks.map((item, index) => {
-                            const isInternalPage = ['About', 'Courses', 'Blogs', 'Careers'].includes(item);
-                            const path = isInternalPage ? `/${item.toLowerCase()}` : (item === 'Home' ? '/' : `/#${item.toLowerCase()}`);
+                            const isInternalPage = ['About', 'Courses', 'Our Services', 'Blogs', 'Careers'].includes(item);
+                            const path = isInternalPage ? `/${item.toLowerCase().replace(' ', '-')}` : (item === 'Home' ? '/' : `/#${item.toLowerCase().replace(' ', '-')}`);
 
                             const handleHomeClick = (e) => {
                                 if (item === 'Home' && location.pathname === '/') {
@@ -161,6 +162,13 @@ const Navbar = () => {
                                 Admission
                             </motion.button>
                         </Link>
+                        {/* Desktop Menu Icon */}
+                        <div
+                            onClick={() => setDesktopMenuOpen(true)}
+                            className={`hidden lg:flex items-center justify-center cursor-pointer transition-colors duration-300 ml-2 p-2 rounded-full ${isWhiteNav ? 'text-blue-900 hover:bg-blue-100 hover:text-accent-blue' : 'text-white hover:bg-white/10 hover:text-accent-cyan'}`}
+                        >
+                            <Menu className="w-6 h-6" />
+                        </div>
                         {/* Mobile hamburger */}
                         <button
                             className={`lg:hidden p-2 rounded-lg transition-colors ${isWhiteNav ? 'text-blue-900 hover:bg-blue-100' : 'text-white hover:bg-white/10'}`}
@@ -175,7 +183,7 @@ const Navbar = () => {
 
             {/* Desktop Mega Menu Overlay */}
             <AnimatePresence>
-                {hoveredItem && ['Courses', 'Blogs', 'Careers', 'Contact Us'].includes(hoveredItem) && (
+                {hoveredItem && ['Courses', 'Our Services', 'Blogs', 'Careers', 'Contact Us'].includes(hoveredItem) && (
                     <motion.div
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: 'auto' }}
@@ -203,6 +211,22 @@ const Navbar = () => {
                                                 <li><Link to="/courses" className="hover:text-accent-cyan transition-colors">Diploma in Photography</Link></li>
                                                 <li><Link to="/courses" className="hover:text-accent-cyan transition-colors">Diploma in Graphic Design</Link></li>
                                                 <li><Link to="/courses" className="hover:text-accent-cyan transition-colors">Integrated Diploma in Creative Media</Link></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {hoveredItem === 'Our Services' && (
+                                    <div className="flex flex-row gap-24 w-full max-w-5xl">
+                                        <div className="w-full">
+                                            <h4 className={`text-sm font-bold tracking-wider mb-6 uppercase ${isWhiteNav ? 'text-slate-500' : 'text-slate-400'}`}>Professional Services</h4>
+                                            <ul className={`grid grid-cols-2 gap-x-12 gap-y-4 text-base font-medium ${isWhiteNav ? 'text-blue-900' : 'text-white'}`}>
+                                                <li><Link to="/our-services#digital-marketing" className="hover:text-accent-cyan transition-colors">Digital Marketing Solutions</Link></li>
+                                                <li><Link to="/our-services#branding" className="hover:text-accent-cyan transition-colors">Brand Identity & Strategy</Link></li>
+                                                <li><Link to="/our-services#web-development" className="hover:text-accent-cyan transition-colors">Web Design & Development</Link></li>
+                                                <li><Link to="/our-services#content-creation" className="hover:text-accent-cyan transition-colors">Content Creation & Photography</Link></li>
+                                                <li><Link to="/our-services#seo" className="hover:text-accent-cyan transition-colors">Search Engine Optimization</Link></li>
+                                                <li><Link to="/our-services#social-media" className="hover:text-accent-cyan transition-colors">Social Media Management</Link></li>
                                             </ul>
                                         </div>
                                     </div>
@@ -292,6 +316,69 @@ const Navbar = () => {
                 )}
             </AnimatePresence>
 
+            {/* Desktop Side Drawer (Menu) */}
+            <AnimatePresence>
+                {desktopMenuOpen && (
+                    <>
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.3 }}
+                            onClick={() => setDesktopMenuOpen(false)}
+                            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] hidden lg:block"
+                        />
+                        <motion.div
+                            initial={{ x: '100%' }}
+                            animate={{ x: 0 }}
+                            exit={{ x: '100%' }}
+                            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                            className="fixed top-0 right-0 h-screen w-[320px] bg-[#1a1f2e] border-l border-white/10 shadow-2xl z-[70] hidden lg:flex flex-col overflow-y-auto"
+                        >
+                            <div className="p-6 flex justify-between items-center border-b border-white/10">
+                                <span className="text-white font-bold tracking-wider text-lg">MENU</span>
+                                <button
+                                    onClick={() => setDesktopMenuOpen(false)}
+                                    className="p-2 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
+                                >
+                                    <X className="w-6 h-6" />
+                                </button>
+                            </div>
+
+                            <div className="p-8 flex-grow flex flex-col gap-10">
+                                <div>
+                                    <h4 className="text-xs font-bold tracking-wider mb-6 uppercase text-slate-500">Quick Links</h4>
+                                    <ul className="flex flex-col gap-4 text-slate-200">
+                                        <li><Link to="/" onClick={() => setDesktopMenuOpen(false)} className="hover:text-accent-cyan transition-colors text-lg font-medium">Home</Link></li>
+                                        <li><Link to="/about" onClick={() => setDesktopMenuOpen(false)} className="hover:text-accent-cyan transition-colors text-lg font-medium">About Us</Link></li>
+                                        <li><Link to="/courses" onClick={() => setDesktopMenuOpen(false)} className="hover:text-accent-cyan transition-colors text-lg font-medium">Courses</Link></li>
+                                        <li><Link to="/our-services" onClick={() => setDesktopMenuOpen(false)} className="hover:text-accent-cyan transition-colors text-lg font-medium">Our Services</Link></li>
+                                        <li><Link to="/blogs" onClick={() => setDesktopMenuOpen(false)} className="hover:text-accent-cyan transition-colors text-lg font-medium">Blogs</Link></li>
+                                        <li><Link to="/careers" onClick={() => setDesktopMenuOpen(false)} className="hover:text-accent-cyan transition-colors text-lg font-medium">Careers</Link></li>
+                                        <li><Link to="/admission" onClick={() => setDesktopMenuOpen(false)} className="hover:text-accent-cyan transition-colors text-lg font-medium">Admission</Link></li>
+                                        <li><a href="#contact" onClick={() => setDesktopMenuOpen(false)} className="hover:text-accent-cyan transition-colors text-lg font-medium">Contact Us</a></li>
+                                    </ul>
+                                </div>
+
+                                <div>
+                                    <h4 className="text-xs font-bold tracking-wider mb-6 uppercase text-slate-500">Featured Info</h4>
+                                    <div className="space-y-6">
+                                        <div>
+                                            <p className="text-sm font-bold uppercase mb-1 text-accent-cyan">Admissions Open</p>
+                                            <p className="text-sm text-slate-400">Enroll now for the upcoming batch of AI Digital Marketing.</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-sm font-bold uppercase mb-1 text-accent-cyan">Get in Touch</p>
+                                            <p className="text-sm text-slate-400">hello@breathart.in<br />+91 98765 43210</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </>
+                )}
+            </AnimatePresence>
+
             {/* Mobile Menu Drawer */}
             <AnimatePresence>
                 {menuOpen && (
@@ -304,8 +391,8 @@ const Navbar = () => {
                     >
                         <div className="w-full px-6 pb-12 flex flex-col gap-6">
                             {navLinks.map((item) => {
-                                const isInternalPage = ['About', 'Courses', 'Blogs', 'Careers'].includes(item);
-                                const path = isInternalPage ? `/${item.toLowerCase()}` : (item === 'Home' ? '/' : `/#${item.toLowerCase()}`);
+                                const isInternalPage = ['About', 'Courses', 'Our Services', 'Blogs', 'Careers'].includes(item);
+                                const path = isInternalPage ? `/${item.toLowerCase().replace(' ', '-')}` : (item === 'Home' ? '/' : `/#${item.toLowerCase().replace(' ', '-')}`);
 
                                 const handleHomeClick = (e) => {
                                     setMenuOpen(false);

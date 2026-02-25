@@ -1,5 +1,9 @@
 import { motion } from 'framer-motion';
 import Grainient from '../components/Grainient';
+import photographyImage from '../assets/photography.png';
+import instituteImage from '../assets/institute.png';
+import marketingImage from '../assets/marketing.png';
+import bgImage from '../assets/bg.jpeg';
 
 const AboutUs = () => {
     return (
@@ -90,26 +94,55 @@ const AboutUs = () => {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.8 }}
-                    className="bg-gradient-to-br from-slate-50 to-white border border-slate-200 rounded-3xl p-8 md:p-12 lg:p-16 relative overflow-hidden shadow-xl"
+                    className="border border-white/20 rounded-3xl p-8 md:p-12 lg:p-16 relative overflow-hidden shadow-xl"
                 >
-                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-accent-cyan to-accent-blue" />
+                    {/* Background Image & Overlay */}
+                    <div
+                        className="absolute inset-0 z-0"
+                        style={{
+                            backgroundImage: `url(${bgImage})`,
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center',
+                        }}
+                    />
+                    <div className="absolute inset-0 bg-[#0a0f1a]/80 z-0" />
 
-                    <div className="text-center max-w-4xl mx-auto">
-                        <h3 className="text-3xl md:text-4xl font-bold mb-8 text-slate-900">BreathArt Group</h3>
+                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-accent-cyan to-accent-blue z-10" />
 
-                        <div className="space-y-6 text-slate-600 text-lg leading-relaxed text-left md:text-center">
-                            <p>
-                                <strong className="text-accent-cyan font-bold">BreathArt Group</strong> is a UAE-based creative and business group offering a complete ecosystem of AI-powered digital marketing, branding solutions, education institutes, professional photography studios, and business consultancy services.
-                            </p>
-                            <p>
-                                Founded in 2024 in the United Arab Emirates, BreathArt Group has expanded its operations to India and global markets, supporting brands and individuals across multiple industries. Our integrated approach helps businesses achieve strong online visibility, high-quality lead generation, and long-term brand growth.
-                            </p>
-                            <p>
-                                With a growing international presence, we have successfully served more than <strong className="text-slate-900">500 happy clients worldwide</strong>, delivering measurable results and creating new business opportunities every month across the globe.
-                            </p>
-                            <p className="text-xl text-slate-800 font-medium mt-8 pt-8 border-t border-slate-200">
-                                At BreathArt Group, we focus on transforming companies into brands by combining strategic marketing, creative innovation, advanced AI solutions, and industry-focused education.
-                            </p>
+                    <div className="max-w-7xl mx-auto relative z-10">
+                        <div className="grid lg:grid-cols-[auto_1fr] gap-12 lg:gap-16 items-center">
+                            {/* Images Column */}
+                            <div className="flex flex-col gap-8 w-full max-w-[120px] mx-auto lg:mx-0">
+                                <div className="flex items-center justify-center">
+                                    <img src={photographyImage} alt="Photography Studio" className="w-full h-auto object-contain" />
+                                </div>
+                                <div className="flex items-center justify-center">
+                                    <img src={instituteImage} alt="Education Institute" className="w-full h-auto object-contain" />
+                                </div>
+                                <div className="flex items-center justify-center">
+                                    <img src={marketingImage} alt="Digital Marketing" className="w-full h-auto object-contain" />
+                                </div>
+                            </div>
+
+                            {/* Text Column */}
+                            <div className="flex flex-col justify-center">
+                                <h3 className="text-3xl md:text-4xl font-bold mb-8 text-white text-left">BreathArt Group</h3>
+
+                                <div className="space-y-6 text-slate-300 text-lg leading-relaxed text-left">
+                                    <p>
+                                        <strong className="text-accent-cyan font-bold">BreathArt Group</strong> is a UAE-based creative and business group offering a complete ecosystem of AI-powered digital marketing, branding solutions, education institutes, professional photography studios, and business consultancy services.
+                                    </p>
+                                    <p>
+                                        Founded in 2024 in the United Arab Emirates, BreathArt Group has expanded its operations to India and global markets, supporting brands and individuals across multiple industries. Our integrated approach helps businesses achieve strong online visibility, high-quality lead generation, and long-term brand growth.
+                                    </p>
+                                    <p>
+                                        With a growing international presence, we have successfully served more than <strong className="text-white">500 happy clients worldwide</strong>, delivering measurable results and creating new business opportunities every month across the globe.
+                                    </p>
+                                    <p className="text-xl text-slate-200 font-medium mt-8 pt-8 border-t border-white/20">
+                                        At BreathArt Group, we focus on transforming companies into brands by combining strategic marketing, creative innovation, advanced AI solutions, and industry-focused education.
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </motion.div>

@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import whiskImage from '../assets/whisk.jpeg';
+import whiskImage from '../assets/fro.jpg';
 import Beams from './Beams';
 
 const About = () => {
@@ -40,13 +40,12 @@ const About = () => {
                         style={{ willChange: "transform, opacity" }}
                         className="relative"
                     >
-                        <div className="aspect-square rounded-2xl overflow-hidden shadow-2xl shadow-black/50 border border-white/10 group">
+                        <div className="aspect-square w-full max-w-[480px] mx-auto rounded-2xl overflow-hidden shadow-2xl shadow-black/50 border border-white/10 group">
                             <img
                                 src={whiskImage}
                                 alt="BICT Excellence"
                                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                             />
-                            <div className="absolute inset-0 bg-gradient-to-t from-secondary/60 to-transparent opacity-40"></div>
                         </div>
                     </motion.div>
                     <motion.div
