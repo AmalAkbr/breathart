@@ -1,8 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import breathLogo from '../assets/breath.png?update=2';
-import ignetLogo from '../assets/ignet.png';
-import metaLogo from '../assets/meta.png';
+import breathLogo from '../assets/breath.webp';
+import ignetLogo from '../assets/ignet.webp';
+import metaLogo from '../assets/meta.webp';
 
 const logos = [
     { name: 'BreathArt', src: breathLogo },
@@ -32,8 +32,10 @@ const PartnerLogos = () => {
                                         <img
                                             src={logo.src}
                                             alt={logo.name}
+                                            loading="lazy"
+                                            decoding="async"
                                             className="h-full w-auto object-contain block filter brightness-90 hover:brightness-100 transition-all"
-                                            onError={(e) => { e.target.style.display = 'none'; console.error(`Failed to load logo: ${logo.name}`); }}
+                                            onError={(e) => { e.target.style.display = 'none'; }}
                                         />
                                     </div>
                                 </div>

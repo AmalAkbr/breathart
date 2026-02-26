@@ -4,11 +4,11 @@ import { Link } from 'react-router-dom';
 import LiquidChrome from '../components/LiquidChrome';
 
 // Importing course images
-import firstImg from '../assets/first.jpeg';
-import secondImg from '../assets/second.png';
-import thirdImg from '../assets/third.png';
-import fourthImg from '../assets/fourth.png';
-import lastImg from '../assets/last.png';
+import firstImg from '../assets/first.webp';
+import secondImg from '../assets/second.webp';
+import thirdImg from '../assets/third.webp';
+import fourthImg from '../assets/fourth.webp';
+import lastImg from '../assets/last.webp';
 
 const courseData = [
     {

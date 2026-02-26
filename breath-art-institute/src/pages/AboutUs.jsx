@@ -1,9 +1,9 @@
 import { motion } from 'framer-motion';
 import Grainient from '../components/Grainient';
-import photographyImage from '../assets/photography.png';
-import instituteImage from '../assets/institute.png';
-import marketingImage from '../assets/marketing.png';
-import bgImage from '../assets/bg.jpeg';
+import photographyImage from '../assets/photography.webp';
+import instituteImage from '../assets/institute.webp';
+import marketingImage from '../assets/marketing.webp';
+import bgImage from '../assets/bg.webp';
 
 const AboutUs = () => {
     return (
@@ -114,13 +114,13 @@ const AboutUs = () => {
                             {/* Images Column */}
                             <div className="flex flex-col gap-8 w-full max-w-[120px] mx-auto lg:mx-0">
                                 <div className="flex items-center justify-center">
-                                    <img src={photographyImage} alt="Photography Studio" className="w-full h-auto object-contain" />
+                                    <img src={photographyImage} alt="Photography Studio" loading="lazy" decoding="async" className="w-full h-auto object-contain" />
                                 </div>
                                 <div className="flex items-center justify-center">
-                                    <img src={instituteImage} alt="Education Institute" className="w-full h-auto object-contain" />
+                                    <img src={instituteImage} alt="Education Institute" loading="lazy" decoding="async" className="w-full h-auto object-contain" />
                                 </div>
                                 <div className="flex items-center justify-center">
-                                    <img src={marketingImage} alt="Digital Marketing" className="w-full h-auto object-contain" />
+                                    <img src={marketingImage} alt="Digital Marketing" loading="lazy" decoding="async" className="w-full h-auto object-contain" />
                                 </div>
                             </div>
 

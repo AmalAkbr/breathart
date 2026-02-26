@@ -1,11 +1,11 @@
 import { motion } from 'framer-motion';
 
 // Importing mentor images
-import prajithImg from '../assets/Photo-1.png';
-import bipashaImg from '../assets/Photo-2.png';
-import sonaImg from '../assets/Photo-3.png';
-import gladsonImg from '../assets/Photo-4.png';
-import adithImg from '../assets/Photo-1.png'; // No 5th photo found, using placeholder or reusing
+import prajithImg from '../assets/Photo-1.webp';
+import bipashaImg from '../assets/Photo-2.webp';
+import sonaImg from '../assets/Photo-3.webp';
+import gladsonImg from '../assets/Photo-4.webp';
+import adithImg from '../assets/Photo-1.webp'; // No 5th photo found, using placeholder or reusing
 
 const mentors = [
     { name: "Prajith Prakash", role: "Operations Manager", image: sonaImg },
@@ -44,6 +44,8 @@ const Mentors = () => {
                                         <img
                                             src={mentor.image}
                                             alt={mentor.name}
+                                            loading="lazy"
+                                            decoding="async"
                                             className="w-full h-full object-contain group-hover:-translate-y-2 group-hover:drop-shadow-[0_10px_20px_rgba(6,182,212,0.3)] transition-all duration-500"
                                         />
                                     ) : (

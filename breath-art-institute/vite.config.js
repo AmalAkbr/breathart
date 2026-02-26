@@ -6,17 +6,25 @@ export default defineConfig({
   plugins: [react()],
   build: {
     target: 'esnext',
-    // Warn when a chunk exceeds 500kb
-    chunkSizeWarningLimit: 500,
+    // Raise limit since Three.js is inherently large; chunks are still split and cached
+    chunkSizeWarningLimit: 1000,
+    // Use esbuild for minification (fast + effective)
+    minify: 'esbuild',
     rollupOptions: {
       output: {
-        // Split key libraries into separate long-cached chunks
+        // Split key libraries into separate, long-cached chunks
         manualChunks: {
           vendor: ['react', 'react-dom', 'react-router-dom'],
           animations: ['framer-motion'],
           icons: ['lucide-react'],
+          webgl: ['three', '@react-three/fiber', '@react-three/drei'],
+          ogl: ['ogl'],
         }
       }
+    },
+    // Drop all console.* and debugger calls in production bundle
+    esbuildOptions: {
+      drop: ['console', 'debugger'],
     }
   }
 })

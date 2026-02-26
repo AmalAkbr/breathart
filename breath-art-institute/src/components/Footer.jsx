@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom';
-import insta from '../assets/instagram.png';
-import face from '../assets/facebook.png';
-import linkedin from '../assets/linkedin.png';
-import xIcon from '../assets/X.png';
+import insta from '../assets/instagram.webp';
+import face from '../assets/facebook.png'; // tiny (21KB), not converted
+import linkedin from '../assets/linkedin.png'; // tiny (9KB), not converted
+import xIcon from '../assets/X.png'; // tiny (37KB), not converted
 
 const Footer = () => {
     return (
@@ -18,16 +18,16 @@ const Footer = () => {
                         </p>
                         <div className="flex gap-4">
                             <a href="https://www.instagram.com/breathart.institute/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-accent-cyan/20 hover:border-accent-cyan/40 transition-colors cursor-pointer overflow-hidden">
-                                <img src={insta} alt="Instagram" className="w-full h-full object-cover" />
+                                <img src={insta} alt="Instagram" loading="lazy" decoding="async" className="w-full h-full object-cover" />
                             </a>
                             <a href="https://www.facebook.com/people/Breathart-institute-of-creative-technology/61579983401340/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-accent-blue/20 hover:border-accent-blue/40 transition-colors cursor-pointer overflow-hidden p-[2px]">
-                                <img src={face} alt="Facebook" className="w-full h-full object-cover rounded-[10px] scale-110" />
+                                <img src={face} alt="Facebook" loading="lazy" decoding="async" className="w-full h-full object-cover rounded-[10px] scale-110" />
                             </a>
                             <a href="https://www.linkedin.com/company/breathart-marketing-agency/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-accent-cyan/20 hover:border-accent-cyan/40 transition-colors cursor-pointer overflow-hidden">
-                                <img src={linkedin} alt="LinkedIn" className="w-full h-full object-cover" />
+                                <img src={linkedin} alt="LinkedIn" loading="lazy" decoding="async" className="w-full h-full object-cover" />
                             </a>
                             <a href="https://x.com/BreathartInd" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-accent-blue/20 hover:border-accent-blue/40 transition-colors cursor-pointer overflow-hidden p-[2px]">
-                                <img src={xIcon} alt="X (formerly Twitter)" className="w-full h-full object-cover rounded-[10px]" />
+                                <img src={xIcon} alt="X (formerly Twitter)" loading="lazy" decoding="async" className="w-full h-full object-cover rounded-[10px]" />
                             </a>
                         </div>
                     </div>

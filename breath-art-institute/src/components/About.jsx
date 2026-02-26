@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import whiskImage from '../assets/froo.jpg';
+import whiskImage from '../assets/froo.webp';
 import Beams from './Beams';
 
 const About = () => {
@@ -37,13 +37,15 @@ const About = () => {
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.8 }}
-                        style={{ willChange: "transform, opacity" }}
+                        style={{ willChange: "transform" }}
                         className="relative"
                     >
                         <div className="aspect-square w-full max-w-[480px] mx-auto rounded-2xl overflow-hidden shadow-2xl shadow-black/50 border border-white/10 group">
                             <img
                                 src={whiskImage}
                                 alt="BICT Excellence"
+                                loading="lazy"
+                                decoding="async"
                                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                             />
                         </div>

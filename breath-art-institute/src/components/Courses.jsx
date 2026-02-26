@@ -1,5 +1,5 @@
-import crs1 from '../assets/crs1.png';
-import crs2 from '../assets/crs2.png';
+import crs1 from '../assets/crs1.webp';
+import crs2 from '../assets/crs2.webp';
 
 const CourseCard = ({ title, description }) => (
     <div className="bg-gradient-to-br from-secondary via-slate-900/80 to-primary border border-white/10 p-8 rounded-2xl hover:border-accent-cyan/50 transition-all shadow-xl shadow-blue-900/10 hover:shadow-2xl hover:shadow-accent-cyan/20 group relative overflow-hidden flex flex-col h-full">
@@ -31,7 +31,7 @@ const Courses = () => {
                     {/* Card 1: Digital Marketing */}
                     <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-lg flex flex-col h-full">
                         <div className="w-full h-48 sm:h-56 lg:h-64 shrink-0">
-                            <img src={crs1} alt="Advanced Digital Marketing Course" className="w-full h-full object-cover" />
+                            <img src={crs1} alt="Advanced Digital Marketing Course" loading="lazy" decoding="async" className="w-full h-full object-cover" />
                         </div>
                         <div className="p-6 md:p-8 flex flex-col flex-grow">
                             <span className="text-accent-cyan font-bold tracking-wider uppercase mb-2 block text-sm">Premium Course</span>
@@ -58,7 +58,7 @@ const Courses = () => {
                     {/* Card 2: Creative Education */}
                     <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-lg flex flex-col h-full">
                         <div className="w-full h-48 sm:h-56 lg:h-64 shrink-0">
-                            <img src={crs2} alt="Creative Education" className="w-full h-full object-cover" />
+                            <img src={crs2} alt="Creative Education" loading="lazy" decoding="async" className="w-full h-full object-cover" />
                         </div>
                         <div className="p-6 md:p-8 flex flex-col flex-grow">
                             <span className="text-accent-blue font-bold tracking-wider uppercase mb-2 block text-sm">Skill Development</span>
