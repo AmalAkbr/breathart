@@ -1,29 +1,44 @@
+import { lazy, Suspense } from 'react';
 import Hero from '../components/Hero';
-import PartnerLogos from '../components/PartnerLogos';
-import About from '../components/About';
-import VisionMission from '../components/VisionMission';
-import Courses from '../components/Courses';
-import Certifications from '../components/Certifications';
-import Placement from '../components/Placement';
-import Mentors from '../components/Mentors';
-import DigitalMarketingCareer from '../components/DigitalMarketingCareer';
-import FAQ from '../components/FAQ';
-import Location from '../components/Location';
+
+// Eagerly loaded: Hero is the LCP element, must render immediately
+// Everything below the fold is lazy-loaded — downloaded only when needed
+
+const PartnerLogos = lazy(() => import('../components/PartnerLogos'));
+const About = lazy(() => import('../components/About'));
+const VisionMission = lazy(() => import('../components/VisionMission'));
+const Courses = lazy(() => import('../components/Courses'));
+const Certifications = lazy(() => import('../components/Certifications'));
+const Placement = lazy(() => import('../components/Placement'));
+const Mentors = lazy(() => import('../components/Mentors'));
+const DigitalMarketingCareer = lazy(() => import('../components/DigitalMarketingCareer'));
+const ToolsCovered = lazy(() => import('../components/ToolsCovered'));
+const FAQ = lazy(() => import('../components/FAQ'));
+const Location = lazy(() => import('../components/Location'));
+
+// Invisible fallback — preserves scroll position/layout while chunk loads
+const SectionLoader = () => <div style={{ minHeight: '200px' }} aria-hidden="true" />;
 
 const Home = () => {
     return (
         <main>
+            {/* Hero renders immediately — it is the LCP element */}
             <Hero />
-            <PartnerLogos />
-            <About />
-            <VisionMission />
-            <Courses />
-            <Certifications />
-            <Placement />
-            <Mentors />
-            <DigitalMarketingCareer />
-            <FAQ />
-            <Location />
+
+            {/* All below-fold sections are lazily loaded */}
+            <Suspense fallback={<SectionLoader />}>
+                <PartnerLogos />
+                <About />
+                <VisionMission />
+                <Courses />
+                <Certifications />
+                <Placement />
+                <Mentors />
+                <DigitalMarketingCareer />
+                <ToolsCovered />
+                <FAQ />
+                <Location />
+            </Suspense>
         </main>
     );
 };

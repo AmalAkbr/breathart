@@ -115,3 +115,47 @@ body {
 @utility text-gradient {
   @apply bg-clip-text text-transparent bg-gradient-to-r from-accent-cyan to-accent-blue;
 }
+
+/* =====================================================
+   PERFORMANCE: content-visibility
+   Tells the browser to skip layout/paint for off-screen
+   sections. Biggest single CSS win for long pages.
+   ===================================================== */
+section {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 600px;
+  /* estimated height — prevents scroll jump */
+}
+
+/* =====================================================
+   GPU COMPOSITING: promote animated elements to own layer
+   prevents them from triggering repaints on the main layer
+   ===================================================== */
+[class*="animate-"],
+[style*="will-change"] {
+  backface-visibility: hidden;
+  transform-style: flat;
+}
+
+/* =====================================================
+   MARQUEE / LOGO SLIDER: GPU-accelerated via transform
+   ===================================================== */
+.marquee-track {
+  will-change: transform;
+}
+
+/* =====================================================
+   ACCESSIBILITY: respect OS reduce-motion preference
+   Disables all animations for users who find them distracting
+   ===================================================== */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

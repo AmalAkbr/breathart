@@ -50,11 +50,30 @@ function extendMaterial(BaseMaterial, cfg) {
     return mat;
 }
 
-const CanvasWrapper = ({ children }) => (
-    <Canvas dpr={[1, 2]} frameloop="always" className="beams-container">
-        {children}
-    </Canvas>
-);
+const CanvasWrapper = ({ children }) => {
+    const canvasRef = useRef(null);
+
+    useEffect(() => {
+        if (!canvasRef.current) return;
+        const canvas = canvasRef.current;
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                // Pause GPU work when scrolled off screen
+                canvas.style.visibility = entry.isIntersecting ? 'visible' : 'hidden';
+            },
+            { threshold: 0 }
+        );
+        observer.observe(canvas);
+        return () => observer.disconnect();
+    }, []);
+
+    return (
+        // dpr capped at 1 — retina ([1,2]) doubles GPU load with minimal visual gain
+        <Canvas ref={canvasRef} dpr={1} frameloop="always" className="beams-container">
+            {children}
+        </Canvas>
+    );
+};
 
 const hexToNormalizedRGB = hex => {
     const clean = hex.replace('#', '');

@@ -115,6 +115,8 @@ const CourseModule = ({ course, index }) => {
                                 <img
                                     src={course.image}
                                     alt={course.title}
+                                    loading="lazy"
+                                    decoding="async"
                                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                                 />
                             </div>
@@ -191,7 +193,10 @@ const CourseModule = ({ course, index }) => {
                     </ul>
                 </div>
 
-                <Link to="/admission" className="inline-flex items-center gap-2 text-accent-blue font-bold hover:gap-4 transition-all w-fit group">
+                <Link
+                    to={`/admission?course=${encodeURIComponent(course.title)}`}
+                    className="inline-flex items-center gap-2 text-accent-blue font-bold hover:gap-4 transition-all w-fit group"
+                >
                     Enroll in this course
                     <ArrowRight className="w-5 h-5 group-hover:text-accent-cyan transition-colors" />
                 </Link>

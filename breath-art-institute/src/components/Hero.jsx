@@ -1,21 +1,23 @@
 import { motion } from 'framer-motion';
 import heroCharacter from '../assets/hero.png';
-import LiquidChrome from './LiquidChrome';
+import Beams from './Beams';
 
 import { Link } from 'react-router-dom';
 
 const Hero = () => {
     return (
         <section id="home" className="min-h-screen flex items-center justify-center relative overflow-hidden bg-primary pt-16">
-            {/* LiquidChrome Background */}
-            <div className="absolute inset-0 z-0 opacity-60 [mask-image:linear-gradient(to_bottom,black_70%,transparent)]">
-                <LiquidChrome
-                    baseColor={[0.02, 0.05, 0.15]}
-                    speed={0.15}
-                    amplitude={0.4}
-                    frequencyX={2}
-                    frequencyY={2}
-                    interactive={true}
+            {/* Beams Background */}
+            <div className="absolute inset-0 z-0 opacity-30 [mask-image:linear-gradient(to_bottom,black_70%,transparent)]">
+                <Beams
+                    beamWidth={2}
+                    beamHeight={15}
+                    beamNumber={12}
+                    lightColor="#0008f5"
+                    speed={2}
+                    noiseIntensity={1.75}
+                    scale={0.2}
+                    rotation={0}
                 />
             </div>
 
@@ -79,6 +81,7 @@ const Hero = () => {
                             y: { duration: 6, repeat: Infinity, ease: "easeInOut" },
                             scale: { duration: 4, repeat: Infinity, ease: "easeInOut" }
                         }}
+                        style={{ willChange: 'transform' }}
                         className="relative w-auto h-full max-h-[500px] flex items-center justify-center"
                     >
                         {/* Glow effect behind */}
@@ -87,6 +90,8 @@ const Hero = () => {
                         <img
                             src={heroCharacter}
                             alt="3D Student Character"
+                            fetchpriority="high"
+                            decoding="async"
                             className="w-full h-full object-contain relative z-10 drop-shadow-2xl max-h-[500px]"
                         />
 

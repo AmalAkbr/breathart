@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import whiskImage from '../assets/fro.jpg';
+import whiskImage from '../assets/froo.jpg';
 import Beams from './Beams';
 
 const About = () => {

@@ -52,11 +52,11 @@ const Navbar = () => {
             <nav
                 onMouseLeave={() => setHoveredItem(null)}
                 className={`fixed top-0 w-full z-50 transition-all duration-300 ${hoveredItem && ['Courses', 'Our Services', 'Blogs', 'Careers', 'Contact Us'].includes(hoveredItem)
-                    ? (isWhiteNav ? 'bg-white/70 backdrop-blur-3xl shadow-lg border-transparent' : 'bg-[#0a0f1a]/60 backdrop-blur-3xl shadow-xl border-transparent')
+                    ? (isWhiteNav ? 'bg-white/80 backdrop-blur-3xl shadow-lg border-transparent' : 'bg-[#0a0f1a]/80 backdrop-blur-3xl shadow-xl border-transparent')
                     : isWhiteNav
-                        ? 'bg-white/90 backdrop-blur-xl border-b border-slate-200 shadow-sm'
+                        ? 'bg-white/95 backdrop-blur-xl border-b border-slate-200 shadow-sm'
                         : scrolled
-                            ? 'bg-white/10 backdrop-blur-xl border-b border-white/20'
+                            ? 'bg-[#0a192f]/80 backdrop-blur-xl border-b border-white/10 shadow-lg'
                             : 'bg-transparent border-b border-transparent'
                     }`}
             >
@@ -88,13 +88,16 @@ const Navbar = () => {
                     {/* Desktop Nav */}
                     <div className="hidden lg:flex items-center space-x-10">
                         {navLinks.map((item, index) => {
-                            const isInternalPage = ['About', 'Courses', 'Our Services', 'Blogs', 'Careers'].includes(item);
-                            const path = isInternalPage ? `/${item.toLowerCase().replace(' ', '-')}` : (item === 'Home' ? '/' : `/#${item.toLowerCase().replace(' ', '-')}`);
+                            const isInternalPage = ['About', 'Courses', 'Blogs', 'Careers'].includes(item);
+                            const path = item === 'Our Services' ? '/#tools' : isInternalPage ? `/${item.toLowerCase().replace(' ', '-')}` : (item === 'Home' ? '/' : `/#${item.toLowerCase().replace(' ', '-')}`);
 
                             const handleHomeClick = (e) => {
-                                if (item === 'Home' && location.pathname === '/') {
-                                    e.preventDefault();
+                                if (item === 'Home') {
+                                    if (location.pathname === '/') {
+                                        e.preventDefault();
+                                    }
                                     window.scrollTo({ top: 0, behavior: 'smooth' });
+                                    setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 100);
                                 }
                             };
 
@@ -221,12 +224,12 @@ const Navbar = () => {
                                         <div className="w-full">
                                             <h4 className={`text-sm font-bold tracking-wider mb-6 uppercase ${isWhiteNav ? 'text-slate-500' : 'text-slate-400'}`}>Professional Services</h4>
                                             <ul className={`grid grid-cols-2 gap-x-12 gap-y-4 text-base font-medium ${isWhiteNav ? 'text-blue-900' : 'text-white'}`}>
-                                                <li><Link to="/our-services#digital-marketing" className="hover:text-accent-cyan transition-colors">Digital Marketing Solutions</Link></li>
-                                                <li><Link to="/our-services#branding" className="hover:text-accent-cyan transition-colors">Brand Identity & Strategy</Link></li>
-                                                <li><Link to="/our-services#web-development" className="hover:text-accent-cyan transition-colors">Web Design & Development</Link></li>
-                                                <li><Link to="/our-services#content-creation" className="hover:text-accent-cyan transition-colors">Content Creation & Photography</Link></li>
-                                                <li><Link to="/our-services#seo" className="hover:text-accent-cyan transition-colors">Search Engine Optimization</Link></li>
-                                                <li><Link to="/our-services#social-media" className="hover:text-accent-cyan transition-colors">Social Media Management</Link></li>
+                                                <li><Link to="/#tools" className="hover:text-accent-cyan transition-colors">Digital Marketing Solutions</Link></li>
+                                                <li><Link to="/#tools" className="hover:text-accent-cyan transition-colors">Brand Identity & Strategy</Link></li>
+                                                <li><Link to="/#tools" className="hover:text-accent-cyan transition-colors">Web Design & Development</Link></li>
+                                                <li><Link to="/#tools" className="hover:text-accent-cyan transition-colors">Content Creation & Photography</Link></li>
+                                                <li><Link to="/#tools" className="hover:text-accent-cyan transition-colors">Search Engine Optimization</Link></li>
+                                                <li><Link to="/#tools" className="hover:text-accent-cyan transition-colors">Social Media Management</Link></li>
                                             </ul>
                                         </div>
                                     </div>
@@ -352,7 +355,7 @@ const Navbar = () => {
                                         <li><Link to="/" onClick={() => setDesktopMenuOpen(false)} className="hover:text-accent-cyan transition-colors text-lg font-medium">Home</Link></li>
                                         <li><Link to="/about" onClick={() => setDesktopMenuOpen(false)} className="hover:text-accent-cyan transition-colors text-lg font-medium">About Us</Link></li>
                                         <li><Link to="/courses" onClick={() => setDesktopMenuOpen(false)} className="hover:text-accent-cyan transition-colors text-lg font-medium">Courses</Link></li>
-                                        <li><Link to="/our-services" onClick={() => setDesktopMenuOpen(false)} className="hover:text-accent-cyan transition-colors text-lg font-medium">Our Services</Link></li>
+                                        <li><Link to="/#tools" onClick={() => setDesktopMenuOpen(false)} className="hover:text-accent-cyan transition-colors text-lg font-medium">Our Services</Link></li>
                                         <li><Link to="/blogs" onClick={() => setDesktopMenuOpen(false)} className="hover:text-accent-cyan transition-colors text-lg font-medium">Blogs</Link></li>
                                         <li><Link to="/careers" onClick={() => setDesktopMenuOpen(false)} className="hover:text-accent-cyan transition-colors text-lg font-medium">Careers</Link></li>
                                         <li><Link to="/admission" onClick={() => setDesktopMenuOpen(false)} className="hover:text-accent-cyan transition-colors text-lg font-medium">Admission</Link></li>
@@ -391,14 +394,17 @@ const Navbar = () => {
                     >
                         <div className="w-full px-6 pb-12 flex flex-col gap-6">
                             {navLinks.map((item) => {
-                                const isInternalPage = ['About', 'Courses', 'Our Services', 'Blogs', 'Careers'].includes(item);
-                                const path = isInternalPage ? `/${item.toLowerCase().replace(' ', '-')}` : (item === 'Home' ? '/' : `/#${item.toLowerCase().replace(' ', '-')}`);
+                                const isInternalPage = ['About', 'Courses', 'Blogs', 'Careers'].includes(item);
+                                const path = item === 'Our Services' ? '/#tools' : isInternalPage ? `/${item.toLowerCase().replace(' ', '-')}` : (item === 'Home' ? '/' : `/#${item.toLowerCase().replace(' ', '-')}`);
 
                                 const handleHomeClick = (e) => {
                                     setMenuOpen(false);
-                                    if (item === 'Home' && location.pathname === '/') {
-                                        e.preventDefault();
+                                    if (item === 'Home') {
+                                        if (location.pathname === '/') {
+                                            e.preventDefault();
+                                        }
                                         window.scrollTo({ top: 0, behavior: 'smooth' });
+                                        setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 100);
                                     }
                                 };
 

@@ -1,7 +1,11 @@
 import { motion } from 'framer-motion';
 import { Mail, Phone, MapPin, Send } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
+import { useState } from 'react';
 
 const Admission = () => {
+    const [searchParams] = useSearchParams();
+    const [selectedCourse, setSelectedCourse] = useState(searchParams.get('course') || '');
     return (
         <div className="min-h-screen bg-slate-50 pt-32 pb-24 w-full max-w-[100vw] overflow-x-hidden text-slate-900 theme-light-section relative">
 
@@ -133,7 +137,11 @@ const Admission = () => {
 
                             <div className="space-y-2">
                                 <label className="text-sm font-bold text-slate-700 ml-1">Course of Interest *</label>
-                                <select className="w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-3.5 text-slate-900 focus:outline-none focus:border-accent-blue focus:ring-1 focus:ring-accent-blue transition-all appearance-none cursor-pointer">
+                                <select
+                                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-3.5 text-slate-900 focus:outline-none focus:border-accent-blue focus:ring-1 focus:ring-accent-blue transition-all appearance-none cursor-pointer"
+                                    value={selectedCourse}
+                                    onChange={(e) => setSelectedCourse(e.target.value)}
+                                >
                                     <option value="" disabled selected>Select a program</option>
                                     <option value="Master Diploma in AI Digital Marketing" className="bg-white">Master Diploma in AI Digital Marketing</option>
                                     <option value="Diploma in AI Digital Marketing" className="bg-white">Diploma in AI Digital Marketing</option>

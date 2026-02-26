@@ -1,13 +1,20 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, lazy, Suspense } from 'react';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
-import Home from './pages/Home';
-import Blogs from './pages/Blogs';
-import Careers from './pages/Careers';
-import Admission from './pages/Admission';
-import AboutUs from './pages/AboutUs';
-import CoursesPage from './pages/CoursesPage';
+import WhatsAppButton from './components/WhatsAppButton';
+import ScrollToTopButton from './components/ScrollToTopButton';
+
+// Lazy-loaded pages — each becomes a separate JS chunk (code splitting)
+const Home = lazy(() => import('./pages/Home'));
+const Blogs = lazy(() => import('./pages/Blogs'));
+const Careers = lazy(() => import('./pages/Careers'));
+const Admission = lazy(() => import('./pages/Admission'));
+const AboutUs = lazy(() => import('./pages/AboutUs'));
+const CoursesPage = lazy(() => import('./pages/CoursesPage'));
+
+// Invisible fallback — preserves full height to prevent CLS
+const PageLoader = () => <div style={{ minHeight: '100vh' }} aria-hidden="true" />;
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -41,27 +48,28 @@ const ScrollToTop = () => {
   return null;
 };
 
-import WhatsAppButton from './components/WhatsAppButton';
-
 function App() {
   return (
     <Router>
       <ScrollToTop />
       <div className="min-h-screen text-white font-sans selection:bg-accent-cyan/30 overflow-x-hidden w-full max-w-[100vw]">
         <Navbar />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/about" element={<AboutUs />} />
-          <Route path="/courses" element={<CoursesPage />} />
-          <Route path="/blogs" element={<Blogs />} />
-          <Route path="/careers" element={<Careers />} />
-          <Route path="/admission" element={<Admission />} />
-        </Routes>
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/about" element={<AboutUs />} />
+            <Route path="/courses" element={<CoursesPage />} />
+            <Route path="/blogs" element={<Blogs />} />
+            <Route path="/careers" element={<Careers />} />
+            <Route path="/admission" element={<Admission />} />
+          </Routes>
+        </Suspense>
         <Footer />
         <WhatsAppButton />
+        <ScrollToTopButton />
       </div>
     </Router>
-  )
+  );
 }
 
-export default App
+export default App;
