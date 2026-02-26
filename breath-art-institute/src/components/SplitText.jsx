@@ -24,7 +24,10 @@ const SplitText = ({
     const ref = useRef(null);
     const animationCompletedRef = useRef(false);
     const onCompleteRef = useRef(onLetterAnimationComplete);
-    const [fontsLoaded, setFontsLoaded] = useState(false);
+    const [fontsLoaded, setFontsLoaded] = useState(() => {
+        if (typeof document === 'undefined') return false;
+        return document.fonts.status === 'loaded';
+    });
 
     // Keep callback ref updated
     useEffect(() => {
@@ -32,9 +35,7 @@ const SplitText = ({
     }, [onLetterAnimationComplete]);
 
     useEffect(() => {
-        if (document.fonts.status === 'loaded') {
-            setFontsLoaded(true);
-        } else {
+        if (document.fonts.status !== 'loaded') {
             document.fonts.ready.then(() => {
                 setFontsLoaded(true);
             });
@@ -51,7 +52,7 @@ const SplitText = ({
             if (el._rbsplitInstance) {
                 try {
                     el._rbsplitInstance.revert();
-                } catch (_) {
+                } catch {
                     /* noop */
                 }
                 el._rbsplitInstance = null;
@@ -122,7 +123,7 @@ const SplitText = ({
                 });
                 try {
                     splitInstance.revert();
-                } catch (_) {
+                } catch {
                     /* noop */
                 }
                 el._rbsplitInstance = null;

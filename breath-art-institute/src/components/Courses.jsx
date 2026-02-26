@@ -1,18 +1,33 @@
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import crs1 from '../assets/crs1.webp';
 import crs2 from '../assets/crs2.webp';
+import EnrollModal from './EnrollModal';
 
 const CourseCard = ({ title, description }) => (
     <div className="bg-gradient-to-br from-secondary via-slate-900/80 to-primary border border-white/10 p-8 rounded-2xl hover:border-accent-cyan/50 transition-all shadow-xl shadow-blue-900/10 hover:shadow-2xl hover:shadow-accent-cyan/20 group relative overflow-hidden flex flex-col h-full">
         <div className="absolute top-0 right-0 w-32 h-32 bg-accent-cyan/20 blur-3xl -z-0 pointer-events-none"></div>
         <h3 className="text-xl font-heading font-bold mb-4 text-white group-hover:text-accent-cyan transition-colors relative z-10">{title}</h3>
         <p className="text-slate-300 mb-6 text-sm leading-relaxed relative z-10 flex-grow">{description}</p>
-        <button className="w-full py-3 mt-auto rounded-lg border border-accent-cyan text-accent-cyan font-medium hover:bg-accent-cyan hover:text-white transition-all relative z-10">
+        <Link
+            to={`/admission?course=${encodeURIComponent(title)}`}
+            className="w-full py-3 mt-auto rounded-lg border border-accent-cyan text-accent-cyan font-medium hover:bg-accent-cyan hover:text-white transition-all relative z-10 text-center block"
+        >
             Enroll Now
-        </button>
+        </Link>
     </div>
 );
 
 const Courses = () => {
+    const [modalOpen, setModalOpen] = useState(false);
+    const [selectedCourse, setSelectedCourse] = useState('');
+
+    const openEnroll = (course = '') => {
+        setSelectedCourse(course);
+        setModalOpen(true);
+    };
+    const closeEnroll = () => setModalOpen(false);
+
     return (
         <section id="courses" className="py-16 md:py-20 bg-white theme-light-section">
             <div className="container mx-auto px-4 md:px-6">
@@ -49,7 +64,10 @@ const Courses = () => {
                                     </li>
                                 ))}
                             </ul>
-                            <button className="w-full py-3 bg-gradient-to-r from-accent-cyan to-accent-blue text-white rounded-xl font-bold shadow-md hover:shadow-lg transition-all mt-auto">
+                            <button
+                                onClick={() => openEnroll('Advanced Digital Marketing')}
+                                className="w-full py-3 bg-gradient-to-r from-accent-cyan to-accent-blue text-white rounded-xl font-bold shadow-md hover:shadow-lg hover:shadow-accent-cyan/30 hover:-translate-y-0.5 transition-all mt-auto"
+                            >
                                 Enroll Now
                             </button>
                         </div>
@@ -76,7 +94,10 @@ const Courses = () => {
                                     </li>
                                 ))}
                             </ul>
-                            <button className="w-full py-3 bg-gradient-to-r from-accent-blue to-purple-600 text-white rounded-xl font-bold shadow-md hover:shadow-lg transition-all mt-auto">
+                            <button
+                                onClick={() => openEnroll('Creative Education')}
+                                className="w-full py-3 bg-gradient-to-r from-accent-blue to-purple-600 text-white rounded-xl font-bold shadow-md hover:shadow-lg hover:shadow-accent-blue/30 hover:-translate-y-0.5 transition-all mt-auto"
+                            >
                                 Enroll Now
                             </button>
                         </div>
@@ -92,20 +113,28 @@ const Courses = () => {
                 </div>
                 <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
                     <CourseCard
-                        title="Master In AI Digital Marketing"
+                        title="Master Diploma in AI Digital Marketing"
                         description="An advanced course that blends AI and digital marketing strategies to create future-ready marketers. Master tools like ChatGPT, Midjourney, and data analytics."
                     />
                     <CourseCard
-                        title="Diploma In Digital Marketing"
+                        title="Diploma in AI Digital Marketing"
                         description="A practical course that teaches you how to run ads, manage social media, and optimize SEO. Perfect for beginners looking to start a career."
                     />
                     <CourseCard
-                        title="Diploma In Graphic Design & Photography"
+                        title="Diploma in Graphic Design & Photography"
                         description="Become a skilled photographer and Graphic designer. Learn Adobe Creative Suite, composition, and visual storytelling techniques."
                     />
                 </div>
 
             </div>
+
+            {/* Enroll Modal */}
+            <EnrollModal
+                key={selectedCourse}
+                open={modalOpen}
+                onClose={closeEnroll}
+                defaultCourse={selectedCourse}
+            />
         </section>
     );
 };

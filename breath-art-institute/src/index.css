@@ -99,7 +99,14 @@
 }
 
 html {
-  scroll-behavior: smooth;
+  /* Lenis takes over scrolling — remove native smooth to avoid conflicts */
+  scroll-behavior: auto;
+  overscroll-behavior: none;
+  /* prevent bounce/rubber-band on chrome */
+  /* make font rendering super crisp */
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
@@ -110,6 +117,29 @@ body {
   min-height: 100vh;
   background: linear-gradient(160deg, #0a192f 0%, #112240 50%, #0a192f 100%);
   color: #ffffff;
+  overscroll-behavior: none;
+}
+
+/* ── Global smooth transitions on interactive elements ─────────────────────
+   Buttons, links, inputs all inherit a subtle ease so nothing snaps */
+a,
+button,
+input,
+select,
+textarea,
+[role="button"],
+[tabindex] {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── GPU-accelerate Framer Motion wrappers & any element that animates ──── */
+[data-framer-component-type],
+.motion-safe\:will-change-transform,
+[style*="transform"],
+[style*="opacity"] {
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 @utility text-gradient {

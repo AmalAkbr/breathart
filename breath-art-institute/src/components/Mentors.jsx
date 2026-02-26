@@ -5,7 +5,7 @@ import prajithImg from '../assets/Photo-1.webp';
 import bipashaImg from '../assets/Photo-2.webp';
 import sonaImg from '../assets/Photo-3.webp';
 import gladsonImg from '../assets/Photo-4.webp';
-import adithImg from '../assets/Photo-1.webp'; // No 5th photo found, using placeholder or reusing
+// No 5th photo found
 
 const mentors = [
     { name: "Prajith Prakash", role: "Operations Manager", image: sonaImg },

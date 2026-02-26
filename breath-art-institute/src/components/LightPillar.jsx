@@ -26,15 +26,12 @@ const LightPillar = ({
     const geometryRef = useRef(null);
     const mouseRef = useRef(new THREE.Vector2(0, 0));
     const timeRef = useRef(0);
-    const [webGLSupported, setWebGLSupported] = useState(true);
-
-    useEffect(() => {
+    const [webGLSupported, setWebGLSupported] = useState(() => {
+        if (typeof document === 'undefined') return true;
         const canvas = document.createElement('canvas');
-        const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-        if (!gl) {
-            setWebGLSupported(false);
-        }
-    }, []);
+        return !!(canvas.getContext('webgl') || canvas.getContext('experimental-webgl'));
+    });
+
 
     useEffect(() => {
         if (!containerRef.current || !webGLSupported) return;
@@ -79,7 +76,8 @@ const LightPillar = ({
                 stencil: false,
                 depth: false
             });
-        } catch (error) {
+        } catch {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setWebGLSupported(false);
             return;
         }

@@ -13,6 +13,7 @@ const Placement = lazy(() => import('../components/Placement'));
 const Mentors = lazy(() => import('../components/Mentors'));
 const DigitalMarketingCareer = lazy(() => import('../components/DigitalMarketingCareer'));
 const ToolsCovered = lazy(() => import('../components/ToolsCovered'));
+const HappyClients = lazy(() => import('../components/HappyClients'));
 const FAQ = lazy(() => import('../components/FAQ'));
 const Location = lazy(() => import('../components/Location'));
 
@@ -36,6 +37,7 @@ const Home = () => {
                 <Mentors />
                 <DigitalMarketingCareer />
                 <ToolsCovered />
+                <HappyClients />
                 <FAQ />
                 <Location />
             </Suspense>

@@ -15,7 +15,7 @@ const questions = [
     "Is there internship support?"
 ];
 
-const AccordionItem = ({ question, index }) => {
+const AccordionItem = ({ question }) => {
     const [isOpen, setIsOpen] = useState(false);
 
     return (

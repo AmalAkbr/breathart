@@ -37,7 +37,7 @@ const Placement = () => {
                         className="text-base md:text-lg text-slate-600 mb-6 max-w-3xl mx-auto leading-relaxed space-y-4 text-justify md:text-center"
                     >
                         <p>BreathArt Digital Marketing Agency is a results-driven digital marketing agency in Kerala, helping businesses and entrepreneurs grow their brand, leads, and sales through powerful online marketing strategies. We specialize in delivering customized digital solutions that focus on real growth, not just visibility.</p>
-                        <p>At BreathArt, we understand that every business is unique. That’s why we create tailored digital marketing strategies designed to meet your specific goals, target audience, and industry needs. From startups to established enterprises, we help brands build a strong online presence and achieve long-term success.</p>
+                        <p>At BreathArt, we understand that every business is unique. That's why we create tailored digital marketing strategies designed to meet your specific goals, target audience, and industry needs. From startups to established enterprises, we help brands build a strong online presence and achieve long-term success.</p>
                     </motion.div>
                 </div>
 

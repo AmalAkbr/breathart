@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
-import { useEffect, lazy, Suspense } from 'react';
+import { useEffect, lazy, Suspense, useRef } from 'react';
+import Lenis from 'lenis';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import WhatsAppButton from './components/WhatsAppButton';
@@ -12,6 +13,7 @@ const Careers = lazy(() => import('./pages/Careers'));
 const Admission = lazy(() => import('./pages/Admission'));
 const AboutUs = lazy(() => import('./pages/AboutUs'));
 const CoursesPage = lazy(() => import('./pages/CoursesPage'));
+const Brochure = lazy(() => import('./pages/Brochure'));
 
 // Invisible fallback — preserves full height to prevent CLS
 const PageLoader = () => <div style={{ minHeight: '100vh' }} aria-hidden="true" />;
@@ -20,35 +22,59 @@ const ScrollToTop = () => {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    // Prevent the browser from restoring the previous scroll position
     if ('scrollRestoration' in window.history) {
       window.history.scrollRestoration = 'manual';
     }
-
-    // If reloading with a hash (like /#about), strip it to force starting at the top Hero section
     if (window.location.hash) {
       window.history.replaceState(null, '', window.location.pathname);
     }
 
-    // Force scroll to top on every route change and initial load
-    window.scrollTo(0, 0);
-    setTimeout(() => {
+    // Use Lenis for smooth top-scroll on route change, fall back to native
+    if (window.__lenis) {
+      window.__lenis.scrollTo(0, { immediate: true });
+    } else {
       window.scrollTo(0, 0);
-    }, 50);
+    }
 
-    // Also force scroll to top right before the page unloads/reloads
     const handleBeforeUnload = () => window.scrollTo(0, 0);
     window.addEventListener('beforeunload', handleBeforeUnload);
-
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-    };
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [pathname]);
 
   return null;
 };
 
 function App() {
+  const lenisRef = useRef(null);
+
+  useEffect(() => {
+    // ── Lenis smooth scroll ──────────────────────────────────────────
+    const lenis = new Lenis({
+      duration: 1.4,          // animation duration in seconds
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // expo ease-out
+      smoothWheel: true,      // smooth mouse wheel
+      smoothTouch: false,     // native on touch (feels better)
+      wheelMultiplier: 0.9,   // slightly slower wheel = more premium feel
+      touchMultiplier: 1.5,
+    });
+    lenisRef.current = lenis;
+    window.__lenis = lenis;  // expose so navbar hash links can use lenis.scrollTo
+
+    // RAF loop
+    let rafId;
+    function raf(time) {
+      lenis.raf(time);
+      rafId = requestAnimationFrame(raf);
+    }
+    rafId = requestAnimationFrame(raf);
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      lenis.destroy();
+      delete window.__lenis;
+    };
+  }, []);
+
   return (
     <Router>
       <ScrollToTop />
@@ -62,6 +88,7 @@ function App() {
             <Route path="/blogs" element={<Blogs />} />
             <Route path="/careers" element={<Careers />} />
             <Route path="/admission" element={<Admission />} />
+            <Route path="/brochure" element={<Brochure />} />
           </Routes>
         </Suspense>
         <Footer />

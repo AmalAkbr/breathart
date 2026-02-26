@@ -1,16 +1,11 @@
 import './StarBorder.css';
 
-const StarBorder = ({
-    as: Component = 'div',
-    className = '',
-    color = 'white',
-    speed = '6s',
-    thickness = 1,
-    children,
-    ...rest
-}) => {
+const StarBorder = (props) => {
+    const Element = props.as || 'div';
+    const { className = '', color = 'white', speed = '6s', thickness = 1, children, ...rest } = props;
+
     return (
-        <Component
+        <Element
             className={`star-border-container ${className}`}
             style={{
                 padding: `${thickness}px 0`,
@@ -33,7 +28,7 @@ const StarBorder = ({
                 }}
             ></div>
             <div className="inner-content">{children}</div>
-        </Component>
+        </Element>
     );
 };
 
