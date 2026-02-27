@@ -16,7 +16,7 @@ const Location = () => {
                         <div className="absolute inset-0 bg-slate-800 animate-pulse -z-10" />
 
                         <iframe
-                            src="https://maps.google.com/maps?q=BreathArt+Institute+of+Creative+Technology,+Karthika+Tower,+Opposite+Wedland+Weddings,+Attingal&t=k&z=18&output=embed"
+                            src="https://maps.google.com/maps?q=BreathArt+Institute+of+Creative+Technology,+Karthika+Tower,+Opposite+Wedland+Weddings,+Attingal&t=m&z=17&output=embed"
                             width="100%"
                             height="100%"
                             style={{ border: 0 }}
