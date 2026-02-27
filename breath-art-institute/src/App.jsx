@@ -14,6 +14,7 @@ const Admission = lazy(() => import('./pages/Admission'));
 const AboutUs = lazy(() => import('./pages/AboutUs'));
 const CoursesPage = lazy(() => import('./pages/CoursesPage'));
 const Brochure = lazy(() => import('./pages/Brochure'));
+const LandingPage = lazy(() => import('./pages/LandingPage'));
 
 // Invisible fallback — preserves full height to prevent CLS
 const PageLoader = () => <div style={{ minHeight: '100vh' }} aria-hidden="true" />;
@@ -42,6 +43,29 @@ const ScrollToTop = () => {
   }, [pathname]);
 
   return null;
+};
+
+// Layout for the main website that includes global navigation and footers
+const MainLayout = () => {
+  return (
+    <>
+      <Navbar />
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/about" element={<AboutUs />} />
+          <Route path="/courses" element={<CoursesPage />} />
+          <Route path="/blogs" element={<Blogs />} />
+          <Route path="/careers" element={<Careers />} />
+          <Route path="/admission" element={<Admission />} />
+          <Route path="/brochure" element={<Brochure />} />
+        </Routes>
+      </Suspense>
+      <Footer />
+      <WhatsAppButton />
+      <ScrollToTopButton />
+    </>
+  );
 };
 
 function App() {
@@ -79,21 +103,17 @@ function App() {
     <Router>
       <ScrollToTop />
       <div className="min-h-screen text-white font-sans selection:bg-accent-cyan/30 overflow-x-hidden w-full max-w-[100vw]">
-        <Navbar />
-        <Suspense fallback={<PageLoader />}>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/about" element={<AboutUs />} />
-            <Route path="/courses" element={<CoursesPage />} />
-            <Route path="/blogs" element={<Blogs />} />
-            <Route path="/careers" element={<Careers />} />
-            <Route path="/admission" element={<Admission />} />
-            <Route path="/brochure" element={<Brochure />} />
-          </Routes>
-        </Suspense>
-        <Footer />
-        <WhatsAppButton />
-        <ScrollToTopButton />
+        <Routes>
+          {/* Isolated Landing Page (No Navbar/Footer) */}
+          <Route path="/landing" element={
+            <Suspense fallback={<PageLoader />}>
+              <LandingPage />
+            </Suspense>
+          } />
+
+          {/* Main Website Routes (Wrapped with Navbar/Footer) */}
+          <Route path="/*" element={<MainLayout />} />
+        </Routes>
       </div>
     </Router>
   );

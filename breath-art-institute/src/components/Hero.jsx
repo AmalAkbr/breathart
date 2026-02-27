@@ -31,7 +31,8 @@ const Hero = () => {
                 <div className="text-center lg:text-left order-2 lg:order-1">
                     <motion.h2
                         initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
                         transition={{ duration: 0.8 }}
                         style={{ willChange: "transform, opacity" }}
                         className="text-accent-cyan font-bold tracking-wider mb-3 uppercase text-xs md:text-sm"
@@ -41,7 +42,8 @@ const Hero = () => {
 
                     <motion.h1
                         initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
                         transition={{ duration: 0.8, delay: 0.2 }}
                         style={{ willChange: "transform, opacity" }}
                         className="text-[2rem] sm:text-4xl md:text-6xl lg:text-7xl font-heading font-bold mb-6 text-white leading-tight break-words"
@@ -54,7 +56,8 @@ const Hero = () => {
 
                     <motion.div
                         initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
                         transition={{ duration: 0.8, delay: 0.4 }}
                         style={{ willChange: "transform, opacity" }}
                         className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start w-full"
@@ -68,7 +71,8 @@ const Hero = () => {
                 {/* 3D Character Image */}
                 <motion.div
                     initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
                     transition={{ duration: 1 }}
                     className="relative h-[280px] sm:h-[360px] lg:h-[70vh] w-full flex items-center justify-center order-1 lg:order-2"
                 >

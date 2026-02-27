@@ -63,14 +63,20 @@ const Navbar = () => {
         if (anyOpen) {
             if (window.__lenis) window.__lenis.stop();
             document.body.style.overflow = 'hidden';
+            document.documentElement.style.overflow = 'hidden';
+            document.body.style.touchAction = 'none';
         } else {
             if (window.__lenis) window.__lenis.start();
             document.body.style.overflow = '';
+            document.documentElement.style.overflow = '';
+            document.body.style.touchAction = '';
         }
 
         return () => {
             if (window.__lenis) window.__lenis.start();
             document.body.style.overflow = '';
+            document.documentElement.style.overflow = '';
+            document.body.style.touchAction = '';
         };
     }, [hoveredItem, menuOpen, desktopMenuOpen, contactOpen]);
 
@@ -80,7 +86,7 @@ const Navbar = () => {
         <>
             <nav
                 onMouseLeave={() => setHoveredItem(null)}
-                className={`fixed top-0 w-full z-50 transition-all duration-300 ${hoveredItem && ['Courses', 'Our Services', 'Blogs', 'Careers', 'Contact Us'].includes(hoveredItem)
+                className={`fixed top-0 w-full ${menuOpen ? 'z-[70]' : 'z-50'} transition-all duration-300 ${hoveredItem && ['Courses', 'Our Services', 'Blogs', 'Careers', 'Contact Us'].includes(hoveredItem)
                     ? (isWhiteNav ? 'bg-white/80 backdrop-blur-3xl shadow-lg border-transparent' : 'bg-[#0a0f1a]/80 backdrop-blur-3xl shadow-xl border-transparent')
                     : isWhiteNav
                         ? 'bg-white/95 backdrop-blur-xl border-b border-slate-200 shadow-sm'
@@ -419,59 +425,96 @@ const Navbar = () => {
             <AnimatePresence>
                 {menuOpen && (
                     <motion.div
-                        initial={{ opacity: 0, y: -20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
                         transition={{ duration: 0.3 }}
-                        className={`fixed top-0 left-0 right-0 z-40 backdrop-blur-2xl border-b lg:hidden overflow-hidden pt-24 ${isWhiteNav ? 'bg-white/95 border-slate-200' : 'bg-[#0a0f1a]/95 border-white/10'}`}
+                        className={`fixed inset-0 z-[60] lg:hidden backdrop-blur-3xl ${isWhiteNav ? 'bg-white/95' : 'bg-[#0a0f1a]/95'}`}
                     >
-                        <div className="w-full px-6 pb-12 flex flex-col gap-6">
-                            {navLinks.map((item) => {
-                                const isInternalPage = ['About', 'Courses', 'Blogs', 'Careers', 'Brochure'].includes(item);
-                                const path = item === 'Our Services' ? '/#tools' : isInternalPage ? `/${item.toLowerCase().replace(' ', '-')}` : (item === 'Home' ? '/' : `/#${item.toLowerCase().replace(' ', '-')}`);
+                        <div className="h-full w-full overflow-y-auto overscroll-contain pt-24 pb-20 px-6">
+                            <div className="w-full px-6 pb-20 flex flex-col gap-10">
+                                {/* Quick Links Section */}
+                                <div>
+                                    <h4 className={`text-xs font-bold tracking-wider mb-6 uppercase ${isWhiteNav ? 'text-slate-500' : 'text-slate-500'}`}>Quick Links</h4>
+                                    <div className="flex flex-col gap-4">
+                                        {[
+                                            { name: 'Home', path: '/' },
+                                            { name: 'About Us', path: '/about' },
+                                            { name: 'Courses', path: '/courses' },
+                                            { name: 'Our Services', path: '/#tools' },
+                                            { name: 'Blogs', path: '/blogs' },
+                                            { name: 'Careers', path: '/careers' },
+                                            { name: 'Brochure', path: '/brochure' },
+                                            { name: 'Admission', path: '/admission' }
+                                        ].map((item) => (
+                                            <Link
+                                                key={item.name}
+                                                to={item.path}
+                                                onClick={(e) => {
+                                                    setMenuOpen(false);
+                                                    if (item.name === 'Home') {
+                                                        if (location.pathname === '/') {
+                                                            e.preventDefault();
+                                                        }
+                                                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                                                        setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 100);
+                                                    }
+                                                }}
+                                                className={`text-2xl font-bold py-2 transition-colors flex justify-between items-center group ${isWhiteNav ? 'text-blue-900' : 'text-slate-200'}`}
+                                            >
+                                                {item.name}
+                                                <span className={`w-2 h-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity ${isWhiteNav ? 'bg-accent-blue' : 'bg-accent-cyan'}`} />
+                                            </Link>
+                                        ))}
+                                        <button
+                                            onClick={openContact}
+                                            className={`text-2xl font-bold py-2 transition-colors flex justify-between items-center group w-full text-left ${isWhiteNav ? 'text-blue-900 hover:text-accent-blue' : 'text-slate-200 hover:text-accent-cyan'}`}
+                                        >
+                                            Contact Us
+                                            <span className={`w-2 h-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity ${isWhiteNav ? 'bg-accent-blue' : 'bg-accent-cyan'}`} />
+                                        </button>
+                                    </div>
+                                </div>
 
-                                const handleHomeClick = (e) => {
-                                    setMenuOpen(false);
-                                    if (item === 'Home') {
-                                        if (location.pathname === '/') {
-                                            e.preventDefault();
-                                        }
-                                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                                        setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 100);
-                                    }
-                                };
+                                {/* Featured Info Section */}
+                                <div>
+                                    <h4 className={`text-xs font-bold tracking-wider mb-6 uppercase ${isWhiteNav ? 'text-slate-500' : 'text-slate-500'}`}>Featured Info</h4>
+                                    <div className="space-y-6">
+                                        <div>
+                                            <p className="text-sm font-bold uppercase mb-1 text-accent-cyan">Admissions Open</p>
+                                            <p className={`text-sm ${isWhiteNav ? 'text-slate-600' : 'text-slate-400'}`}>Enroll now for the upcoming batch of AI Digital Marketing.</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-sm font-bold uppercase mb-1 text-accent-cyan">Get in Touch</p>
+                                            <div className={`space-y-3 mt-4 ${isWhiteNav ? 'text-slate-600' : 'text-slate-400'}`}>
+                                                <a href="mailto:info@breathartinstitute.in" className="flex items-center gap-2 hover:text-accent-cyan transition-colors">
+                                                    <Mail className="w-4 h-4" /> info@breathartinstitute.in
+                                                </a>
+                                                <a href="tel:+918590144794" className="flex items-center gap-2 hover:text-accent-cyan transition-colors">
+                                                    <Phone className="w-4 h-4" /> +91 8590 144 794
+                                                </a>
+                                                <div className="flex items-start gap-2">
+                                                    <MapPin className="w-4 h-4 mt-0.5 shrink-0" />
+                                                    <span>Karthika Tower, Attingal, Trivandrum</span>
+                                                </div>
+                                            </div>
+                                        </div>
 
-                                return isInternalPage || item === 'Home' ? (
-                                    <Link
-                                        key={item}
-                                        to={path}
-                                        onClick={handleHomeClick}
-                                        className={`text-2xl font-bold py-3 border-b last:border-none transition-colors flex justify-between items-center group ${isWhiteNav ? 'text-blue-900 border-slate-100' : 'text-slate-200 border-white/5'}`}
-                                    >
-                                        {item}
-                                        <span className={`w-2 h-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity ${isWhiteNav ? 'bg-accent-blue' : 'bg-accent-cyan'}`} />
-                                    </Link>
-                                ) : (
-                                    <a
-                                        key={item}
-                                        href={path}
-                                        onClick={() => setMenuOpen(false)}
-                                        className={`text-2xl font-bold py-3 border-b last:border-none transition-colors flex justify-between items-center group ${isWhiteNav ? 'text-blue-900 border-slate-100' : 'text-slate-200 border-white/5'}`}
-                                    >
-                                        {item}
-                                        <span className={`w-2 h-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity ${isWhiteNav ? 'bg-accent-blue' : 'bg-accent-cyan'}`} />
-                                    </a>
-                                );
-                            })}
-                            {/* Contact Us button in mobile menu */}
-                            <button
-                                onClick={openContact}
-                                className={`text-2xl font-bold py-3 border-b last:border-none transition-colors flex justify-between items-center group w-full text-left ${isWhiteNav ? 'text-blue-900 border-slate-100 hover:text-accent-blue' : 'text-slate-200 border-white/5 hover:text-accent-cyan'}`}
-                            >
-                                Contact Us
-                                <span className={`w-2 h-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity ${isWhiteNav ? 'bg-accent-blue' : 'bg-accent-cyan'}`} />
-                            </button>
-
+                                        {/* Socials */}
+                                        <div className="pt-4 flex gap-4">
+                                            <a href="https://www.instagram.com/breathart.tools/" target="_blank" rel="noopener noreferrer" className={`p-2 rounded-full transition-colors ${isWhiteNav ? 'bg-slate-100 text-slate-600 hover:text-accent-blue' : 'bg-white/5 text-slate-400 hover:text-white'}`}>
+                                                <Instagram className="w-5 h-5" />
+                                            </a>
+                                            <a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer" className={`p-2 rounded-full transition-colors ${isWhiteNav ? 'bg-slate-100 text-slate-600 hover:text-accent-blue' : 'bg-white/5 text-slate-400 hover:text-white'}`}>
+                                                <Facebook className="w-5 h-5" />
+                                            </a>
+                                            <a href="https://www.linkedin.com/" target="_blank" rel="noopener noreferrer" className={`p-2 rounded-full transition-colors ${isWhiteNav ? 'bg-slate-100 text-slate-600 hover:text-accent-blue' : 'bg-white/5 text-slate-400 hover:text-white'}`}>
+                                                <Linkedin className="w-5 h-5" />
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </motion.div>
                 )}

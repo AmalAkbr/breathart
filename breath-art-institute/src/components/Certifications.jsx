@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 
 const Certifications = () => {
     return (
-        <section className="py-20 relative bg-secondary">
+        <section className="py-20 relative bg-secondary -mt-[2px] z-10">
             {/* Wave Separator Top - transitions from the white courses section above */}
             <div className="absolute top-0 left-0 w-full overflow-hidden leading-[0]">
                 <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none" className="relative block w-[calc(100%+1.3px)] h-[60px] fill-white">

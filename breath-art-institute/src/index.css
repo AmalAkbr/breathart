@@ -111,8 +111,6 @@ html {
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
   background: linear-gradient(160deg, #0a192f 0%, #112240 50%, #0a192f 100%);
