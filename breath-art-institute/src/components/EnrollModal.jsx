@@ -83,7 +83,7 @@ const EnrollModal = ({ open, onClose, defaultCourse = '' }) => {
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.94, y: 30 }}
                             transition={{ type: 'spring', damping: 24, stiffness: 260 }}
-                            className="w-full max-w-3xl bg-white rounded-3xl shadow-2xl shadow-black/30 overflow-hidden flex flex-col max-h-[90vh] pointer-events-auto"
+                            className="w-full max-w-3xl bg-white rounded-3xl shadow-2xl shadow-black/30 overflow-y-auto flex flex-col max-h-[90vh] pointer-events-auto"
                         >
                             {/* Glow blobs */}
                             <div className="absolute top-0 right-0 w-64 h-64 bg-accent-cyan/10 blur-[80px] pointer-events-none" />
@@ -92,49 +92,62 @@ const EnrollModal = ({ open, onClose, defaultCourse = '' }) => {
                             <div className="flex flex-col md:flex-row flex-1 min-h-0 relative z-10">
 
                                 {/* ── Left panel ─────────────────────────────────────── */}
-                                <div className="md:w-[42%] bg-gradient-to-br from-[#0a192f] via-[#112240] to-[#0d2137] p-8 md:p-10 flex flex-col justify-between shrink-0">
-                                    <div>
-                                        {/* Close on mobile */}
-                                        <div className="flex justify-end md:hidden mb-4">
-                                            <button onClick={onClose} className="p-2 rounded-full text-white/50 hover:text-white hover:bg-white/10 transition-colors">
-                                                <X className="w-5 h-5" />
-                                            </button>
-                                        </div>
+                                <div className="md:w-[42%] bg-gradient-to-br from-[#0a192f] via-[#112240] to-[#0d2137] flex flex-col justify-between shrink-0">
 
-                                        <div className="w-12 h-12 rounded-2xl bg-accent-cyan/20 border border-accent-cyan/30 flex items-center justify-center mb-6">
-                                            <BookOpen className="w-6 h-6 text-accent-cyan" />
+                                    {/* Mobile: compact horizontal strip */}
+                                    <div className="flex md:hidden items-center gap-3 px-4 py-3">
+                                        <div className="w-9 h-9 rounded-xl bg-accent-cyan/20 border border-accent-cyan/30 flex items-center justify-center shrink-0">
+                                            <BookOpen className="w-4 h-4 text-accent-cyan" />
                                         </div>
-
-                                        <h2 className="text-white font-bold text-2xl md:text-3xl leading-tight mb-3">
-                                            Enroll in Your <br />
-                                            <span className="bg-clip-text text-transparent bg-gradient-to-r from-accent-cyan to-accent-blue">
-                                                Dream Course
-                                            </span>
-                                        </h2>
-                                        <p className="text-slate-400 text-sm leading-relaxed mb-8">
-                                            Fill in your details and our admissions team will reach out within 24 hours to confirm your enrollment.
-                                        </p>
-
-                                        {/* Selected course badge */}
-                                        <div className="bg-white/5 border border-white/10 rounded-2xl p-5">
-                                            <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">Selected Program</p>
-                                            <p className="text-white font-semibold text-base leading-snug">
-                                                {defaultCourse || 'Not specified'}
-                                            </p>
-                                            <div className="mt-3 inline-flex items-center gap-1.5 bg-accent-cyan/20 text-accent-cyan text-xs font-bold px-3 py-1 rounded-full">
-                                                <span className="w-1.5 h-1.5 rounded-full bg-accent-cyan animate-pulse" />
-                                                Admissions Open
-                                            </div>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-white font-bold text-sm leading-tight">Enroll in Your Dream Course</p>
+                                            {defaultCourse && (
+                                                <p className="text-accent-cyan text-xs truncate mt-0.5">{defaultCourse}</p>
+                                            )}
                                         </div>
+                                        <button onClick={onClose} className="p-2 rounded-full text-white/50 hover:text-white hover:bg-white/10 transition-colors shrink-0">
+                                            <X className="w-5 h-5" />
+                                        </button>
                                     </div>
 
-                                    <p className="text-slate-600 text-xs mt-8 hidden md:block">
-                                        BreathArt Institute of Creative Technology, Attingal, Trivandrum
-                                    </p>
+                                    {/* Desktop: full vertical panel */}
+                                    <div className="hidden md:flex flex-col justify-between flex-1 p-10">
+                                        <div>
+                                            <div className="w-12 h-12 rounded-2xl bg-accent-cyan/20 border border-accent-cyan/30 flex items-center justify-center mb-6">
+                                                <BookOpen className="w-6 h-6 text-accent-cyan" />
+                                            </div>
+
+                                            <h2 className="text-white font-bold text-3xl leading-tight mb-3">
+                                                Enroll in Your <br />
+                                                <span className="bg-clip-text text-transparent bg-gradient-to-r from-accent-cyan to-accent-blue">
+                                                    Dream Course
+                                                </span>
+                                            </h2>
+                                            <p className="text-slate-400 text-sm leading-relaxed mb-8">
+                                                Fill in your details and our admissions team will reach out within 24 hours to confirm your enrollment.
+                                            </p>
+
+                                            {/* Selected course badge */}
+                                            <div className="bg-white/5 border border-white/10 rounded-2xl p-5">
+                                                <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">Selected Program</p>
+                                                <p className="text-white font-semibold text-base leading-snug">
+                                                    {defaultCourse || 'Not specified'}
+                                                </p>
+                                                <div className="mt-3 inline-flex items-center gap-1.5 bg-accent-cyan/20 text-accent-cyan text-xs font-bold px-3 py-1 rounded-full">
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-accent-cyan animate-pulse" />
+                                                    Admissions Open
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <p className="text-slate-600 text-xs mt-8">
+                                            BreathArt Institute of Creative Technology, Attingal, Trivandrum
+                                        </p>
+                                    </div>
                                 </div>
 
                                 {/* ── Right panel: Form ───────────────────────────────── */}
-                                <div className="flex-1 p-8 md:p-10 overflow-y-auto">
+                                <div className="flex-1 p-5 md:p-10 overflow-y-auto">
 
                                     {/* Close on desktop */}
                                     <div className="hidden md:flex justify-end mb-2">
