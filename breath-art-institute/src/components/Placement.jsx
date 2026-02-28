@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
-import experts from '../assets/experts.jpeg';
-import career from '../assets/career.jpeg';
+import experts from '../assets/experts.webp';
+import career from '../assets/career.webp';
 
 const Placement = () => {
     return (

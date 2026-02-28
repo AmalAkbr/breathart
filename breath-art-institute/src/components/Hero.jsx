@@ -34,7 +34,6 @@ const Hero = () => {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.8 }}
-                        style={{ willChange: "transform, opacity" }}
                         className="text-accent-cyan font-bold tracking-wider mb-3 uppercase text-xs md:text-sm"
                     >
                         Kerala's Most Advanced Digital Marketing Training Programme
@@ -45,7 +44,6 @@ const Hero = () => {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.8, delay: 0.2 }}
-                        style={{ willChange: "transform, opacity" }}
                         className="text-[2rem] sm:text-4xl md:text-6xl lg:text-7xl font-heading font-bold mb-6 text-white leading-tight break-words"
                     >
                         Kerala's Best <br />
@@ -59,7 +57,6 @@ const Hero = () => {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.8, delay: 0.4 }}
-                        style={{ willChange: "transform, opacity" }}
                         className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start w-full"
                     >
                         <Link to="/courses" className="bg-gradient-to-r from-accent-cyan to-accent-blue text-white px-8 py-3 rounded-full font-bold hover:shadow-lg hover:shadow-accent-cyan/30 transition-all transform-gpu hover:-translate-y-1 w-full sm:w-auto break-words whitespace-normal text-center inline-block">

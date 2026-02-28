@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { Globe } from 'lucide-react';
-import globeBg from '../assets/globe.jpeg';
+import globeBg from '../assets/globe.webp';
 
 const HappyClients = () => {
     return (

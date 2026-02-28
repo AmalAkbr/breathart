@@ -37,7 +37,6 @@ const About = () => {
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.8 }}
-                        style={{ willChange: "transform" }}
                         className="relative"
                     >
                         <div className="aspect-square w-full max-w-[480px] mx-auto rounded-2xl overflow-hidden shadow-2xl shadow-black/50 border border-white/10 group">
@@ -55,13 +54,11 @@ const About = () => {
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.8 }}
-                        style={{ willChange: "transform, opacity" }}
                     >
                         <motion.h2
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
-                            style={{ willChange: "transform, opacity" }}
                             className="text-4xl lg:text-5xl font-heading font-bold mb-6 text-white leading-tight break-words"
                         >
                             <span className="text-gradient">About</span> BreathArt Institute
@@ -72,7 +69,6 @@ const About = () => {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: 0.1 }}
-                            style={{ willChange: "transform, opacity" }}
                             className="text-slate-300 mb-6 text-lg break-words whitespace-normal"
                         >
                             BreathArt Institute of Creative Technology (BICT) is a premier international agency-based institute and a proud part of the renowned BreathArt Group – Dubai. We deliver global education standards through real-world, agency-driven training designed to create industry-ready digital professionals.

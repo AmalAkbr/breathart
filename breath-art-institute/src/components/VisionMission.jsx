@@ -78,7 +78,6 @@ const VisionMission = () => {
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true, margin: "-100px" }}
                         transition={{ duration: 1.2, delay: 0.2, type: "spring", bounce: 0.3 }}
-                        style={{ willChange: "transform, opacity" }}
                         className="w-full h-full min-h-[120px] lg:min-h-[130px] lg:translate-y-3"
                     >
                         <TiltedCard
