@@ -17,15 +17,11 @@ const EnrollModal = ({ open, onClose, defaultCourse = '' }) => {
         if (open) {
             setForm({ name: '', email: '', phone: '', message: '' });
             setStatus('idle');
-            // Lock scroll — stop Lenis if active, fall back to overflow:hidden
-            if (window.__lenis) window.__lenis.stop();
             document.body.style.overflow = 'hidden';
         } else {
-            if (window.__lenis) window.__lenis.start();
             document.body.style.overflow = '';
         }
         return () => {
-            if (window.__lenis) window.__lenis.start();
             document.body.style.overflow = '';
         };
     }, [open]);
@@ -147,7 +143,10 @@ const EnrollModal = ({ open, onClose, defaultCourse = '' }) => {
                                 </div>
 
                                 {/* ── Right panel: Form ───────────────────────────────── */}
-                                <div className="flex-1 p-5 md:p-10 overflow-y-auto">
+                                <div
+                                    data-lenis-prevent="true"
+                                    className="flex-1 p-5 md:p-10 overflow-y-auto"
+                                >
 
                                     {/* Close on desktop */}
                                     <div className="hidden md:flex justify-end mb-2">

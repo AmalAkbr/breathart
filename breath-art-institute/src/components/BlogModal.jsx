@@ -7,7 +7,7 @@ const BlogModal = ({ blog, onClose }) => {
     useEffect(() => {
         document.body.style.overflow = 'hidden';
         return () => {
-            document.body.style.overflow = 'unset';
+            document.body.style.overflow = '';
         };
     }, []);
 
@@ -50,7 +50,10 @@ const BlogModal = ({ blog, onClose }) => {
                 </div>
 
                 {/* Content Section (Scrollable) */}
-                <div className="p-8 overflow-y-auto w-full custom-scrollbar flex-1 bg-white">
+                <div
+                    data-lenis-prevent="true"
+                    className="p-8 overflow-y-auto w-full custom-scrollbar flex-1 bg-white"
+                >
                     <div className="prose prose-lg prose-slate max-w-none">
                         {blog.content ? (
                             blog.content.map((paragraph, idx) => (

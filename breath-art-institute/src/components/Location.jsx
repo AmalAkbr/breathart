@@ -16,14 +16,13 @@ const Location = () => {
                         <div className="absolute inset-0 bg-slate-800 animate-pulse -z-10" />
 
                         <iframe
-                            src="https://maps.google.com/maps?q=BreathArt+Institute+of+Creative+Technology,+Karthika+Tower,+Opposite+Wedland+Weddings,+Attingal&t=m&z=17&output=embed"
+                            src="https://maps.google.com/maps?q=Breathart%20Institute%20of%20Creative%20Technology%20%28BICT%29%20Karthika%20Tower%2C%20Opposite%20Wedland%20Weddings%2C%20Attingal&t=m&z=13&output=embed&iwloc=near"
                             width="100%"
                             height="100%"
-                            style={{ border: 0 }}
                             allowFullScreen=""
                             loading="lazy"
                             referrerPolicy="no-referrer-when-downgrade"
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover border-0"
                             title="BreathArt Institute Location"
                         ></iframe>
                     </div>

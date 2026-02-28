@@ -17,7 +17,7 @@ const Brochure = lazy(() => import('./pages/Brochure'));
 const LandingPage = lazy(() => import('./pages/LandingPage'));
 
 // Invisible fallback — preserves full height to prevent CLS
-const PageLoader = () => <div style={{ minHeight: '100vh' }} aria-hidden="true" />;
+const PageLoader = () => <div className="min-h-screen" aria-hidden="true" />;
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();

@@ -4,6 +4,8 @@ import photographyImage from '../assets/photography.webp';
 import instituteImage from '../assets/institute.webp';
 import marketingImage from '../assets/marketing.webp';
 import bgImage from '../assets/bg.webp';
+import RotatingText from '../components/RotatingText';
+import Aurora from '../components/Aurora';
 
 const AboutUs = () => {
     return (
@@ -16,9 +18,30 @@ const AboutUs = () => {
                     transition={{ duration: 0.8 }}
                     className="text-center mb-20"
                 >
-                    <h2 className="text-4xl md:text-5xl lg:text-6xl font-heading font-bold mb-8 leading-tight text-slate-900">
-                        Best Digital Marketing Academy<br />
-                        Powered by <span className="text-gradient">AI UAE Expertise</span>
+                    <h2 className="text-4xl md:text-5xl lg:text-6xl font-heading font-bold mb-8 leading-tight text-slate-900 flex flex-col items-center">
+                        <div>Best Digital Marketing Academy</div>
+                        <div className="flex flex-wrap justify-center items-center gap-x-3 gap-y-2 mt-2 overflow-hidden">
+                            <motion.span
+                                layout
+                                initial={{ y: '100%', opacity: 0 }}
+                                animate={{ y: 0, opacity: 1 }}
+                                transition={{ type: "spring", damping: 25, stiffness: 200, delay: 0.2, layout: { type: "spring", damping: 25, stiffness: 200 } }}
+                                className="inline-block font-medium"
+                            >
+                                Powered by
+                            </motion.span>
+                            <RotatingText
+                                texts={['AI', 'UAE Expertise']}
+                                mainClassName="text-accent-cyan drop-shadow-sm font-bold tracking-tight inline-flex"
+                                staggerFrom="center"
+                                staggerDuration={0.025}
+                                rotationInterval={3500}
+                                initial={{ y: '70%', opacity: 0, scale: 0.95 }}
+                                animate={{ y: 0, opacity: 1, scale: 1 }}
+                                exit={{ y: '-70%', opacity: 0, scale: 0.95 }}
+                                transition={{ type: 'spring', damping: 22, stiffness: 220, mass: 0.6 }}
+                            />
+                        </div>
                     </h2>
                     <p className="text-xl md:text-2xl text-slate-600 max-w-4xl mx-auto leading-relaxed font-light">
                         Join the best digital marketing academy in Attingal. Learn SEO, Google Ads & social media marketing with expert trainers. Enroll today!
@@ -107,40 +130,45 @@ const AboutUs = () => {
                     />
                     <div className="absolute inset-0 bg-[#0a0f1a]/80 z-0" />
 
-                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-accent-cyan to-accent-blue z-10" />
 
-                    <div className="max-w-7xl mx-auto relative z-10">
-                        <div className="grid lg:grid-cols-[auto_1fr] gap-12 lg:gap-16 items-center">
-                            {/* Images Column */}
-                            <div className="flex flex-col gap-8 w-full max-w-[120px] mx-auto lg:mx-0">
-                                <div className="flex items-center justify-center">
-                                    <img src={photographyImage} alt="Photography Studio" loading="lazy" decoding="async" className="w-full h-auto object-contain" />
-                                </div>
-                                <div className="flex items-center justify-center">
-                                    <img src={instituteImage} alt="Education Institute" loading="lazy" decoding="async" className="w-full h-auto object-contain" />
-                                </div>
-                                <div className="flex items-center justify-center">
-                                    <img src={marketingImage} alt="Digital Marketing" loading="lazy" decoding="async" className="w-full h-auto object-contain" />
-                                </div>
-                            </div>
+                    <div className="relative z-10 w-full max-w-7xl mx-auto mt-20 md:mt-32">
+                        <div className="border border-white/10 rounded-3xl p-8 md:p-12 lg:p-16 relative overflow-hidden shadow-2xl bg-[#0f172a]">
+                            <div className="absolute inset-0 bg-slate-900/40 z-[5]" />
 
-                            {/* Text Column */}
-                            <div className="flex flex-col justify-center">
-                                <h3 className="text-3xl md:text-4xl font-bold mb-8 text-white text-left">BreathArt Group</h3>
+                            <div className="relative z-10">
+                                <div className="grid grid-cols-[auto_1fr] lg:grid-cols-[auto_1fr] gap-6 md:gap-12 lg:gap-16 items-center">
+                                    {/* Images Column - Pushed to right on mobile */}
+                                    <div className="flex flex-col gap-4 md:gap-8 w-full max-w-[70px] md:max-w-[120px] order-1 ml-0">
+                                        <div className="flex items-center justify-center bg-white/10 backdrop-blur-sm p-3 md:p-4 rounded-xl md:rounded-2xl border border-white/20">
+                                            <img src={photographyImage} alt="Photography Studio" loading="lazy" decoding="async" className="w-full h-auto object-contain" />
+                                        </div>
+                                        <div className="flex items-center justify-center bg-white/10 backdrop-blur-sm p-3 md:p-4 rounded-xl md:rounded-2xl border border-white/20">
+                                            <img src={instituteImage} alt="Education Institute" loading="lazy" decoding="async" className="w-full h-auto object-contain" />
+                                        </div>
+                                        <div className="flex items-center justify-center bg-white/10 backdrop-blur-sm p-3 md:p-4 rounded-xl md:rounded-2xl border border-white/20">
+                                            <img src={marketingImage} alt="Digital Marketing" loading="lazy" decoding="async" className="w-full h-auto object-contain" />
+                                        </div>
+                                    </div>
 
-                                <div className="space-y-6 text-slate-300 text-lg leading-relaxed text-left">
-                                    <p>
-                                        <strong className="text-accent-cyan font-bold">BreathArt Group</strong> is a UAE-based creative and business group offering a complete ecosystem of AI-powered digital marketing, branding solutions, education institutes, professional photography studios, and business consultancy services.
-                                    </p>
-                                    <p>
-                                        Founded in 2024 in the United Arab Emirates, BreathArt Group has expanded its operations to India and global markets, supporting brands and individuals across multiple industries. Our integrated approach helps businesses achieve strong online visibility, high-quality lead generation, and long-term brand growth.
-                                    </p>
-                                    <p>
-                                        With a growing international presence, we have successfully served more than <strong className="text-white">500 happy clients worldwide</strong>, delivering measurable results and creating new business opportunities every month across the globe.
-                                    </p>
-                                    <p className="text-xl text-slate-200 font-medium mt-8 pt-8 border-t border-white/20">
-                                        At BreathArt Group, we focus on transforming companies into brands by combining strategic marketing, creative innovation, advanced AI solutions, and industry-focused education.
-                                    </p>
+                                    {/* Text Column - Right aligned on mobile */}
+                                    <div className="flex flex-col justify-center order-2 text-left">
+                                        <h3 className="text-2xl md:text-4xl font-bold mb-6 md:mb-8 text-white">BreathArt Group</h3>
+
+                                        <div className="space-y-4 md:space-y-6 text-slate-300 text-sm sm:text-base md:text-lg leading-relaxed">
+                                            <p>
+                                                <strong className="text-accent-cyan font-bold">BreathArt Group</strong> is a UAE-based creative and business group offering a complete ecosystem of AI-powered digital marketing, branding solutions, education institutes, professional photography studios, and business consultancy services.
+                                            </p>
+                                            <p>
+                                                Founded in 2024 in the United Arab Emirates, BreathArt Group has expanded its operations to India and global markets, supporting brands and individuals across multiple industries. Our integrated approach helps businesses achieve strong online visibility, high-quality lead generation, and long-term brand growth.
+                                            </p>
+                                            <p>
+                                                With a growing international presence, we have successfully served more than <strong className="text-white">500 happy clients worldwide</strong>, delivering measurable results and creating new business opportunities every month across the globe.
+                                            </p>
+                                            <p className="text-lg md:text-xl text-slate-200 font-medium mt-6 md:mt-8 pt-6 md:pt-8 border-t border-white/20">
+                                                At BreathArt Group, we focus on transforming companies into brands by combining strategic marketing, creative innovation, advanced AI solutions, and industry-focused education.
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

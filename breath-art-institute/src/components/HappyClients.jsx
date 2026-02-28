@@ -1,9 +1,16 @@
 import { motion } from 'framer-motion';
 import { Globe } from 'lucide-react';
+import globeBg from '../assets/globe.jpeg';
 
 const HappyClients = () => {
     return (
-        <section className="py-24 md:py-32 relative overflow-hidden bg-gradient-to-b from-bg-dark via-bg-mid to-bg-dark">
+        <section className="py-24 md:py-32 relative overflow-hidden text-white">
+            {/* Globe Background */}
+            <div className="absolute inset-0 z-0">
+                <img src={globeBg} alt="Globe Background" loading="lazy" decoding="async" className="w-full h-full object-cover opacity-60" />
+                <div className="absolute inset-0 bg-[#0a192f]/60" />
+            </div>
+
             {/* Background glows */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-accent-blue/10 rounded-full blur-[130px] pointer-events-none" />
             <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-accent-cyan/8 rounded-full blur-[100px] pointer-events-none" />

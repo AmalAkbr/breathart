@@ -29,8 +29,7 @@ const DigitalMarketingCareer = () => {
                         <div className="relative w-full aspect-video bg-slate-900 rounded-xl border border-slate-700/50">
                             <iframe
                                 className="absolute top-0 left-0 w-full h-full"
-                                // Replace 'dQw4w9WgXcQ' with the actual YouTube video ID for the BreathArt video
-                                src="https://www.youtube.com/embed/R0L4E_c6uH8"
+                                src="https://www.youtube.com/embed/odEB4rRC424"
                                 title="Digital Marketing Course BreathArt"
                                 frameBorder="0"
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"

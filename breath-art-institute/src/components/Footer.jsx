@@ -4,7 +4,7 @@ import face from '../assets/facebook.png'; // tiny (21KB), not converted
 import linkedin from '../assets/linkedin.png'; // tiny (9KB), not converted
 import xIcon from '../assets/X.png'; // tiny (37KB), not converted
 
-const Footer = () => {
+const Footer = ({ isLanding = false }) => {
     return (
         <footer id="contact" className="py-12 border-t border-black/40 bg-black text-white shadow-[0_-4px_30px_rgba(0,0,0,0.5)]">
             <div className="w-full max-w-[1600px] mx-auto px-4 md:px-12 lg:px-16">
@@ -16,7 +16,7 @@ const Footer = () => {
                         <p className="text-slate-400 mb-6 max-w-sm">
                             Shaping future leaders through AI-powered creative education and agency-based training.
                         </p>
-                        <div className="flex gap-4">
+                        <div className="flex gap-4 mb-8">
                             <a href="https://www.instagram.com/breathart.institute/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-accent-cyan/20 hover:border-accent-cyan/40 transition-colors cursor-pointer overflow-hidden">
                                 <img src={insta} alt="Instagram" loading="lazy" decoding="async" className="w-full h-full object-cover" />
                             </a>
@@ -30,16 +30,28 @@ const Footer = () => {
                                 <img src={xIcon} alt="X (formerly Twitter)" loading="lazy" decoding="async" className="w-full h-full object-cover rounded-[10px]" />
                             </a>
                         </div>
+                        {!isLanding && (
+                            <Link
+                                to="/landing"
+                                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-white/20 bg-white/5 text-slate-300 hover:text-white hover:border-accent-cyan hover:bg-accent-cyan/10 transition-all font-medium text-sm w-fit"
+                            >
+                                View Landing Page
+                            </Link>
+                        )}
                     </div>
 
                     <div>
                         <h4 className="text-white font-bold mb-4">Quick Links</h4>
                         <ul className="space-y-2 text-slate-400">
                             <li><Link to="/#about" className="hover:text-accent-cyan transition-colors">About Us</Link></li>
-                            <li><Link to="/#courses" className="hover:text-accent-cyan transition-colors">Courses</Link></li>
-                            <li><Link to="/careers" className="hover:text-accent-cyan transition-colors">Careers</Link></li>
-                            <li><Link to="/blogs" className="hover:text-accent-cyan transition-colors">Blogs</Link></li>
-                            <li><Link to="/brochure" className="hover:text-accent-cyan transition-colors">Brochure</Link></li>
+                            {!isLanding && (
+                                <>
+                                    <li><Link to="/#courses" className="hover:text-accent-cyan transition-colors">Courses</Link></li>
+                                    <li><Link to="/careers" className="hover:text-accent-cyan transition-colors">Careers</Link></li>
+                                    <li><Link to="/blogs" className="hover:text-accent-cyan transition-colors">Blogs</Link></li>
+                                    <li><Link to="/brochure" className="hover:text-accent-cyan transition-colors">Brochure</Link></li>
+                                </>
+                            )}
                         </ul>
                     </div>
 

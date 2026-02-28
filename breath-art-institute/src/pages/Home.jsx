@@ -18,7 +18,7 @@ const FAQ = lazy(() => import('../components/FAQ'));
 const Location = lazy(() => import('../components/Location'));
 
 // Invisible fallback — preserves scroll position/layout while chunk loads
-const SectionLoader = () => <div style={{ minHeight: '200px' }} aria-hidden="true" />;
+const SectionLoader = () => <div className="min-h-[200px]" aria-hidden="true" />;
 
 const Home = () => {
     return (

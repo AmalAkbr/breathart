@@ -1,5 +1,7 @@
 import { motion } from 'framer-motion';
 import StarBorder from '../components/StarBorder';
+import { useState } from 'react';
+import JobApplicationModal from '../components/JobApplicationModal';
 
 const jobs = [
     {
@@ -25,6 +27,14 @@ const jobs = [
 ];
 
 const Careers = () => {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedJob, setSelectedJob] = useState("");
+
+    const openModal = (jobTitle) => {
+        setSelectedJob(jobTitle);
+        setIsModalOpen(true);
+    };
+
     return (
         <div className="min-h-screen bg-white pt-32 pb-24 w-full max-w-[100vw] overflow-x-hidden theme-light-section">
             <div className="w-full max-w-[1600px] mx-auto px-4 md:px-12 lg:px-16 py-12">
@@ -78,7 +88,10 @@ const Careers = () => {
                                         </div>
                                     </div>
 
-                                    <button className="mt-8 w-full py-4 rounded-xl bg-gradient-to-r from-accent-cyan to-accent-blue text-white font-bold hover:shadow-lg hover:shadow-accent-cyan/20 transition-all">
+                                    <button
+                                        onClick={() => openModal(job.title)}
+                                        className="mt-8 w-full py-4 rounded-xl bg-gradient-to-r from-accent-cyan to-accent-blue text-white font-bold hover:shadow-lg hover:shadow-accent-cyan/20 transition-all"
+                                    >
                                         Apply Now
                                     </button>
                                 </div>
@@ -87,6 +100,12 @@ const Careers = () => {
                     ))}
                 </div>
             </div>
+
+            <JobApplicationModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                jobTitle={selectedJob}
+            />
         </div>
     );
 };

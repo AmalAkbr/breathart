@@ -362,13 +362,13 @@ const Blogs = () => {
                 </motion.div>
 
                 {/* Animated Slider Container */}
-                <div className="relative min-h-[600px] md:min-h-[500px]">
+                <div className="relative min-h-[600px] md:min-h-[450px]">
                     <AnimatePresence mode="popLayout">
                         <motion.div
                             key={currentSlide}
                             initial={{ opacity: 0, x: 50 }}
                             animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: -50 }}
+                            exit={{ opacity: 0, x: -50, position: 'absolute', top: 0, left: 0 }}
                             transition={{ duration: 0.4 }}
                             className="grid md:grid-cols-2 gap-8 w-full"
                         >
