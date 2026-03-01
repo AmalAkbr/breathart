@@ -334,11 +334,13 @@ const Blogs = () => {
     const totalSlides = Math.ceil(blogs.length / blogsPerPage);
 
     useEffect(() => {
+        // Pause sliding animation when a blog popup is open
+        if (selectedBlog) return;
         const timer = setInterval(() => {
             setCurrentSlide((prev) => (prev + 1) % totalSlides);
         }, 4000);
         return () => clearInterval(timer);
-    }, [totalSlides]);
+    }, [totalSlides, selectedBlog]);
 
     // Get current blogs
     const indexOfLastBlog = (currentSlide + 1) * blogsPerPage;

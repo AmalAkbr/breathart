@@ -133,22 +133,22 @@ const AboutUs = () => {
                     <div className="absolute inset-0 bg-slate-900/40 z-[5]" />
 
                     <div className="relative z-10 p-8 md:p-12 lg:p-16">
-                        <div className="grid grid-cols-[auto_1fr] lg:grid-cols-[auto_1fr] gap-6 md:gap-12 lg:gap-16 items-center">
-                            {/* Images Column */}
-                            <div className="flex flex-col gap-4 md:gap-8 w-full max-w-[70px] md:max-w-[120px]">
-                                <div className="flex items-center justify-center bg-white/10 backdrop-blur-sm p-3 md:p-4 rounded-xl md:rounded-2xl border border-white/20">
+                        <div className="flex flex-col lg:flex-row gap-6 md:gap-12 lg:gap-16 items-center lg:items-center">
+                            {/* Images Row (mobile: horizontal row on top, desktop: vertical column on left) */}
+                            <div className="flex flex-row lg:flex-col gap-4 w-full lg:w-auto lg:max-w-[120px] justify-center">
+                                <div className="flex items-center justify-center w-16 h-16 md:w-20 md:h-20 lg:w-full lg:h-auto flex-shrink-0">
                                     <img src={photographyImage} alt="Photography Studio" loading="lazy" decoding="async" className="w-full h-auto object-contain" />
                                 </div>
-                                <div className="flex items-center justify-center bg-white/10 backdrop-blur-sm p-3 md:p-4 rounded-xl md:rounded-2xl border border-white/20">
+                                <div className="flex items-center justify-center w-16 h-16 md:w-20 md:h-20 lg:w-full lg:h-auto flex-shrink-0">
                                     <img src={instituteImage} alt="Education Institute" loading="lazy" decoding="async" className="w-full h-auto object-contain" />
                                 </div>
-                                <div className="flex items-center justify-center bg-white/10 backdrop-blur-sm p-3 md:p-4 rounded-xl md:rounded-2xl border border-white/20">
+                                <div className="flex items-center justify-center w-16 h-16 md:w-20 md:h-20 lg:w-full lg:h-auto flex-shrink-0">
                                     <img src={marketingImage} alt="Digital Marketing" loading="lazy" decoding="async" className="w-full h-auto object-contain" />
                                 </div>
                             </div>
 
                             {/* Text Column */}
-                            <div className="flex flex-col justify-center text-left">
+                            <div className="flex flex-col justify-center text-left flex-1">
                                 <h3 className="text-2xl md:text-4xl font-bold mb-6 md:mb-8 text-white">BreathArt Group</h3>
 
                                 <div className="space-y-4 md:space-y-6 text-slate-300 text-sm sm:text-base md:text-lg leading-relaxed">
