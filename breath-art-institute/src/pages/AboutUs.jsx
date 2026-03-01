@@ -117,9 +117,9 @@ const AboutUs = () => {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.8 }}
-                    className="border border-white/20 rounded-3xl p-8 md:p-12 lg:p-16 relative overflow-hidden shadow-xl"
+                    className="rounded-3xl relative overflow-hidden"
                 >
-                    {/* Background Image & Overlay */}
+                    {/* Background Image & Overlay — scoped to the card */}
                     <div
                         className="absolute inset-0 z-0"
                         style={{
@@ -128,47 +128,42 @@ const AboutUs = () => {
                             backgroundPosition: 'center',
                         }}
                     />
-                    <div className="absolute inset-0 bg-[#0a0f1a]/80 z-0" />
+                    <div className="absolute inset-0 bg-[#0f172a]/95 z-0" />
+                    <Aurora colorStops={['#000000', '#06b6d4', '#ffffff']} amplitude={1.2} />
+                    <div className="absolute inset-0 bg-slate-900/40 z-[5]" />
 
+                    <div className="relative z-10 p-8 md:p-12 lg:p-16">
+                        <div className="grid grid-cols-[auto_1fr] lg:grid-cols-[auto_1fr] gap-6 md:gap-12 lg:gap-16 items-center">
+                            {/* Images Column */}
+                            <div className="flex flex-col gap-4 md:gap-8 w-full max-w-[70px] md:max-w-[120px]">
+                                <div className="flex items-center justify-center bg-white/10 backdrop-blur-sm p-3 md:p-4 rounded-xl md:rounded-2xl border border-white/20">
+                                    <img src={photographyImage} alt="Photography Studio" loading="lazy" decoding="async" className="w-full h-auto object-contain" />
+                                </div>
+                                <div className="flex items-center justify-center bg-white/10 backdrop-blur-sm p-3 md:p-4 rounded-xl md:rounded-2xl border border-white/20">
+                                    <img src={instituteImage} alt="Education Institute" loading="lazy" decoding="async" className="w-full h-auto object-contain" />
+                                </div>
+                                <div className="flex items-center justify-center bg-white/10 backdrop-blur-sm p-3 md:p-4 rounded-xl md:rounded-2xl border border-white/20">
+                                    <img src={marketingImage} alt="Digital Marketing" loading="lazy" decoding="async" className="w-full h-auto object-contain" />
+                                </div>
+                            </div>
 
-                    <div className="relative z-10 w-full max-w-7xl mx-auto mt-20 md:mt-32">
-                        <div className="border border-white/10 rounded-3xl p-8 md:p-12 lg:p-16 relative overflow-hidden shadow-2xl bg-[#0f172a]">
-                            <div className="absolute inset-0 bg-slate-900/40 z-[5]" />
+                            {/* Text Column */}
+                            <div className="flex flex-col justify-center text-left">
+                                <h3 className="text-2xl md:text-4xl font-bold mb-6 md:mb-8 text-white">BreathArt Group</h3>
 
-                            <div className="relative z-10">
-                                <div className="grid grid-cols-[auto_1fr] lg:grid-cols-[auto_1fr] gap-6 md:gap-12 lg:gap-16 items-center">
-                                    {/* Images Column - Pushed to right on mobile */}
-                                    <div className="flex flex-col gap-4 md:gap-8 w-full max-w-[70px] md:max-w-[120px] order-1 ml-0">
-                                        <div className="flex items-center justify-center bg-white/10 backdrop-blur-sm p-3 md:p-4 rounded-xl md:rounded-2xl border border-white/20">
-                                            <img src={photographyImage} alt="Photography Studio" loading="lazy" decoding="async" className="w-full h-auto object-contain" />
-                                        </div>
-                                        <div className="flex items-center justify-center bg-white/10 backdrop-blur-sm p-3 md:p-4 rounded-xl md:rounded-2xl border border-white/20">
-                                            <img src={instituteImage} alt="Education Institute" loading="lazy" decoding="async" className="w-full h-auto object-contain" />
-                                        </div>
-                                        <div className="flex items-center justify-center bg-white/10 backdrop-blur-sm p-3 md:p-4 rounded-xl md:rounded-2xl border border-white/20">
-                                            <img src={marketingImage} alt="Digital Marketing" loading="lazy" decoding="async" className="w-full h-auto object-contain" />
-                                        </div>
-                                    </div>
-
-                                    {/* Text Column - Right aligned on mobile */}
-                                    <div className="flex flex-col justify-center order-2 text-left">
-                                        <h3 className="text-2xl md:text-4xl font-bold mb-6 md:mb-8 text-white">BreathArt Group</h3>
-
-                                        <div className="space-y-4 md:space-y-6 text-slate-300 text-sm sm:text-base md:text-lg leading-relaxed">
-                                            <p>
-                                                <strong className="text-accent-cyan font-bold">BreathArt Group</strong> is a UAE-based creative and business group offering a complete ecosystem of AI-powered digital marketing, branding solutions, education institutes, professional photography studios, and business consultancy services.
-                                            </p>
-                                            <p>
-                                                Founded in 2024 in the United Arab Emirates, BreathArt Group has expanded its operations to India and global markets, supporting brands and individuals across multiple industries. Our integrated approach helps businesses achieve strong online visibility, high-quality lead generation, and long-term brand growth.
-                                            </p>
-                                            <p>
-                                                With a growing international presence, we have successfully served more than <strong className="text-white">500 happy clients worldwide</strong>, delivering measurable results and creating new business opportunities every month across the globe.
-                                            </p>
-                                            <p className="text-lg md:text-xl text-slate-200 font-medium mt-6 md:mt-8 pt-6 md:pt-8 border-t border-white/20">
-                                                At BreathArt Group, we focus on transforming companies into brands by combining strategic marketing, creative innovation, advanced AI solutions, and industry-focused education.
-                                            </p>
-                                        </div>
-                                    </div>
+                                <div className="space-y-4 md:space-y-6 text-slate-300 text-sm sm:text-base md:text-lg leading-relaxed">
+                                    <p>
+                                        <strong className="text-accent-cyan font-bold">BreathArt Group</strong> is a UAE-based creative and business group offering a complete ecosystem of AI-powered digital marketing, branding solutions, education institutes, professional photography studios, and business consultancy services.
+                                    </p>
+                                    <p>
+                                        Founded in 2024 in the United Arab Emirates, BreathArt Group has expanded its operations to India and global markets, supporting brands and individuals across multiple industries. Our integrated approach helps businesses achieve strong online visibility, high-quality lead generation, and long-term brand growth.
+                                    </p>
+                                    <p>
+                                        With a growing international presence, we have successfully served more than <strong className="text-white">500 happy clients worldwide</strong>, delivering measurable results and creating new business opportunities every month across the globe.
+                                    </p>
+                                    <p className="text-lg md:text-xl text-slate-200 font-medium mt-6 md:mt-8 pt-6 md:pt-8 border-t border-white/20">
+                                        At BreathArt Group, we focus on transforming companies into brands by combining strategic marketing, creative innovation, advanced AI solutions, and industry-focused education.
+                                    </p>
                                 </div>
                             </div>
                         </div>

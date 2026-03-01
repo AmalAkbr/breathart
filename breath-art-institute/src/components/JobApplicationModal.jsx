@@ -2,14 +2,30 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Send, User, Mail, Phone, Link as LinkIcon, Briefcase } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
+const WEB3FORMS_ACCESS_KEY = import.meta.env.VITE_WEB3FORMS_KEY || 'YOUR_WEB3FORMS_KEY';
+
 const JobApplicationModal = ({ isOpen, onClose, jobTitle }) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
+    const [isError, setIsError] = useState(false);
+
+    // Form state
+    const [formData, setFormData] = useState({
+        name: '',
+        phone: '',
+        email: '',
+        portfolio: '',
+        message: ''
+    });
 
     useEffect(() => {
         if (isOpen) {
             document.body.style.overflow = 'hidden';
-            // Disable lenis main scroll if needed, but data-lenis-prevent handles the modal scroll
+            // Reset state
+            setIsSubmitting(false);
+            setIsSuccess(false);
+            setIsError(false);
+            setFormData({ name: '', phone: '', email: '', portfolio: '', message: '' });
         } else {
             document.body.style.overflow = '';
         }
@@ -18,21 +34,48 @@ const JobApplicationModal = ({ isOpen, onClose, jobTitle }) => {
         };
     }, [isOpen]);
 
-    const handleSubmit = (e) => {
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
+        setIsError(false);
 
-        // Mock API call delay
-        setTimeout(() => {
+        try {
+            const res = await fetch('https://api.web3forms.com/submit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+                body: JSON.stringify({
+                    access_key: WEB3FORMS_ACCESS_KEY,
+                    subject: `New Job Application – ${jobTitle}`,
+                    from_name: formData.name,
+                    email: formData.email,
+                    phone: formData.phone,
+                    portfolio_link: formData.portfolio,
+                    message: formData.message || '—',
+                    job_role: jobTitle,
+                    botcheck: '',
+                }),
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                setIsSuccess(true);
+                // Auto close after success
+                setTimeout(() => {
+                    setIsSuccess(false);
+                    onClose();
+                }, 3000);
+            } else {
+                setIsError(true);
+            }
+        } catch {
+            setIsError(true);
+        } finally {
             setIsSubmitting(false);
-            setIsSuccess(true);
-
-            // Auto close after success
-            setTimeout(() => {
-                setIsSuccess(false);
-                onClose();
-            }, 3000);
-        }, 1500);
+        }
     };
 
     return (
@@ -110,6 +153,9 @@ const JobApplicationModal = ({ isOpen, onClose, jobTitle }) => {
                                                     </div>
                                                     <input
                                                         type="text"
+                                                        name="name"
+                                                        value={formData.name}
+                                                        onChange={handleChange}
                                                         required
                                                         className="w-full bg-[#050b14] border border-white/10 rounded-xl py-3 pl-11 pr-4 text-white placeholder-slate-500 focus:outline-none focus:border-accent-cyan focus:ring-1 focus:ring-accent-cyan transition-all"
                                                         placeholder="John Doe"
@@ -126,6 +172,9 @@ const JobApplicationModal = ({ isOpen, onClose, jobTitle }) => {
                                                     </div>
                                                     <input
                                                         type="tel"
+                                                        name="phone"
+                                                        value={formData.phone}
+                                                        onChange={handleChange}
                                                         required
                                                         className="w-full bg-[#050b14] border border-white/10 rounded-xl py-3 pl-11 pr-4 text-white placeholder-slate-500 focus:outline-none focus:border-accent-cyan focus:ring-1 focus:ring-accent-cyan transition-all"
                                                         placeholder="+91 98765 43210"
@@ -143,6 +192,9 @@ const JobApplicationModal = ({ isOpen, onClose, jobTitle }) => {
                                                 </div>
                                                 <input
                                                     type="email"
+                                                    name="email"
+                                                    value={formData.email}
+                                                    onChange={handleChange}
                                                     required
                                                     className="w-full bg-[#050b14] border border-white/10 rounded-xl py-3 pl-11 pr-4 text-white placeholder-slate-500 focus:outline-none focus:border-accent-cyan focus:ring-1 focus:ring-accent-cyan transition-all"
                                                     placeholder="john@example.com"
@@ -159,6 +211,9 @@ const JobApplicationModal = ({ isOpen, onClose, jobTitle }) => {
                                                 </div>
                                                 <input
                                                     type="url"
+                                                    name="portfolio"
+                                                    value={formData.portfolio}
+                                                    onChange={handleChange}
                                                     required
                                                     className="w-full bg-[#050b14] border border-white/10 rounded-xl py-3 pl-11 pr-4 text-white placeholder-slate-500 focus:outline-none focus:border-accent-cyan focus:ring-1 focus:ring-accent-cyan transition-all"
                                                     placeholder="https://yourportfolio.com or GDrive link"
@@ -171,11 +226,20 @@ const JobApplicationModal = ({ isOpen, onClose, jobTitle }) => {
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-300">Cover Letter (Optional)</label>
                                             <textarea
+                                                name="message"
+                                                value={formData.message}
+                                                onChange={handleChange}
                                                 rows="4"
                                                 className="w-full bg-[#050b14] border border-white/10 rounded-xl py-3 px-4 text-white placeholder-slate-500 focus:outline-none focus:border-accent-cyan focus:ring-1 focus:ring-accent-cyan transition-all resize-none custom-scrollbar"
                                                 placeholder="Tell us why you're a great fit for this role..."
                                             ></textarea>
                                         </div>
+
+                                        {isError && (
+                                            <div className="text-red-400 text-sm bg-red-400/10 border border-red-400/20 p-3 rounded-lg">
+                                                Something went wrong submitting your application. Please try again.
+                                            </div>
+                                        )}
 
                                         {/* Submit Button */}
                                         <button
