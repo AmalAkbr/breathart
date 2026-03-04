@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useEffect, useRef, useMemo } from 'react';
+import { forwardRef, useImperativeHandle, useEffect, useRef, useMemo, useState } from 'react';
 
 import * as THREE from 'three';
 
@@ -51,24 +51,31 @@ function extendMaterial(BaseMaterial, cfg) {
 
 const CanvasWrapper = ({ children }) => {
     const canvasRef = useRef(null);
+    const [isVisible, setIsVisible] = useState(true);
 
     useEffect(() => {
         if (!canvasRef.current) return;
-        const canvas = canvasRef.current;
+        // Watch the parent container, not the canvas itself
         const observer = new IntersectionObserver(
             ([entry]) => {
-                // Pause GPU work when scrolled off screen
-                canvas.style.visibility = entry.isIntersecting ? 'visible' : 'hidden';
+                // Actually pause the React Three Fiber WebGL render loop
+                setIsVisible(entry.isIntersecting);
             },
             { threshold: 0 }
         );
-        observer.observe(canvas);
+        // Observe the parent of the canvas, or the canvas wrapper
+        if (canvasRef.current.parentElement) {
+            observer.observe(canvasRef.current.parentElement);
+        } else {
+            observer.observe(canvasRef.current);
+        }
+
         return () => observer.disconnect();
     }, []);
 
     return (
         // dpr capped at 1 — retina ([1,2]) doubles GPU load with minimal visual gain
-        <Canvas ref={canvasRef} dpr={1} frameloop="always" className="beams-container">
+        <Canvas ref={canvasRef} dpr={1} frameloop={isVisible ? "always" : "demand"} className="beams-container" style={{ visibility: isVisible ? 'visible' : 'hidden' }}>
             {children}
         </Canvas>
     );

@@ -23,21 +23,27 @@ const Navbar = () => {
     };
 
     useEffect(() => {
+        let isThrottled = false;
         const handleScroll = () => {
-            setScrolled(window.scrollY > 20);
+            if (!isThrottled) {
+                isThrottled = true;
+                setTimeout(() => {
+                    setScrolled(window.scrollY > 20);
 
-            const lightSections = document.querySelectorAll('.theme-light-section');
-            const navCenter = window.scrollY + 40;
-
-            let isLight = false;
-            lightSections.forEach(section => {
-                const top = section.offsetTop;
-                const bottom = top + section.offsetHeight;
-                if (navCenter >= top && navCenter <= bottom) {
-                    isLight = true;
-                }
-            });
-            setIsWhiteNav(isLight);
+                    const lightSections = document.querySelectorAll('.theme-light-section');
+                    let isLight = false;
+                    for (let i = 0; i < lightSections.length; i++) {
+                        const rect = lightSections[i].getBoundingClientRect();
+                        // Check if 40px from top of viewport is inside this section
+                        if (rect.top <= 40 && rect.bottom >= 40) {
+                            isLight = true;
+                            break;
+                        }
+                    }
+                    setIsWhiteNav(isLight);
+                    isThrottled = false;
+                }, 50);
+            }
         };
         window.addEventListener('scroll', handleScroll, { passive: true });
         handleScroll();

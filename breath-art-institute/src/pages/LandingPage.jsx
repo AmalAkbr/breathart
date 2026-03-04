@@ -1,25 +1,38 @@
 import { motion } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { Award, MapPin, Phone, Mail, Zap } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Logo from '../components/Logo';
-import ToolsCovered from '../components/ToolsCovered';
+import Beams from '../components/Beams';
 import Plasma from '../components/Plasma';
-import Footer from '../components/Footer';
 import insta from '../assets/instagram.webp';
-import face from '../assets/facebook.png';
+
+// Lazy loaded below-the-fold components
+const ToolsCovered = lazy(() => import('../components/ToolsCovered'));
+const Footer = lazy(() => import('../components/Footer'));
+import face from '../assets/facebook.webp';
+import heroCharacter from '../assets/hero.webp';
 import photographyImage from '../assets/photography.webp';
 import instituteImage from '../assets/institute.webp';
 import marketingImage from '../assets/marketing.webp';
-import whiteeImage from '../assets/whitee.jpg';
+import whiteeImage from '../assets/whitee.webp';
 import RotatingText from '../components/RotatingText';
 import ShinyText from '../components/ShinyText';
 import CountUp from '../components/CountUp';
-import ScrollToTopButton from '../components/ScrollToTopButton';
 import Aurora from '../components/Aurora';
-import WhatsAppButton from '../components/WhatsAppButton';
-import ContactUsModal from '../components/ContactUsModal';
-import globeBg from '../assets/globe.jpeg';
+import globeBg from '../assets/globe.webp';
+
+// Lazy loaded below-the-fold components
+const ScrollToTopButton = lazy(() => import('../components/ScrollToTopButton'));
+const WhatsAppButton = lazy(() => import('../components/WhatsAppButton'));
+const ContactUsModal = lazy(() => import('../components/ContactUsModal'));
+const Courses = lazy(() => import('../components/Courses'));
+const GlobalPartners = lazy(() => import('../components/GlobalPartners'));
+const QuickContact = lazy(() => import('../components/QuickContact'));
+const Certifications = lazy(() => import('../components/Certifications'));
+
+// Fallback loader for below the fold content
+const SectionLoader = () => <div className="min-h-[200px]" aria-hidden="true" />;
 
 const LandingPage = () => {
     const [scrolled, setScrolled] = useState(false);
@@ -27,24 +40,36 @@ const LandingPage = () => {
     const [contactOpen, setContactOpen] = useState(false);
 
     useEffect(() => {
+        let isThrottled = false;
         const handleScroll = () => {
-            setScrolled(window.scrollY > 20);
+            if (!isThrottled) {
+                isThrottled = true;
+                setTimeout(() => {
+                    setScrolled(window.scrollY > 20);
 
-            const lightSections = document.querySelectorAll('.theme-light-section');
-            const navCenter = window.scrollY + 40;
-            let isLight = false;
-            lightSections.forEach(section => {
-                const top = section.offsetTop;
-                const bottom = top + section.offsetHeight;
-                if (navCenter >= top && navCenter <= bottom) {
-                    isLight = true;
-                }
-            });
-            setIsWhiteNav(isLight);
+                    const lightSections = document.querySelectorAll('.theme-light-section');
+                    let isLight = false;
+                    for (let i = 0; i < lightSections.length; i++) {
+                        const rect = lightSections[i].getBoundingClientRect();
+                        // Check if 40px from top of viewport is inside this section
+                        if (rect.top <= 40 && rect.bottom >= 40) {
+                            isLight = true;
+                            break;
+                        }
+                    }
+                    setIsWhiteNav(isLight);
+                    isThrottled = false;
+                }, 50);
+            }
         };
-        window.addEventListener('scroll', handleScroll, { passive: true });
-        handleScroll();
-        return () => window.removeEventListener('scroll', handleScroll);
+        const timeoutId = setTimeout(() => {
+            window.addEventListener('scroll', handleScroll, { passive: true });
+            handleScroll();
+        }, 100); // Slight delay on mount to avoid blocking LCP
+        return () => {
+            clearTimeout(timeoutId);
+            window.removeEventListener('scroll', handleScroll);
+        };
     }, []);
 
     // Shared animation variants
@@ -113,35 +138,103 @@ const LandingPage = () => {
             </header>
 
             {/* Hero / About Section - Flexible Height filling remaining space */}
-            <section className="relative w-full min-h-screen flex flex-col items-center justify-center text-center z-10 px-4 md:px-8 lg:px-12 pt-24 pb-12 bg-gradient-to-br from-[#020610] via-[#050b14] to-[#010308]">
+            <section className="relative w-full h-screen flex flex-col items-center justify-center text-center z-10 px-4 md:px-8 lg:px-12 pt-16 bg-primary overflow-hidden">
 
-                {/* Plasma Background */}
-                <div className="absolute inset-0 z-0 overflow-hidden opacity-50 pointer-events-none mix-blend-screen">
-                    <Plasma
-                        color="#06b6d4" // Accent Cyan
-                        speed={1}
-                        scale={1.2}
-                        opacity={1}
-                        mouseInteractive={false} // Disable to avoid stealing clicks since it's behind text
+                {/* Beams Background */}
+                <div className="absolute inset-0 z-0 opacity-30 [mask-image:linear-gradient(to_bottom,black_70%,transparent)]">
+                    <Beams
+                        beamWidth={2}
+                        beamHeight={15}
+                        beamNumber={12}
+                        lightColor="#0008f5"
+                        speed={2}
+                        noiseIntensity={1.75}
+                        scale={0.2}
+                        rotation={0}
                     />
                 </div>
 
-                {/* Optional subtle gradient overlay to ensure text legibility */}
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#050b14]/50 to-[#050b14] z-0 pointer-events-none" />
+                {/* Background Gradient Blobs */}
+                <div className="absolute top-0 right-0 w-[400px] md:w-[600px] h-[400px] md:h-[600px] bg-accent-blue/40 rounded-full blur-[100px] md:blur-[120px] pointer-events-none transform-gpu will-change-transform" />
+                <div className="absolute bottom-0 left-0 w-[400px] md:w-[600px] h-[400px] md:h-[600px] bg-accent-cyan/30 rounded-full blur-[100px] md:blur-[120px] pointer-events-none transform-gpu will-change-transform" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] md:w-[400px] h-[300px] md:h-[400px] bg-blue-700/20 rounded-full blur-[80px] md:blur-[100px] pointer-events-none transform-gpu will-change-transform" />
 
-                <motion.div
-                    initial="hidden"
-                    animate="visible"
-                    variants={staggerContainer}
-                    className="max-w-4xl mx-auto w-full relative z-10"
-                >
-                    <motion.h1 variants={fadeInUp} className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-extrabold tracking-tight mb-6 md:mb-8 leading-[1.1] text-white font-heading uppercase">
-                        <ShinyText text="BREATHART GROUP" disabled={false} speed={2.5} className="!text-white" />
-                    </motion.h1>
-                    <motion.p variants={fadeInUp} className="text-base sm:text-lg text-slate-300 leading-relaxed max-w-2xl mx-auto px-4 sm:px-0">
-                        Transforming companies into global brands, BreathArt Group combines strategic marketing, advanced AI solutions, and creative innovation. We offer a complete ecosystem of digital, educational, and business services designed to drive long-term, measurable success.
-                    </motion.p>
-                </motion.div>
+                <div className="w-full px-4 md:px-12 grid lg:grid-cols-2 gap-8 md:gap-12 items-center z-10">
+                    {/* Text Content */}
+                    <div className="text-center lg:text-left order-2 lg:order-1">
+                        <motion.h2
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.8 }}
+                            className="text-accent-cyan font-bold tracking-wider mb-3 uppercase text-xs md:text-sm"
+                        >
+                            Kerala's Most Advanced Digital Marketing Training Programme
+                        </motion.h2>
+
+                        <motion.h1
+                            initial={{ opacity: 0, y: 30 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.8, delay: 0.2 }}
+                            className="text-[1.75rem] sm:text-3xl md:text-5xl lg:text-5xl xl:text-6xl font-heading font-bold mb-6 text-white leading-tight break-words"
+                        >
+                            Kerala's Best <br />
+                            <span className="text-gradient">AI-Powered</span> <br />
+                            Digital Marketing &<br className="hidden sm:block" />{' '}
+                            Creative Training Institute
+                        </motion.h1>
+                    </div>
+
+                    {/* 3D Character Image */}
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 1 }}
+                        className="relative h-[280px] sm:h-[360px] lg:h-[70vh] w-full flex items-center justify-center order-1 lg:order-2"
+                    >
+                        <motion.div
+                            animate={{
+                                y: [0, -20, 0],
+                                scale: [1, 1.02, 1]
+                            }}
+                            transition={{
+                                y: { duration: 6, repeat: Infinity, ease: "easeInOut" },
+                                scale: { duration: 4, repeat: Infinity, ease: "easeInOut" }
+                            }}
+                            style={{ willChange: 'transform' }}
+                            className="relative w-auto h-full max-h-[500px] flex items-center justify-center"
+                        >
+                            {/* Glow effect behind */}
+                            <div className="absolute inset-0 bg-accent-blue/20 blur-[80px] rounded-full scale-75" />
+
+                            <img
+                                src={heroCharacter}
+                                alt="3D Student Character"
+                                fetchpriority="high"
+                                decoding="async"
+                                className="w-full h-full object-contain relative z-10 drop-shadow-2xl max-h-[500px]"
+                            />
+
+                            {/* Floating Badges */}
+                            <motion.div
+                                animate={{ y: [0, -15, 0], rotate: [0, 5, 0] }}
+                                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                                className="absolute top-4 right-4 md:top-10 md:right-10 w-12 h-12 md:w-16 md:h-16 bg-secondary/90 backdrop-blur rounded-xl border border-white/10 flex items-center justify-center shadow-xl shadow-black/30 z-20"
+                            >
+                                <span className="text-xl md:text-2xl">🤖</span>
+                            </motion.div>
+                            <motion.div
+                                animate={{ y: [0, 15, 0], rotate: [0, -5, 0] }}
+                                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+                                className="absolute bottom-10 left-4 md:bottom-20 md:left-10 w-10 h-10 md:w-14 md:h-14 bg-secondary/90 backdrop-blur rounded-full border border-white/10 flex items-center justify-center shadow-xl shadow-black/30 z-20"
+                            >
+                                <span className="text-lg md:text-xl">🚀</span>
+                            </motion.div>
+                        </motion.div>
+                    </motion.div>
+                </div>
 
                 {/* Scroll Down Indicator */}
                 <motion.div
@@ -167,270 +260,272 @@ const LandingPage = () => {
                 </motion.div>
             </section>
 
-            {/* Academy / Enrollment Section (Moved from Hero) */}
-            <section className="relative z-20 px-4 md:px-8 lg:px-12 py-20 md:py-32 w-full bg-white text-center flex flex-col items-center justify-center theme-light-section overflow-hidden">
-                {/* Background Image */}
-                <div className="absolute inset-0 z-0">
-                    <img src={whiteeImage} alt="Background pattern" loading="lazy" decoding="async" className="w-full h-full object-cover" />
-                </div>
+            {/* All below-fold sections are lazily loaded */}
+            <Suspense fallback={<SectionLoader />}>
+                {/* Quick Contact Section (added after Hero) */}
+                <QuickContact onContactClick={() => setContactOpen(true)} />
 
-                <motion.div
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true, margin: "-100px" }}
-                    variants={staggerContainer}
-                    className="max-w-4xl mx-auto w-full"
-                >
-                    <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full border border-blue-200 bg-blue-50 text-slate-700 font-bold text-xs md:text-sm mb-6 md:mb-8 shadow-sm mx-auto">
-                        <Zap className="w-3.5 h-3.5 md:w-4 md:h-4 text-accent-blue cursor-pointer" /> <span>Transform Your Career in 2026</span>
-                    </motion.div>
+                {/* Premium Courses Section (From Homepage) */}
+                <Courses />
 
-                    <motion.h2 variants={fadeInUp} className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight mb-6 md:mb-8 leading-[1.1] text-slate-900 font-heading flex flex-col items-center">
-                        <div>Best Digital Marketing Academy</div>
-                        <div className="flex flex-wrap justify-center items-center gap-x-3 gap-y-2 mt-2 overflow-hidden">
-                            <motion.span
-                                layout
-                                initial={{ y: '100%', opacity: 0 }}
-                                animate={{ y: 0, opacity: 1 }}
-                                transition={{ type: "spring", damping: 25, stiffness: 200, delay: 0.2, layout: { type: "spring", damping: 25, stiffness: 200 } }}
-                                className="text-slate-600 inline-block font-medium"
-                            >
-                                Powered by
-                            </motion.span>
-                            <RotatingText
-                                texts={['AI', 'UAE Expertise']}
-                                mainClassName="text-accent-cyan drop-shadow-sm font-bold tracking-tight inline-flex"
-                                staggerFrom="center"
-                                staggerDuration={0.025}
-                                rotationInterval={3500}
-                                initial={{ y: '70%', opacity: 0, scale: 0.95 }}
-                                animate={{ y: 0, opacity: 1, scale: 1 }}
-                                exit={{ y: '-70%', opacity: 0, scale: 0.95 }}
-                                transition={{ type: 'spring', damping: 22, stiffness: 220, mass: 0.6 }}
-                            />
-                        </div>
-                    </motion.h2>
+                {/* Certifications Section */}
+                <Certifications />
 
-                    <motion.p variants={fadeInUp} className="text-base sm:text-lg md:text-xl text-slate-700 leading-relaxed mb-4 max-w-2xl mx-auto px-4 sm:px-0 font-medium">
-                        Join the best digital marketing academy in Attingal. Learn SEO, Google Ads & social media marketing with expert trainers. Enroll today!
-                    </motion.p>
-                    <motion.p variants={fadeInUp} className="text-base sm:text-lg text-slate-500 leading-relaxed mb-8 md:mb-12 max-w-2xl mx-auto px-4 sm:px-0">
-                        Learn the art of digital marketing where artificial intelligence meets UAE-specific expertise. Our institute prepares you with industry-ready skills for today's competitive market.
-                    </motion.p>
+                {/* Academy / Enrollment Section (Moved from Hero) */}
+                <section className="relative z-20 px-4 md:px-8 lg:px-12 py-20 md:py-32 w-full bg-white text-center flex flex-col items-center justify-center theme-light-section overflow-hidden">
+                    {/* Background Image */}
+                    <div className="absolute inset-0 z-0">
+                        <img src={whiteeImage} alt="Background pattern" loading="lazy" decoding="async" className="w-full h-full object-cover" />
+                    </div>
 
-                    <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center items-center px-4 sm:px-0 w-full sm:w-auto">
-                        <Link to="/admission" className="w-full sm:w-auto px-6 md:px-8 py-3.5 md:py-4 rounded-full bg-gradient-to-r from-accent-blue to-blue-600 text-white font-bold text-base md:text-lg hover:shadow-xl hover:shadow-accent-blue/25 hover:-translate-y-1 transition-all flex justify-center items-center">
-                            Enroll Now
-                        </Link>
-                    </motion.div>
-                </motion.div>
-            </section>
-
-            {/* Stats Row */}
-            <section className="relative z-20 px-4 md:px-8 lg:px-12 py-12 md:py-20 w-full bg-bg-mid border-y border-white/5">
-                <div className="max-w-[1200px] mx-auto">
                     <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: 0.2, duration: 0.6 }}
-                        className="flex flex-col md:flex-row justify-center items-center gap-6 md:gap-0 py-8 px-6 md:px-12 rounded-3xl bg-bg-dark border border-white/10 shadow-2xl divide-y md:divide-y-0 md:divide-x divide-white/10"
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true, margin: "-100px" }}
+                        variants={staggerContainer}
+                        className="max-w-4xl mx-auto w-full"
                     >
-                        <div className="text-center w-full md:w-1/3 py-2 md:py-0 px-4">
-                            <p className="text-4xl md:text-5xl font-extrabold text-white">
-                                <CountUp from={0} to={100} duration={2} />%
-                            </p>
-                            <p className="text-xs md:text-sm text-accent-cyan font-bold uppercase tracking-wider mt-2">Practical Training</p>
-                        </div>
-                        <div className="text-center w-full md:w-1/3 pt-6 pb-2 md:py-0 px-4">
-                            <p className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-accent-cyan to-accent-blue">
-                                <CountUp from={0} to={500} duration={2.5} />+
-                            </p>
-                            <p className="text-xs md:text-sm text-accent-cyan font-bold uppercase tracking-wider mt-2">Happy Clients</p>
-                        </div>
-                        <div className="text-center w-full md:w-1/3 pt-6 pb-2 md:py-0 px-4">
-                            <p className="text-4xl md:text-5xl font-extrabold text-white">
-                                <CountUp from={0} to={24} duration={1.5} />/7
-                            </p>
-                            <p className="text-xs md:text-sm text-accent-cyan font-bold uppercase tracking-wider mt-2">Student Mentorship</p>
-                        </div>
+                        <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded-full border border-blue-200 bg-blue-50 text-slate-700 font-bold text-xs md:text-sm mb-6 md:mb-8 shadow-sm mx-auto">
+                            <Zap className="w-3.5 h-3.5 md:w-4 md:h-4 text-accent-blue cursor-pointer" /> <span>Transform Your Career in 2026</span>
+                        </motion.div>
+
+                        <motion.h2 variants={fadeInUp} className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight mb-6 md:mb-8 leading-[1.1] text-slate-900 font-heading flex flex-col items-center">
+                            <div>Best Digital Marketing Academy</div>
+                            <div className="flex flex-wrap justify-center items-center gap-x-3 gap-y-2 mt-2 overflow-hidden">
+                                <motion.span
+                                    layout
+                                    initial={{ y: '100%', opacity: 0 }}
+                                    animate={{ y: 0, opacity: 1 }}
+                                    transition={{ type: "spring", damping: 25, stiffness: 200, delay: 0.2, layout: { type: "spring", damping: 25, stiffness: 200 } }}
+                                    className="text-slate-600 inline-block font-medium"
+                                >
+                                    Powered by
+                                </motion.span>
+                                <RotatingText
+                                    texts={['AI', 'UAE Expertise']}
+                                    mainClassName="text-accent-cyan drop-shadow-sm font-bold tracking-tight inline-flex"
+                                    staggerFrom="center"
+                                    staggerDuration={0.025}
+                                    rotationInterval={3500}
+                                    initial={{ y: '70%', opacity: 0, scale: 0.95 }}
+                                    animate={{ y: 0, opacity: 1, scale: 1 }}
+                                    exit={{ y: '-70%', opacity: 0, scale: 0.95 }}
+                                    transition={{ type: 'spring', damping: 22, stiffness: 220, mass: 0.6 }}
+                                />
+                            </div>
+                        </motion.h2>
+
+                        <motion.p variants={fadeInUp} className="text-base sm:text-lg md:text-xl text-slate-700 leading-relaxed mb-4 max-w-2xl mx-auto px-4 sm:px-0 font-medium">
+                            Join the best digital marketing academy in Attingal. Learn SEO, Google Ads & social media marketing with expert trainers. Enroll today!
+                        </motion.p>
+                        <motion.p variants={fadeInUp} className="text-base sm:text-lg text-slate-500 leading-relaxed mb-8 md:mb-12 max-w-2xl mx-auto px-4 sm:px-0">
+                            Learn the art of digital marketing where artificial intelligence meets UAE-specific expertise. Our institute prepares you with industry-ready skills for today's competitive market.
+                        </motion.p>
+
+                        <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center items-center px-4 sm:px-0 w-full sm:w-auto">
+                            <Link to="/admission" className="w-full sm:w-auto px-6 md:px-8 py-3.5 md:py-4 rounded-full bg-gradient-to-r from-accent-blue to-blue-600 text-white font-bold text-base md:text-lg hover:shadow-xl hover:shadow-accent-blue/25 hover:-translate-y-1 transition-all flex justify-center items-center">
+                                Enroll Now
+                            </Link>
+                        </motion.div>
                     </motion.div>
-                </div>
-            </section>
+                </section>
 
-            {/* BreathArt Group Section (White Theme) */}
-            <section className="relative z-20 px-4 md:px-8 lg:px-12 py-16 md:py-24 w-full bg-white theme-light-section">
-                <div className="max-w-7xl mx-auto">
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.8 }}
-                        className="border border-white/10 rounded-3xl p-8 md:p-12 lg:p-16 relative overflow-hidden shadow-2xl bg-[#0f172a]"
-                    >
-                        <Aurora colorStops={['#000000', '#06b6d4', '#ffffff']} amplitude={1.2} />
-                        <div className="absolute inset-0 bg-slate-900/40 z-[5]" /> {/* Overlay to ensure text readability */}
+                {/* Stats Row */}
+                <section className="relative z-20 px-4 md:px-8 lg:px-12 py-12 md:py-20 w-full bg-bg-mid border-y border-white/5">
+                    <div className="max-w-[1200px] mx-auto">
+                        <motion.div
+                            initial={{ opacity: 0, y: 30 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.2, duration: 0.6 }}
+                            className="flex flex-col md:flex-row justify-center items-center gap-6 md:gap-0 py-8 px-6 md:px-12 rounded-3xl bg-bg-dark border border-white/10 shadow-2xl divide-y md:divide-y-0 md:divide-x divide-white/10"
+                        >
+                            <div className="text-center w-full md:w-1/3 py-2 md:py-0 px-4">
+                                <p className="text-4xl md:text-5xl font-extrabold text-white">
+                                    <CountUp from={0} to={100} duration={2} />%
+                                </p>
+                                <p className="text-xs md:text-sm text-accent-cyan font-bold uppercase tracking-wider mt-2">Practical Training</p>
+                            </div>
+                            <div className="text-center w-full md:w-1/3 pt-6 pb-2 md:py-0 px-4">
+                                <p className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-accent-cyan to-accent-blue">
+                                    <CountUp from={0} to={500} duration={2.5} />+
+                                </p>
+                                <p className="text-xs md:text-sm text-accent-cyan font-bold uppercase tracking-wider mt-2">Happy Clients</p>
+                            </div>
+                            <div className="text-center w-full md:w-1/3 pt-6 pb-2 md:py-0 px-4">
+                                <p className="text-4xl md:text-5xl font-extrabold text-white">
+                                    <CountUp from={0} to={24} duration={1.5} />/7
+                                </p>
+                                <p className="text-xs md:text-sm text-accent-cyan font-bold uppercase tracking-wider mt-2">Student Mentorship</p>
+                            </div>
+                        </motion.div>
+                    </div>
+                </section>
 
-                        <div className="relative z-10">
-                            <div className="flex flex-col lg:flex-row gap-6 md:gap-12 lg:gap-16 items-center">
-                                {/* Images Row (mobile: horizontal row centered on top; desktop: vertical column on left) */}
-                                <div className="flex flex-row lg:flex-col gap-4 w-full lg:w-auto lg:max-w-[120px] justify-center">
-                                    <div className="flex items-center justify-center w-16 h-16 md:w-20 md:h-20 lg:w-full lg:h-auto flex-shrink-0">
-                                        <img src={photographyImage} alt="Photography Studio" loading="lazy" decoding="async" className="w-full h-auto object-contain" />
+                {/* BreathArt Group Section (White Theme) */}
+                <section className="relative z-20 px-4 md:px-8 lg:px-12 py-16 md:py-24 w-full bg-white theme-light-section">
+                    <div className="max-w-7xl mx-auto">
+                        <motion.div
+                            initial={{ opacity: 0, y: 30 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.8 }}
+                            className="border border-white/10 rounded-3xl p-8 md:p-12 lg:p-16 relative overflow-hidden shadow-2xl bg-[#0f172a]"
+                        >
+                            <Aurora colorStops={['#000000', '#06b6d4', '#ffffff']} amplitude={1.2} />
+                            <div className="absolute inset-0 bg-slate-900/40 z-[5]" /> {/* Overlay to ensure text readability */}
+
+                            <div className="relative z-10">
+                                <div className="flex flex-col lg:flex-row gap-6 md:gap-12 lg:gap-16 items-center">
+                                    {/* Images Row (mobile: horizontal row centered on top; desktop: vertical column on left) */}
+                                    <div className="flex flex-row lg:flex-col gap-4 w-full lg:w-auto lg:max-w-[120px] justify-center">
+                                        <div className="flex items-center justify-center w-16 h-16 md:w-20 md:h-20 lg:w-full lg:h-auto flex-shrink-0">
+                                            <img src={photographyImage} alt="Photography Studio" loading="lazy" decoding="async" className="w-full h-auto object-contain" />
+                                        </div>
+                                        <div className="flex items-center justify-center w-16 h-16 md:w-20 md:h-20 lg:w-full lg:h-auto flex-shrink-0">
+                                            <img src={instituteImage} alt="Education Institute" loading="lazy" decoding="async" className="w-full h-auto object-contain" />
+                                        </div>
+                                        <div className="flex items-center justify-center w-16 h-16 md:w-20 md:h-20 lg:w-full lg:h-auto flex-shrink-0">
+                                            <img src={marketingImage} alt="Digital Marketing" loading="lazy" decoding="async" className="w-full h-auto object-contain" />
+                                        </div>
                                     </div>
-                                    <div className="flex items-center justify-center w-16 h-16 md:w-20 md:h-20 lg:w-full lg:h-auto flex-shrink-0">
-                                        <img src={instituteImage} alt="Education Institute" loading="lazy" decoding="async" className="w-full h-auto object-contain" />
-                                    </div>
-                                    <div className="flex items-center justify-center w-16 h-16 md:w-20 md:h-20 lg:w-full lg:h-auto flex-shrink-0">
-                                        <img src={marketingImage} alt="Digital Marketing" loading="lazy" decoding="async" className="w-full h-auto object-contain" />
-                                    </div>
-                                </div>
 
-                                {/* Text Column */}
-                                <div className="flex flex-col justify-center text-left flex-1">
-                                    <h3 className="text-2xl md:text-4xl font-bold mb-6 md:mb-8 text-white">BreathArt Group</h3>
+                                    {/* Text Column */}
+                                    <div className="flex flex-col justify-center text-left flex-1">
+                                        <h3 className="text-2xl md:text-4xl font-bold mb-6 md:mb-8 text-white">BreathArt Group</h3>
 
-                                    <div className="space-y-4 md:space-y-6 text-slate-200 text-sm sm:text-base md:text-lg leading-relaxed">
-                                        <p>
-                                            <strong className="text-accent-cyan font-bold">BreathArt Group</strong> is a UAE-based creative and business group offering a complete ecosystem of AI-powered digital marketing, branding solutions, education institutes, professional photography studios, and business consultancy services.
-                                        </p>
-                                        <p>
-                                            Founded in 2024 in the United Arab Emirates, BreathArt Group has expanded its operations to India and global markets, supporting brands and individuals across multiple industries. Our integrated approach helps businesses achieve strong online visibility, high-quality lead generation, and long-term brand growth.
-                                        </p>
-                                        <p>
-                                            With a growing international presence, we have successfully served more than <strong className="text-white">500 happy clients worldwide</strong>, delivering measurable results and creating new business opportunities every month across the globe.
-                                        </p>
-                                        <p className="text-lg md:text-xl text-white font-medium mt-6 md:mt-8 pt-6 md:pt-8 border-t border-white/20">
-                                            At BreathArt Group, we focus on transforming companies into brands by combining strategic marketing, creative innovation, advanced AI solutions, and industry-focused education.
-                                        </p>
+                                        <div className="space-y-4 md:space-y-6 text-slate-200 text-sm sm:text-base md:text-lg leading-relaxed">
+                                            <p>
+                                                <strong className="text-accent-cyan font-bold">BreathArt Group</strong> is a UAE-based creative and business group offering a complete ecosystem of AI-powered digital marketing, branding solutions, education institutes, professional photography studios, and business consultancy services.
+                                            </p>
+                                            <p>
+                                                Founded in 2024 in the United Arab Emirates, BreathArt Group has expanded its operations to India and global markets, supporting brands and individuals across multiple industries. Our integrated approach helps businesses achieve strong online visibility, high-quality lead generation, and long-term brand growth.
+                                            </p>
+                                            <p>
+                                                With a growing international presence, we have successfully served more than <strong className="text-white">500 happy clients worldwide</strong>, delivering measurable results and creating new business opportunities every month across the globe.
+                                            </p>
+                                            <p className="text-lg md:text-xl text-white font-medium mt-6 md:mt-8 pt-6 md:pt-8 border-t border-white/20">
+                                                At BreathArt Group, we focus on transforming companies into brands by combining strategic marketing, creative innovation, advanced AI solutions, and industry-focused education.
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </motion.div>
-                </div>
-            </section>
+                        </motion.div>
+                    </div>
+                </section>
 
-            {/* Tools We Cover Section (Re-used from main site) */}
-            <ToolsCovered />
+                {/* Tools We Cover Section (Re-used from main site) */}
+                <ToolsCovered />
 
-            {/* 500+ Happy Clients Section */}
-            <section className="py-16 md:py-24 relative overflow-hidden text-white">
-                {/* Globe Background */}
-                <div className="absolute inset-0 z-0">
-                    <img src={globeBg} alt="Globe Background" loading="lazy" decoding="async" className="w-full h-full object-cover opacity-60" />
-                    <div className="absolute inset-0 bg-[#0a192f]/60" />
-                </div>
+                {/* 500+ Happy Clients Section */}
+                <section className="py-16 md:py-24 relative overflow-hidden text-white">
+                    {/* Globe Background - Reduced Size */}
+                    <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none overflow-hidden">
+                        <img src={globeBg} alt="Globe Background" loading="lazy" decoding="async" className="w-[80%] max-w-[800px] h-auto object-contain opacity-30 scale-[1.2]" />
+                        <div className="absolute inset-0 bg-[#0a192f]/70" />
+                    </div>
 
-                <div className="max-w-6xl mx-auto px-4 md:px-8 lg:px-12 relative z-10 text-center">
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                    >
-                        <div className="w-16 h-16 md:w-20 md:h-20 bg-accent-cyan/10 backdrop-blur-md rounded-2xl flex items-center justify-center mx-auto mb-6 md:mb-8 border border-accent-cyan/20 shadow-xl">
-                            <Award className="w-8 h-8 md:w-10 md:h-10 text-accent-cyan" />
-                        </div>
-                        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-6">Trusted By <span className="text-accent-cyan">500+</span> Global Clients</h2>
-                        <p className="text-lg md:text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed mb-12 px-4 sm:px-0 font-medium">
-                            Our agency wing has delivered successful campaigns, branding, and development for over 500 businesses worldwide. As a student, you'll learn the exact strategies we use for our paying clients.
-                        </p>
+                    <div className="max-w-6xl mx-auto px-4 md:px-8 lg:px-12 relative z-10 text-center">
+                        <motion.div
+                            initial={{ opacity: 0, y: 30 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                        >
+                            <div className="w-16 h-16 md:w-20 md:h-20 bg-accent-cyan/10 backdrop-blur-md rounded-2xl flex items-center justify-center mx-auto mb-6 md:mb-8 border border-accent-cyan/20 shadow-xl">
+                                <Award className="w-8 h-8 md:w-10 md:h-10 text-accent-cyan" />
+                            </div>
+                            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-6">Trusted By <span className="text-accent-cyan">500+</span> Global Clients</h2>
+                            <p className="text-lg md:text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed mb-12 px-4 sm:px-0 font-medium">
+                                Our agency wing has delivered successful campaigns, branding, and development for over 500 businesses worldwide. As a student, you'll learn the exact strategies we use for our paying clients.
+                            </p>
 
-                        {/* Decorative Logos Marquee */}
-                        <div className="w-full overflow-hidden flex whitespace-nowrap relative py-4">
-                            {/* Gradient fades for marquee */}
-                            <div className="absolute inset-y-0 left-0 w-16 md:w-32 bg-gradient-to-r from-bg-mid to-transparent z-10" />
-                            <div className="absolute inset-y-0 right-0 w-16 md:w-32 bg-gradient-to-l from-bg-mid to-transparent z-10" />
+                            <div className="pb-8"></div>
+                        </motion.div>
+                    </div>
+                </section>
 
-                            <div className="animate-marquee flex gap-12 md:gap-20 items-center opacity-40">
-                                {[...Array(12)].map((_, i) => (
-                                    <div key={i} className="text-2xl md:text-3xl font-black text-slate-500 tracking-tighter uppercase shrink-0 select-none">
-                                        Client Brand {i + 1}
+                {/* Global Partners Section */}
+                <GlobalPartners />
+
+                {/* Contact & Map Section */}
+                <section id="contact" className="py-12 md:py-16 px-4 md:px-8 lg:px-12 bg-white relative z-10 border-b border-slate-200 theme-light-section">
+                    <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-12 lg:gap-16 items-stretch">
+
+                        {/* Contact Info */}
+                        <motion.div
+                            initial={{ opacity: 0, x: -30 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true }}
+                            className="flex-1 flex flex-col justify-center max-w-xl lg:max-w-none mx-auto lg:mx-0 w-full"
+                        >
+                            <span className="text-accent-cyan font-bold tracking-widest uppercase text-xs md:text-sm mb-3 block text-center lg:text-left">Enrollment</span>
+                            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black mb-4 text-slate-900 leading-tight text-center lg:text-left">Start Your <br className="hidden md:block" />Journey Today</h2>
+                            <p className="text-slate-600 text-base md:text-lg mb-8 md:mb-10 text-center lg:text-left">Admissions are open for the upcoming batch. Get in touch with our counselors to find the right program for you.</p>
+
+                            <div className="space-y-4 md:space-y-6">
+                                <a href="tel:+918590144794" className="flex items-center gap-4 group p-4 md:p-5 rounded-2xl bg-white border border-slate-200 shadow-sm hover:border-accent-blue hover:shadow-xl hover:shadow-accent-blue/10 transition-all w-full">
+                                    <div className="w-12 h-12 md:w-14 md:h-14 shrink-0 rounded-xl bg-accent-blue/10 flex items-center justify-center group-hover:bg-accent-blue group-hover:text-white transition-colors text-accent-blue">
+                                        <Phone className="w-5 h-5 md:w-6 md:h-6" />
                                     </div>
-                                ))}
-                            </div>
-                        </div>
-                    </motion.div>
-                </div>
-            </section>
+                                    <div className="min-w-0">
+                                        <p className="text-xs md:text-sm text-slate-500 mb-0.5 font-medium uppercase tracking-wider">Call Us Now</p>
+                                        <p className="text-lg md:text-xl font-bold text-slate-900 truncate">+91 8590 144 794</p>
+                                    </div>
+                                </a>
 
-            {/* Contact & Map Section */}
-            <section id="contact" className="py-12 md:py-16 px-4 md:px-8 lg:px-12 bg-white relative z-10 border-b border-slate-200 theme-light-section">
-                <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-12 lg:gap-16 items-stretch">
+                                <a href="mailto:info@breathartinstitute.in" className="flex items-center gap-4 group p-4 md:p-5 rounded-2xl bg-white border border-slate-200 shadow-sm hover:border-accent-cyan hover:shadow-xl hover:shadow-accent-cyan/10 transition-all w-full">
+                                    <div className="w-12 h-12 md:w-14 md:h-14 shrink-0 rounded-xl bg-accent-cyan/10 flex items-center justify-center group-hover:bg-accent-cyan group-hover:text-white transition-colors text-accent-cyan">
+                                        <Mail className="w-5 h-5 md:w-6 md:h-6" />
+                                    </div>
+                                    <div className="min-w-0">
+                                        <p className="text-xs md:text-sm text-slate-500 mb-0.5 font-medium uppercase tracking-wider">Email Us</p>
+                                        <p className="text-base md:text-lg font-bold text-slate-900 truncate block">info@breathartinstitute.in</p>
+                                    </div>
+                                </a>
 
-                    {/* Contact Info */}
-                    <motion.div
-                        initial={{ opacity: 0, x: -30 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        className="flex-1 flex flex-col justify-center max-w-xl lg:max-w-none mx-auto lg:mx-0 w-full"
-                    >
-                        <span className="text-accent-cyan font-bold tracking-widest uppercase text-xs md:text-sm mb-3 block text-center lg:text-left">Enrollment</span>
-                        <h2 className="text-3xl sm:text-4xl md:text-5xl font-black mb-4 text-slate-900 leading-tight text-center lg:text-left">Start Your <br className="hidden md:block" />Journey Today</h2>
-                        <p className="text-slate-600 text-base md:text-lg mb-8 md:mb-10 text-center lg:text-left">Admissions are open for the upcoming batch. Get in touch with our counselors to find the right program for you.</p>
-
-                        <div className="space-y-4 md:space-y-6">
-                            <a href="tel:+918590144794" className="flex items-center gap-4 group p-4 md:p-5 rounded-2xl bg-white border border-slate-200 shadow-sm hover:border-accent-blue hover:shadow-xl hover:shadow-accent-blue/10 transition-all w-full">
-                                <div className="w-12 h-12 md:w-14 md:h-14 shrink-0 rounded-xl bg-accent-blue/10 flex items-center justify-center group-hover:bg-accent-blue group-hover:text-white transition-colors text-accent-blue">
-                                    <Phone className="w-5 h-5 md:w-6 md:h-6" />
-                                </div>
-                                <div className="min-w-0">
-                                    <p className="text-xs md:text-sm text-slate-500 mb-0.5 font-medium uppercase tracking-wider">Call Us Now</p>
-                                    <p className="text-lg md:text-xl font-bold text-slate-900 truncate">+91 8590 144 794</p>
-                                </div>
-                            </a>
-
-                            <a href="mailto:info@breathartinstitute.in" className="flex items-center gap-4 group p-4 md:p-5 rounded-2xl bg-white border border-slate-200 shadow-sm hover:border-accent-cyan hover:shadow-xl hover:shadow-accent-cyan/10 transition-all w-full">
-                                <div className="w-12 h-12 md:w-14 md:h-14 shrink-0 rounded-xl bg-accent-cyan/10 flex items-center justify-center group-hover:bg-accent-cyan group-hover:text-white transition-colors text-accent-cyan">
-                                    <Mail className="w-5 h-5 md:w-6 md:h-6" />
-                                </div>
-                                <div className="min-w-0">
-                                    <p className="text-xs md:text-sm text-slate-500 mb-0.5 font-medium uppercase tracking-wider">Email Us</p>
-                                    <p className="text-base md:text-lg font-bold text-slate-900 truncate block">info@breathartinstitute.in</p>
-                                </div>
-                            </a>
-
-                            <div className="flex items-center gap-4 group p-4 md:p-5 rounded-2xl bg-white border border-slate-200 shadow-sm w-full">
-                                <div className="w-12 h-12 md:w-14 md:h-14 shrink-0 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600">
-                                    <MapPin className="w-5 h-5 md:w-6 md:h-6" />
-                                </div>
-                                <div className="min-w-0">
-                                    <p className="text-xs md:text-sm text-slate-500 mb-0.5 font-medium uppercase tracking-wider">Location</p>
-                                    <p className="text-sm md:text-base font-bold text-slate-900">Karthika Tower, Attingal, Trivandrum</p>
+                                <div className="flex items-center gap-4 group p-4 md:p-5 rounded-2xl bg-white border border-slate-200 shadow-sm w-full">
+                                    <div className="w-12 h-12 md:w-14 md:h-14 shrink-0 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600">
+                                        <MapPin className="w-5 h-5 md:w-6 md:h-6" />
+                                    </div>
+                                    <div className="min-w-0">
+                                        <p className="text-xs md:text-sm text-slate-500 mb-0.5 font-medium uppercase tracking-wider">Location</p>
+                                        <p className="text-sm md:text-base font-bold text-slate-900">Karthika Tower, Attingal, Trivandrum</p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </motion.div>
+                        </motion.div>
 
-                    {/* Google Map */}
-                    <motion.div
-                        initial={{ opacity: 0, x: 30 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        className="flex-1 w-full max-w-xl lg:max-w-none mx-auto min-h-[350px] md:min-h-[450px] lg:min-h-full rounded-3xl overflow-hidden shadow-xl shadow-slate-200 border border-slate-200 relative group"
-                    >
-                        <div className="absolute inset-0 bg-slate-100 animate-pulse -z-10" />
-                        <iframe
-                            src="https://maps.google.com/maps?q=Breathart%20Institute%20of%20Creative%20Technology%20%28BICT%29%20Karthika%20Tower%2C%20Opposite%20Wedland%20Weddings%2C%20Attingal&t=k&z=13&output=embed&iwloc=near"
-                            width="100%"
-                            height="100%"
-                            allowFullScreen=""
-                            loading="lazy"
-                            referrerPolicy="no-referrer-when-downgrade"
-                            title="BreathArt Institute Location"
-                            className="w-full h-full min-h-[350px] object-cover border-0"
-                        ></iframe>
-                    </motion.div>
+                        {/* Google Map */}
+                        <motion.div
+                            initial={{ opacity: 0, x: 30 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true }}
+                            className="w-full lg:w-1/2 max-w-lg lg:max-w-none mx-auto h-[250px] md:h-[300px] lg:h-[350px] rounded-3xl overflow-hidden shadow-xl shadow-slate-200 border border-slate-200 relative group"
+                        >
+                            <div className="absolute inset-0 bg-slate-100 -z-10" />
+                            <iframe
+                                src="https://maps.google.com/maps?q=Breathart%20Institute%20of%20Creative%20Technology%20%28BICT%29%20Karthika%20Tower%2C%20Opposite%20Wedland%20Weddings%2C%20Attingal&t=k&z=13&output=embed&iwloc=near"
+                                width="100%"
+                                height="100%"
+                                allowFullScreen=""
+                                loading="lazy"
+                                referrerPolicy="no-referrer-when-downgrade"
+                                title="BreathArt Institute Location"
+                                className="w-full h-full object-cover border-0"
+                            ></iframe>
+                        </motion.div>
 
-                </div>
-            </section>
+                    </div>
+                </section>
 
-            <Footer isLanding={true} />
-            <ScrollToTopButton />
-            <WhatsAppButton />
+                <Footer isLanding={true} />
+                <ScrollToTopButton />
+                <WhatsAppButton />
 
-            {/* ── Contact Us Modal Popup ── */}
-            <ContactUsModal isOpen={contactOpen} onClose={() => setContactOpen(false)} />
+                {/* ── Contact Us Modal Popup ── */}
+                <ContactUsModal isOpen={contactOpen} onClose={() => setContactOpen(false)} />
+            </Suspense>
         </div>
     );
 };

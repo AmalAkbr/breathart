@@ -16,7 +16,7 @@ const mentors = [
     { name: "Bipasha M", role: "Business Development Manager", image: prajithImg },
     { name: "Sona T P", role: "Marketing Analyst", image: bipashaImg },
     { name: "Gladson", role: "Senior Photographer & Trainer", image: gladsonImg },
-    { name: "Salima", role: "Digital Marketing Trainer", image: salimaImg },
+    { name: "Salima", role: "Digital Marketing Tutor", image: salimaImg },
     { name: "Suneesh", role: "Assistant Branch Manager", image: suneeshImg }
 ];
 

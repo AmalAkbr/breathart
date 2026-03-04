@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+
 
 const tools = [
     {
@@ -152,18 +152,14 @@ const ToolsCovered = () => {
                 {/* Grid of tools */}
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
                     {tools.map((tool, index) => (
-                        <motion.div
+                        <div
                             key={tool.id}
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true, margin: "-50px" }}
-                            transition={{ duration: 0.5, delay: index * 0.05 }}
-                            className={`${tool.bg} rounded-xl md:rounded-2xl transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:shadow-black/5 flex items-center justify-center p-6 h-32 md:h-40 xl:h-44 group`}
+                            className={`${tool.bg} rounded-xl md:rounded-2xl flex items-center justify-center p-6 h-32 md:h-40 xl:h-44`}
                         >
-                            <div className="group-hover:scale-110 transition-transform duration-500">
+                            <div>
                                 {tool.content}
                             </div>
-                        </motion.div>
+                        </div>
                     ))}
                 </div>
             </div>

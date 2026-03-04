@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import heroCharacter from '../assets/hero.png';
+import heroCharacter from '../assets/hero.webp';
 import Beams from './Beams';
 
 import { Link } from 'react-router-dom';
@@ -22,8 +22,8 @@ const Hero = () => {
             </div>
 
             {/* Background Gradient Blobs */}
-            <div className="absolute top-0 right-0 w-[400px] md:w-[600px] h-[400px] md:h-[600px] bg-accent-blue/40 rounded-full blur-[100px] md:blur-[120px] animate-pulse pointer-events-none transform-gpu will-change-transform" />
-            <div className="absolute bottom-0 left-0 w-[400px] md:w-[600px] h-[400px] md:h-[600px] bg-accent-cyan/30 rounded-full blur-[100px] md:blur-[120px] animate-pulse delay-1000 pointer-events-none transform-gpu will-change-transform" />
+            <div className="absolute top-0 right-0 w-[400px] md:w-[600px] h-[400px] md:h-[600px] bg-accent-blue/40 rounded-full blur-[100px] md:blur-[120px] pointer-events-none transform-gpu will-change-transform" />
+            <div className="absolute bottom-0 left-0 w-[400px] md:w-[600px] h-[400px] md:h-[600px] bg-accent-cyan/30 rounded-full blur-[100px] md:blur-[120px] pointer-events-none transform-gpu will-change-transform" />
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] md:w-[400px] h-[300px] md:h-[400px] bg-blue-700/20 rounded-full blur-[80px] md:blur-[100px] pointer-events-none transform-gpu will-change-transform" />
 
             <div className="w-full px-4 md:px-12 grid lg:grid-cols-2 gap-8 md:gap-12 items-center z-10 py-12 md:py-20">
@@ -86,7 +86,7 @@ const Hero = () => {
                         className="relative w-auto h-full max-h-[500px] flex items-center justify-center"
                     >
                         {/* Glow effect behind */}
-                        <div className="absolute inset-0 bg-accent-blue/20 blur-[80px] rounded-full scale-75 animate-pulse" />
+                        <div className="absolute inset-0 bg-accent-blue/20 blur-[80px] rounded-full scale-75" />
 
                         <img
                             src={heroCharacter}

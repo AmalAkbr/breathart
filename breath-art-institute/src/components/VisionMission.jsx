@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import TiltedCard from './TiltedCard';
 import SplitText from './SplitText';
 import LightPillar from './LightPillar';
-import cardBg from '../assets/whitee.jpg';
+import cardBg from '../assets/whitee.webp';
 
 const VisionMission = () => {
     return (

@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom';
 import insta from '../assets/instagram.webp';
-import face from '../assets/facebook.png'; // tiny (21KB), not converted
-import linkedin from '../assets/linkedin.png'; // tiny (9KB), not converted
-import xIcon from '../assets/X.png'; // tiny (37KB), not converted
+import face from '../assets/facebook.webp'; // tiny (21KB), not converted
+import linkedin from '../assets/linkedin.webp'; // tiny (9KB), not converted
+import xIcon from '../assets/X.webp'; // tiny (37KB), not converted
 
 const Footer = ({ isLanding = false }) => {
     return (
