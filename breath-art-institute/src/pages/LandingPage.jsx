@@ -13,7 +13,7 @@ const Footer = lazy(() => import('../components/Footer'));
 import face from '../assets/facebook.webp';
 import heroCharacter from '../assets/hero.webp';
 import photographyImage from '../assets/photography.webp';
-import instituteImage from '../assets/institute.webp';
+import instituteImage from '../assets/institute.png';
 import marketingImage from '../assets/marketing.webp';
 import whiteeImage from '../assets/whitee.webp';
 import RotatingText from '../components/RotatingText';
@@ -93,7 +93,7 @@ const LandingPage = () => {
 
             {/* Minimal Header (Dynamic Scroll & Theme) */}
             <header
-                className={`fixed top-0 w-full z-[70] transition-all duration-300 py-3 md:py-4 px-4 md:px-8 lg:px-12 flex justify-between items-center ${isWhiteNav
+                className={`fixed top-0 w-full z-[70] transition-all duration-300 py-1 md:py-2 px-4 md:px-8 lg:px-12 flex justify-between items-center ${isWhiteNav
                     ? 'bg-white/95 backdrop-blur-3xl shadow-lg border-b border-slate-200 text-slate-900'
                     : scrolled
                         ? 'bg-[#0a192f]/80 backdrop-blur-xl border-b border-white/10 shadow-lg text-white'
@@ -101,10 +101,10 @@ const LandingPage = () => {
                     }`}
             >
                 <div className="flex items-center gap-2 md:gap-3 transition-colors duration-300">
-                    <Logo variant={isWhiteNav ? "dark" : "light"} className="w-8 h-8 md:w-10 md:h-10 text-current" />
-                    <div className="flex flex-col">
-                        <h1 className="font-bold text-base md:text-lg tracking-tight leading-none text-current">BreathArt</h1>
-                        <span className={`text-[9px] md:text-[10px] uppercase font-bold tracking-widest mt-0.5 ${isWhiteNav ? 'text-accent-blue' : 'text-accent-cyan'}`}>Institute</span>
+                    <Logo variant={isWhiteNav ? "dark" : "light"} className="w-14 h-14 md:w-16 md:h-16 text-current scale-[1.5] origin-left" />
+                    <div className="flex flex-col justify-center">
+                        <h1 className="text-base md:text-xl font-heading font-bold text-gradient leading-tight">BreathArt Institute</h1>
+                        <span className={`text-[9px] md:text-xs tracking-widest hidden sm:block transition-colors duration-300 ${isWhiteNav ? 'text-blue-800' : 'text-slate-300'}`}>LEARN | CREATE | GROW</span>
                     </div>
                 </div>
                 <div className="flex items-center gap-2 md:gap-4">
@@ -378,12 +378,12 @@ const LandingPage = () => {
                             <div className="relative z-10">
                                 <div className="flex flex-col lg:flex-row gap-6 md:gap-12 lg:gap-16 items-center">
                                     {/* Images Row (mobile: horizontal row centered on top; desktop: vertical column on left) */}
-                                    <div className="flex flex-row lg:flex-col gap-4 w-full lg:w-auto lg:max-w-[120px] justify-center">
+                                    <div className="flex flex-row lg:flex-col gap-10 w-full lg:w-auto lg:max-w-[120px] justify-center">
                                         <div className="flex items-center justify-center w-16 h-16 md:w-20 md:h-20 lg:w-full lg:h-auto flex-shrink-0">
                                             <img src={photographyImage} alt="Photography Studio" loading="lazy" decoding="async" className="w-full h-auto object-contain" />
                                         </div>
                                         <div className="flex items-center justify-center w-16 h-16 md:w-20 md:h-20 lg:w-full lg:h-auto flex-shrink-0">
-                                            <img src={instituteImage} alt="Education Institute" loading="lazy" decoding="async" className="w-full h-auto object-contain" />
+                                            <img src={instituteImage} alt="Education Institute" loading="lazy" decoding="async" className="w-full h-auto object-contain scale-[2.2]" />
                                         </div>
                                         <div className="flex items-center justify-center w-16 h-16 md:w-20 md:h-20 lg:w-full lg:h-auto flex-shrink-0">
                                             <img src={marketingImage} alt="Digital Marketing" loading="lazy" decoding="async" className="w-full h-auto object-contain" />

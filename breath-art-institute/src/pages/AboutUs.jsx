@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import Grainient from '../components/Grainient';
 import photographyImage from '../assets/photography.webp';
-import instituteImage from '../assets/institute.webp';
+import instituteImage from '../assets/institute.png';
 import marketingImage from '../assets/marketing.webp';
 import bgImage from '../assets/bg.webp';
 import RotatingText from '../components/RotatingText';
@@ -135,12 +135,12 @@ const AboutUs = () => {
                     <div className="relative z-10 p-8 md:p-12 lg:p-16">
                         <div className="flex flex-col lg:flex-row gap-6 md:gap-12 lg:gap-16 items-center lg:items-center">
                             {/* Images Row (mobile: horizontal row on top, desktop: vertical column on left) */}
-                            <div className="flex flex-row lg:flex-col gap-4 w-full lg:w-auto lg:max-w-[120px] justify-center">
+                            <div className="flex flex-row lg:flex-col gap-10 w-full lg:w-auto lg:max-w-[120px] justify-center">
                                 <div className="flex items-center justify-center w-16 h-16 md:w-20 md:h-20 lg:w-full lg:h-auto flex-shrink-0">
                                     <img src={photographyImage} alt="Photography Studio" loading="lazy" decoding="async" className="w-full h-auto object-contain" />
                                 </div>
                                 <div className="flex items-center justify-center w-16 h-16 md:w-20 md:h-20 lg:w-full lg:h-auto flex-shrink-0">
-                                    <img src={instituteImage} alt="Education Institute" loading="lazy" decoding="async" className="w-full h-auto object-contain" />
+                                    <img src={instituteImage} alt="Education Institute" loading="lazy" decoding="async" className="w-full h-auto object-contain scale-[2.2]" />
                                 </div>
                                 <div className="flex items-center justify-center w-16 h-16 md:w-20 md:h-20 lg:w-full lg:h-auto flex-shrink-0">
                                     <img src={marketingImage} alt="Digital Marketing" loading="lazy" decoding="async" className="w-full h-auto object-contain" />

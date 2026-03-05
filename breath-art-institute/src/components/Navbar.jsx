@@ -102,7 +102,7 @@ const Navbar = () => {
                             : 'bg-transparent border-b border-transparent'
                     }`}
             >
-                <div className={`w-full py-4 px-4 md:px-12 flex justify-between items-center transition-colors duration-300 ${isWhiteNav ? 'text-blue-900' : 'text-white'}`}>
+                <div className={`w-full py-1 px-4 md:px-12 flex justify-between items-center transition-colors duration-300 ${isWhiteNav ? 'text-blue-900' : 'text-white'}`}>
                     {/* Logo */}
                     <Link
                         to="/"
@@ -119,7 +119,7 @@ const Navbar = () => {
                             transition={{ duration: 0.5 }}
                             className="flex items-center gap-2 cursor-pointer"
                         >
-                            <Logo className="w-10 h-10 md:w-14 md:h-14" />
+                            <Logo className="w-14 h-14 md:w-16 md:h-16 scale-[1.3] origin-left" />
                             <div className="flex flex-col">
                                 <span className="text-base md:text-xl font-heading font-bold text-gradient leading-tight">BreathArt Institute</span>
                                 <span className={`text-[9px] md:text-xs tracking-widest hidden sm:block transition-colors duration-300 ${isWhiteNav ? 'text-blue-800' : 'text-slate-300'}`}>LEARN | CREATE | GROW</span>

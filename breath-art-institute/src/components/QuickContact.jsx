@@ -1,9 +1,45 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Phone, Mail, MapPin, ArrowRight, Zap } from 'lucide-react';
+import { Phone, Mail, MapPin, ArrowRight, Zap, Loader2, CheckCircle2 } from 'lucide-react';
 import insta from '../assets/instagram.webp';
 import face from '../assets/facebook.webp';
 
 const QuickContact = ({ onContactClick }) => {
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitStatus, setSubmitStatus] = useState(null); // 'success' | 'error' | null
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+        setSubmitStatus(null);
+
+        const formData = new FormData(e.target);
+        formData.append("access_key", "5c42dcb8-f7ac-4753-a3ca-16f5f7006633");
+
+        try {
+            const response = await fetch("https://api.web3forms.com/submit", {
+                method: "POST",
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                setSubmitStatus('success');
+                e.target.reset(); // Clear the form
+                setTimeout(() => setSubmitStatus(null), 5000); // Reset success message after 5s
+            } else {
+                console.error("Form submission failed:", data);
+                setSubmitStatus('error');
+            }
+        } catch (error) {
+            console.error("Error submitting form:", error);
+            setSubmitStatus('error');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
     return (
         <section className="relative w-full py-16 px-4 md:px-8 lg:px-12 bg-white overflow-hidden border-y border-slate-200 z-20">
             {/* Background Effects */}
@@ -113,7 +149,7 @@ const QuickContact = ({ onContactClick }) => {
                         className="w-full lg:w-[400px] xl:w-[450px] shrink-0"
                     >
                         <form
-                            onSubmit={(e) => { e.preventDefault(); alert("Form Submitted Successfully!"); }}
+                            onSubmit={handleSubmit}
                             className="relative bg-[#0a192f] backdrop-blur-2xl p-6 md:p-8 rounded-2xl border border-accent-blue/30 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5),0_0_40px_-10px_rgba(0,180,255,0.15)] flex flex-col gap-4 overflow-hidden"
                         >
                             {/* Inner Glass Glow */}
@@ -125,33 +161,42 @@ const QuickContact = ({ onContactClick }) => {
                                 <div>
                                     <input
                                         type="text"
+                                        name="name"
                                         placeholder="Full Name"
                                         required
-                                        className="w-full bg-[#112240] text-white border border-white/5 rounded-xl px-4 py-3 outline-none focus:border-accent-cyan/50 focus:bg-[#1a2f55]/50 transition-colors text-sm"
+                                        disabled={isSubmitting}
+                                        className="w-full bg-[#112240] text-white border border-white/5 rounded-xl px-4 py-3 outline-none focus:border-accent-cyan/50 focus:bg-[#1a2f55]/50 transition-colors text-sm disabled:opacity-50"
                                     />
                                 </div>
                                 <div>
                                     <input
                                         type="tel"
+                                        name="phone"
                                         placeholder="Mobile Number"
                                         required
-                                        className="w-full bg-[#112240] text-white border border-white/5 rounded-xl px-4 py-3 outline-none focus:border-accent-cyan/50 focus:bg-[#1a2f55]/50 transition-colors text-sm"
+                                        disabled={isSubmitting}
+                                        className="w-full bg-[#112240] text-white border border-white/5 rounded-xl px-4 py-3 outline-none focus:border-accent-cyan/50 focus:bg-[#1a2f55]/50 transition-colors text-sm disabled:opacity-50"
                                     />
                                 </div>
                                 <div>
                                     <input
                                         type="email"
+                                        name="email"
                                         placeholder="Email Address"
                                         required
-                                        className="w-full bg-[#112240] text-white border border-white/5 rounded-xl px-4 py-3 outline-none focus:border-accent-cyan/50 focus:bg-[#1a2f55]/50 transition-colors text-sm"
+                                        disabled={isSubmitting}
+                                        className="w-full bg-[#112240] text-white border border-white/5 rounded-xl px-4 py-3 outline-none focus:border-accent-cyan/50 focus:bg-[#1a2f55]/50 transition-colors text-sm disabled:opacity-50"
                                     />
                                 </div>
                                 <div>
                                     <select
+                                        name="course"
+                                        defaultValue=""
                                         required
-                                        className="w-full bg-[#112240] text-slate-300 border border-white/5 rounded-xl px-4 py-3 outline-none focus:border-accent-cyan/50 focus:bg-[#1a2f55]/50 transition-colors text-sm appearance-none cursor-pointer"
+                                        disabled={isSubmitting}
+                                        className="w-full bg-[#112240] text-slate-300 border border-white/5 rounded-xl px-4 py-3 outline-none focus:border-accent-cyan/50 focus:bg-[#1a2f55]/50 transition-colors text-sm appearance-none cursor-pointer disabled:opacity-50"
                                     >
-                                        <option value="" disabled selected>Interested Course</option>
+                                        <option value="" disabled>Interested Course</option>
                                         <option value="Advanced Digital Marketing">Advanced Digital Marketing</option>
                                         <option value="Creative Education">Creative Education</option>
                                         <option value="Master Diploma in AI Digital Marketing">Master Diploma in AI Digital Marketing</option>
@@ -159,17 +204,31 @@ const QuickContact = ({ onContactClick }) => {
                                         <option value="Diploma in Graphic Design & Photography">Diploma in Graphic Design & Photography</option>
                                         <option value="SEO Mastery">SEO Mastery</option>
                                         <option value="Social Media Management">Social Media Management</option>
-                                        <option value="other">Other / Not Sure</option>
+                                        <option value="Other">Other / Not Sure</option>
                                     </select>
                                 </div>
                             </div>
 
                             <button
                                 type="submit"
-                                className="w-full mt-2 group relative flex items-center justify-center gap-2 px-6 py-3.5 bg-gradient-to-r from-accent-cyan to-accent-blue text-white font-bold text-sm rounded-xl overflow-hidden hover:shadow-lg hover:shadow-accent-cyan/20 transition-all duration-300"
+                                disabled={isSubmitting || submitStatus === 'success'}
+                                className={`w-full mt-2 group relative flex items-center justify-center gap-2 px-6 py-3.5 text-white font-bold text-sm rounded-xl overflow-hidden transition-all duration-300 ${submitStatus === 'success'
+                                    ? 'bg-green-500'
+                                    : submitStatus === 'error'
+                                        ? 'bg-red-500 hover:bg-red-600'
+                                        : 'bg-gradient-to-r from-accent-cyan to-accent-blue hover:shadow-lg hover:shadow-accent-cyan/20'
+                                    } disabled:opacity-70 disabled:cursor-not-allowed`}
                             >
                                 <span className="relative z-10 flex items-center gap-2">
-                                    Submit Request <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                    {isSubmitting ? (
+                                        <>Sending... <Loader2 className="w-4 h-4 animate-spin" /></>
+                                    ) : submitStatus === 'success' ? (
+                                        <>Sent Successfully! <CheckCircle2 className="w-4 h-4" /></>
+                                    ) : submitStatus === 'error' ? (
+                                        <>Submission Failed - Try Again</>
+                                    ) : (
+                                        <>Submit Request <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></>
+                                    )}
                                 </span>
                             </button>
                             <p className="text-[10px] text-slate-500 text-center mt-2">
