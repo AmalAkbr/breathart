@@ -217,21 +217,6 @@ const LandingPage = () => {
                                 className="w-full h-full object-contain relative z-10 drop-shadow-2xl max-h-[500px]"
                             />
 
-                            {/* Floating Badges */}
-                            <motion.div
-                                animate={{ y: [0, -15, 0], rotate: [0, 5, 0] }}
-                                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                                className="absolute top-4 right-4 md:top-10 md:right-10 w-12 h-12 md:w-16 md:h-16 bg-secondary/90 backdrop-blur rounded-xl border border-white/10 flex items-center justify-center shadow-xl shadow-black/30 z-20"
-                            >
-                                <span className="text-xl md:text-2xl">🤖</span>
-                            </motion.div>
-                            <motion.div
-                                animate={{ y: [0, 15, 0], rotate: [0, -5, 0] }}
-                                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-                                className="absolute bottom-10 left-4 md:bottom-20 md:left-10 w-10 h-10 md:w-14 md:h-14 bg-secondary/90 backdrop-blur rounded-full border border-white/10 flex items-center justify-center shadow-xl shadow-black/30 z-20"
-                            >
-                                <span className="text-lg md:text-xl">🚀</span>
-                            </motion.div>
                         </motion.div>
                     </motion.div>
                 </div>
