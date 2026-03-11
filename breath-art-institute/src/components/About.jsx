@@ -1,10 +1,22 @@
 import { motion } from 'framer-motion';
 import whiskImage from '../assets/froo.webp';
-import Beams from './Beams';
+import bg2 from '../assets/bg2.jpg';
 
 const About = () => {
     return (
-        <section id="about" className="py-24 relative overflow-hidden bg-bg-dark">
+        <section 
+            id="about" 
+            className="py-24 relative overflow-hidden"
+            style={{ 
+                backgroundImage: `url(${bg2})`, 
+                backgroundSize: 'cover', 
+                backgroundPosition: 'center',
+                backgroundAttachment: 'fixed'
+            }}
+        >
+            {/* Dark overlay for text readability */}
+            <div className="absolute inset-0 bg-[#0a0f1a]/80 z-10 pointer-events-none" />
+
             {/* Wave Separator Top - transitions from the white PartnerLogos section above */}
             <div className="absolute top-0 left-0 w-full overflow-hidden leading-[0] z-20">
                 <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none" className="relative block w-[calc(100%+1.3px)] h-[60px] fill-white">
@@ -15,21 +27,9 @@ const About = () => {
             <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-accent-blue/5 rounded-full blur-[100px] pointer-events-none transform-gpu will-change-transform" />
             <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-accent-cyan/5 rounded-full blur-[100px] pointer-events-none transform-gpu will-change-transform" />
 
-            {/* Beams Background with seamless blending */}
-            <div className="absolute inset-0 z-0 opacity-30 [mask-image:linear-gradient(to_bottom,transparent,black_20%,black_80%,transparent)]">
-                <Beams
-                    beamWidth={2}
-                    beamHeight={15}
-                    beamNumber={12}
-                    lightColor="#0008f5"
-                    speed={2}
-                    noiseIntensity={1.75}
-                    scale={0.2}
-                    rotation={0}
-                />
-            </div>
 
-            <div className="w-full max-w-[1600px] mx-auto px-4 md:px-12 lg:px-16 relative z-10">
+
+            <div className="w-full max-w-[1600px] mx-auto px-4 md:px-12 lg:px-16 relative z-20">
                 <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
                     {/* Image/Visual Side */}
                     <motion.div
@@ -39,13 +39,13 @@ const About = () => {
                         transition={{ duration: 0.8 }}
                         className="relative"
                     >
-                        <div className="aspect-square w-full max-w-[480px] mx-auto rounded-2xl overflow-hidden shadow-2xl shadow-black/50 border border-white/10 group">
+                        <div className="aspect-square w-full max-w-[480px] mx-auto rounded-2xl overflow-hidden shadow-2xl shadow-black/50 border border-white/10">
                             <img
                                 src={whiskImage}
                                 alt="BICT Excellence"
                                 loading="lazy"
                                 decoding="async"
-                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                className="w-full h-full object-cover"
                             />
                         </div>
                     </motion.div>

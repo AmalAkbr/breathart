@@ -1,26 +1,23 @@
 import { motion } from 'framer-motion';
 import heroCharacter from '../assets/hero.webp';
-import Beams from './Beams';
+import bg2 from '../assets/bg2.jpg';
 
 import { Link } from 'react-router-dom';
 
 const Hero = () => {
     return (
-        <section id="home" className="min-h-screen flex items-center justify-center relative overflow-hidden bg-primary pt-16">
-            {/* Beams Background */}
-            <div className="absolute inset-0 z-0 opacity-30 [mask-image:linear-gradient(to_bottom,black_70%,transparent)]">
-                <Beams
-                    beamWidth={2}
-                    beamHeight={15}
-                    beamNumber={12}
-                    lightColor="#0008f5"
-                    speed={2}
-                    noiseIntensity={1.75}
-                    scale={0.2}
-                    rotation={0}
-                />
-            </div>
-
+        <section 
+            id="home" 
+            className="min-h-screen flex items-center justify-center relative overflow-hidden pt-16"
+            style={{ 
+                backgroundImage: `url(${bg2})`, 
+                backgroundSize: 'cover', 
+                backgroundPosition: 'center',
+                backgroundAttachment: 'fixed',
+                backgroundRepeat: 'no-repeat'
+            }}
+        >
+            <div className="absolute inset-0 bg-[#0a0f1a]/80 z-0 pointer-events-none" />
             {/* Background Gradient Blobs */}
             <div className="absolute top-0 right-0 w-[400px] md:w-[600px] h-[400px] md:h-[600px] bg-accent-blue/40 rounded-full blur-[100px] md:blur-[120px] pointer-events-none transform-gpu will-change-transform" />
             <div className="absolute bottom-0 left-0 w-[400px] md:w-[600px] h-[400px] md:h-[600px] bg-accent-cyan/30 rounded-full blur-[100px] md:blur-[120px] pointer-events-none transform-gpu will-change-transform" />
@@ -73,18 +70,7 @@ const Hero = () => {
                     transition={{ duration: 1 }}
                     className="relative h-[280px] sm:h-[360px] lg:h-[70vh] w-full flex items-center justify-center order-1 lg:order-2"
                 >
-                    <motion.div
-                        animate={{
-                            y: [0, -20, 0],
-                            scale: [1, 1.02, 1]
-                        }}
-                        transition={{
-                            y: { duration: 6, repeat: Infinity, ease: "easeInOut" },
-                            scale: { duration: 4, repeat: Infinity, ease: "easeInOut" }
-                        }}
-                        style={{ willChange: 'transform' }}
-                        className="relative w-auto h-full max-h-[500px] flex items-center justify-center"
-                    >
+                    <div className="relative w-auto h-full max-h-[500px] flex items-center justify-center">
                         {/* Glow effect behind */}
                         <div className="absolute inset-0 bg-accent-blue/20 blur-[80px] rounded-full scale-75" />
 
@@ -96,7 +82,7 @@ const Hero = () => {
                             className="w-full h-full object-contain relative z-10 drop-shadow-2xl max-h-[500px]"
                         />
 
-                    </motion.div>
+                    </div>
                 </motion.div>
             </div>
         </section>

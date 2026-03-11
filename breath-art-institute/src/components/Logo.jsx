@@ -1,6 +1,6 @@
 import instituteLogo from '../assets/institute.png';
 
-const Logo = ({ className, variant }) => {
+const Logo = ({ className }) => {
     return (
         <img
             src={instituteLogo}

@@ -155,7 +155,7 @@ const Navbar = () => {
                                             to={path}
                                             onClick={handleHomeClick}
                                             onMouseEnter={() => setHoveredItem(item)}
-                                            className={`transition-colors duration-300 text-sm uppercase tracking-widest font-medium relative group py-2 ${isWhiteNav ? 'text-blue-900 hover:text-accent-blue' : 'text-slate-200 hover:text-white'}`}
+                                            className={`transition-colors duration-300 text-xs uppercase tracking-widest font-medium relative group py-2 ${isWhiteNav ? 'text-blue-900 hover:text-accent-blue' : 'text-slate-200 hover:text-white'}`}
                                         >
                                             {item}
                                             <span className={`absolute bottom-1 left-0 w-0 h-0.5 transition-all duration-300 group-hover:w-full ${isWhiteNav ? 'bg-accent-blue' : 'bg-accent-cyan'}`} />
@@ -164,7 +164,7 @@ const Navbar = () => {
                                         <a
                                             href={path}
                                             onMouseEnter={() => setHoveredItem(item)}
-                                            className={`transition-colors duration-300 text-sm uppercase tracking-widest font-medium relative group py-2 ${isWhiteNav ? 'text-blue-900 hover:text-accent-blue' : 'text-slate-200 hover:text-white'}`}
+                                            className={`transition-colors duration-300 text-xs uppercase tracking-widest font-medium relative group py-2 ${isWhiteNav ? 'text-blue-900 hover:text-accent-blue' : 'text-slate-200 hover:text-white'}`}
                                         >
                                             {item}
                                             <span className={`absolute bottom-1 left-0 w-0 h-0.5 transition-all duration-300 group-hover:w-full ${isWhiteNav ? 'bg-accent-blue' : 'bg-accent-cyan'}`} />

@@ -15,7 +15,9 @@ const EnrollModal = ({ open, onClose, defaultCourse = '' }) => {
     // Reset form + status and lock scroll every time the modal opens
     useEffect(() => {
         if (open) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setForm({ name: '', email: '', phone: '', message: '' });
+             
             setStatus('idle');
             document.body.style.overflow = 'hidden';
         } else {

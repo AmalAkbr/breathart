@@ -39,22 +39,22 @@ const Mentors = () => {
                         initial={{ opacity: 0, scale: 0.9 }}
                         whileInView={{ opacity: 1, scale: 1 }}
                         viewport={{ once: true }}
-                        className="flex flex-col items-center group cursor-pointer"
+                        className="flex flex-col items-center cursor-pointer"
                     >
                         <div className="relative mb-6">
-                            <div className="w-40 h-40 md:w-56 md:h-56 z-10 relative flex items-center justify-center transition-all duration-500">
+                            <div className="w-40 h-40 md:w-56 md:h-56 z-10 relative flex items-center justify-center">
                                 <img
                                     src={ceo.image}
                                     alt={ceo.name}
                                     loading="lazy"
                                     decoding="async"
-                                    className="w-full h-full object-contain group-hover:-translate-y-2 group-hover:drop-shadow-[0_10px_30px_rgba(6,182,212,0.4)] transition-all duration-500"
+                                    className="w-full h-full object-contain"
                                 />
                             </div>
-                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 rounded-full bg-accent-cyan/20 opacity-0 group-hover:opacity-100 blur-3xl group-hover:bg-accent-blue/40 group-hover:scale-150 transition-all duration-700 -z-10"></div>
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 rounded-full bg-accent-cyan/20 blur-3xl -z-10"></div>
                         </div>
 
-                        <h3 className="text-2xl font-bold text-white mb-1 group-hover:text-accent-cyan transition-colors">{ceo.name}</h3>
+                        <h3 className="text-2xl font-bold text-white mb-1 transition-colors">{ceo.name}</h3>
                         <p className="text-accent-cyan text-base font-semibold">{ceo.role}</p>
                     </motion.div>
                 </div>
@@ -68,26 +68,26 @@ const Mentors = () => {
                             whileInView={{ opacity: 1, scale: 1 }}
                             viewport={{ once: true }}
                             transition={{ delay: index * 0.1 }}
-                            className="flex flex-col items-center group cursor-pointer w-full"
+                            className="flex flex-col items-center cursor-pointer w-full"
                         >
                             <div className="relative mb-4 md:mb-6 flex justify-center w-full">
-                                <div className={`w-28 h-28 md:w-32 lg:w-36 md:h-32 lg:h-36 z-10 relative flex items-center justify-center transition-all duration-500 overflow-hidden ${!mentor.image ? 'bg-slate-800/50 rounded-full group-hover:-translate-y-2 group-hover:drop-shadow-[0_10px_20px_rgba(6,182,212,0.3)]' : ''}`}>
+                                <div className={`w-28 h-28 md:w-32 lg:w-36 md:h-32 lg:h-36 z-10 relative flex items-center justify-center overflow-hidden ${!mentor.image ? 'bg-slate-800/50 rounded-full' : ''}`}>
                                     {mentor.image ? (
                                         <img
                                             src={mentor.image}
                                             alt={mentor.name}
                                             loading="lazy"
                                             decoding="async"
-                                            className="w-full h-full object-contain group-hover:-translate-y-2 group-hover:drop-shadow-[0_10px_20px_rgba(6,182,212,0.3)] transition-all duration-500"
+                                            className="w-full h-full object-contain"
                                         />
                                     ) : (
                                         <span className="text-5xl opacity-50">👤</span>
                                     )}
                                 </div>
-                                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full bg-accent-cyan/20 opacity-0 group-hover:opacity-100 blur-3xl group-hover:bg-accent-blue/40 group-hover:scale-150 transition-all duration-700 -z-10"></div>
+                                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full bg-accent-cyan/20 blur-3xl -z-10"></div>
                             </div>
 
-                            <h3 className="text-base md:text-md lg:text-lg font-bold text-white mb-1 group-hover:text-accent-cyan transition-colors text-center px-1 lg:px-2">{mentor.name}</h3>
+                            <h3 className="text-base md:text-md lg:text-lg font-bold text-white mb-1 transition-colors text-center px-1 lg:px-2">{mentor.name}</h3>
                             <p className="text-slate-400 text-xs md:text-sm text-center px-1 lg:px-2">{mentor.role}</p>
                         </motion.div>
                     ))}

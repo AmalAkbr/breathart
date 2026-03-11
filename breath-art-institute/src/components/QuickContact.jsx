@@ -4,7 +4,7 @@ import { Phone, Mail, MapPin, ArrowRight, Zap, Loader2, CheckCircle2 } from 'luc
 import insta from '../assets/instagram.webp';
 import face from '../assets/facebook.webp';
 
-const QuickContact = ({ onContactClick }) => {
+const QuickContact = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitStatus, setSubmitStatus] = useState(null); // 'success' | 'error' | null
 

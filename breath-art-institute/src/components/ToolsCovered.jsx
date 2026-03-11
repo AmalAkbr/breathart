@@ -151,7 +151,7 @@ const ToolsCovered = () => {
 
                 {/* Grid of tools */}
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
-                    {tools.map((tool, index) => (
+                    {tools.map((tool) => (
                         <div
                             key={tool.id}
                             className={`${tool.bg} rounded-xl md:rounded-2xl flex items-center justify-center p-6 h-32 md:h-40 xl:h-44`}

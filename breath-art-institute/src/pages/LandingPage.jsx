@@ -3,7 +3,7 @@ import { useState, useEffect, lazy, Suspense } from 'react';
 import { Award, MapPin, Phone, Mail, Zap } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Logo from '../components/Logo';
-import Beams from '../components/Beams';
+
 import Plasma from '../components/Plasma';
 import insta from '../assets/instagram.webp';
 
@@ -21,6 +21,7 @@ import ShinyText from '../components/ShinyText';
 import CountUp from '../components/CountUp';
 import Aurora from '../components/Aurora';
 import globeBg from '../assets/globe.webp';
+import bg2 from '../assets/bg2.jpg';
 
 // Lazy loaded below-the-fold components
 const ScrollToTopButton = lazy(() => import('../components/ScrollToTopButton'));
@@ -138,21 +139,18 @@ const LandingPage = () => {
             </header>
 
             {/* Hero / About Section - Flexible Height filling remaining space */}
-            <section className="relative w-full h-screen flex flex-col items-center justify-center text-center z-10 px-4 md:px-8 lg:px-12 pt-16 bg-primary overflow-hidden">
-
-                {/* Beams Background */}
-                <div className="absolute inset-0 z-0 opacity-30 [mask-image:linear-gradient(to_bottom,black_70%,transparent)]">
-                    <Beams
-                        beamWidth={2}
-                        beamHeight={15}
-                        beamNumber={12}
-                        lightColor="#0008f5"
-                        speed={2}
-                        noiseIntensity={1.75}
-                        scale={0.2}
-                        rotation={0}
-                    />
-                </div>
+            <section 
+                className="relative w-full h-screen flex flex-col items-center justify-center text-center z-10 px-4 md:px-8 lg:px-12 pt-16 overflow-hidden"
+                style={{ 
+                    backgroundImage: `url(${bg2})`, 
+                    backgroundSize: 'cover', 
+                    backgroundPosition: 'center',
+                    backgroundAttachment: 'fixed',
+                    backgroundRepeat: 'no-repeat'
+                }}
+            >
+                {/* Background Dark Overlay */}
+                <div className="absolute inset-0 bg-[#0a0f1a]/80 z-0 pointer-events-none" />
 
                 {/* Background Gradient Blobs */}
                 <div className="absolute top-0 right-0 w-[400px] md:w-[600px] h-[400px] md:h-[600px] bg-accent-blue/40 rounded-full blur-[100px] md:blur-[120px] pointer-events-none transform-gpu will-change-transform" />
