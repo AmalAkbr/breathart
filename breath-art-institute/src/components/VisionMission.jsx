@@ -20,7 +20,7 @@ const VisionMission = () => {
             <div className="w-full max-w-[1100px] mx-auto px-4 md:px-12 lg:px-16 relative z-10">
                 <div className="text-center mb-8 lg:mb-10">
                     <h2 className="text-3xl md:text-4xl lg:text-5xl font-heading font-black text-white tracking-tight drop-shadow-[0_4px_4px_rgba(0,0,0,0.8)] relative z-20">
-                        <SplitText text="Empowering the Next Generation" delay={20} splitType="words" duration={0.4} rootMargin="-50px" />
+                        <SplitText text="Empowering the Next Generation" delay={20} splitType="words" duration={0.4} threshold={0.5} rootMargin="0px" />
                     </h2>
                 </div>
                 <div className="grid lg:grid-cols-2 gap-6 lg:gap-10">
@@ -51,13 +51,13 @@ const VisionMission = () => {
 
                                     <div className="relative z-10">
                                         <h3 className="text-xl lg:text-2xl font-heading font-black text-black mb-1 tracking-tight drop-shadow-sm">
-                                            <SplitText text="VISION" delay={30} duration={0.4} rootMargin="-50px" />
+                                            <SplitText text="VISION" delay={30} duration={0.4} threshold={0.5} rootMargin="0px" />
                                         </h3>
                                         <span className="inline-block text-xs lg:text-sm text-blue-700 font-bold tracking-wide uppercase mb-1 lg:mb-2 pb-1 border-b border-blue-700/30">
                                             <SplitText text="Shaping Future Leaders" delay={15} splitType="chars" duration={0.4} />
                                         </span>
                                         <div className="text-xs lg:text-sm text-slate-900 leading-snug font-medium">
-                                            <SplitText text="To become the global benchmark in AI-powered creative education, producing world-class digital professionals capable of leading the future economy from Kerala to the world stage." delay={8} splitType="chars" duration={0.3} textAlign="left" />
+                                            <SplitText text="To become the global benchmark in AI-powered creative education, producing world-class digital professionals capable of leading the future economy from Kerala to the world stage." delay={8} splitType="chars" duration={0.3} textAlign="left" threshold={0.5} />
                                         </div>
                                     </div>
                                 </div>
@@ -91,13 +91,13 @@ const VisionMission = () => {
 
                                     <div className="relative z-10">
                                         <h3 className="text-xl lg:text-2xl font-heading font-black text-black mb-1 tracking-tight drop-shadow-sm">
-                                            <SplitText text="MISSION" delay={30} duration={0.4} rootMargin="-50px" />
+                                            <SplitText text="MISSION" delay={30} duration={0.4} threshold={0.5} rootMargin="0px" />
                                         </h3>
                                         <span className="inline-block text-xs lg:text-sm text-blue-700 font-bold tracking-wide uppercase mb-1 lg:mb-2 pb-1 border-b border-blue-700/30">
                                             <SplitText text="Empowering the World" delay={15} splitType="chars" duration={0.4} />
                                         </span>
                                         <div className="text-xs lg:text-sm text-slate-900 leading-snug font-medium">
-                                            <SplitText text="To bridge creativity and technology through agency-based, real-world training so every student gains international-grade skills, mentorship, and placement support to thrive globally." delay={8} splitType="chars" duration={0.3} textAlign="left" />
+                                            <SplitText text="To bridge creativity and technology through agency-based, real-world training so every student gains international-grade skills, mentorship, and placement support to thrive globally." delay={8} splitType="chars" duration={0.3} textAlign="left" threshold={0.5} />
                                         </div>
                                     </div>
                                 </div>
