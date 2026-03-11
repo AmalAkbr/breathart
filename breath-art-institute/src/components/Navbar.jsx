@@ -56,7 +56,11 @@ const Navbar = () => {
             setTimeout(() => {
                 const element = document.getElementById(id);
                 if (element) {
-                    element.scrollIntoView({ behavior: 'smooth' });
+                    if (window.__lenis) {
+                        window.__lenis.scrollTo(element, { immediate: false });
+                    } else {
+                        element.scrollIntoView({ behavior: 'smooth' });
+                    }
                 }
             }, 100); // Small delay to ensure the page has rendered
         }
@@ -110,7 +114,11 @@ const Navbar = () => {
                             if (location.pathname === '/') {
                                 e.preventDefault();
                             }
-                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                            if (window.__lenis) {
+                                window.__lenis.scrollTo(0, { immediate: false });
+                            } else {
+                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                            }
                         }}
                     >
                         <motion.div
@@ -138,8 +146,15 @@ const Navbar = () => {
                                     if (location.pathname === '/') {
                                         e.preventDefault();
                                     }
-                                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                                    setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 100);
+                                    const scrollFn = () => {
+                                        if (window.__lenis) {
+                                            window.__lenis.scrollTo(0, { immediate: false });
+                                        } else {
+                                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                                        }
+                                    };
+                                    scrollFn();
+                                    setTimeout(scrollFn, 100);
                                 }
                             };
 
@@ -463,8 +478,15 @@ const Navbar = () => {
                                                         if (location.pathname === '/') {
                                                             e.preventDefault();
                                                         }
-                                                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                                                        setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 100);
+                                                        const scrollFn = () => {
+                                                            if (window.__lenis) {
+                                                                window.__lenis.scrollTo(0, { immediate: false });
+                                                            } else {
+                                                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                                                            }
+                                                        };
+                                                        scrollFn();
+                                                        setTimeout(scrollFn, 100);
                                                     }
                                                 }}
                                                 className={`text-2xl font-bold py-2 transition-colors flex justify-between items-center group ${isWhiteNav ? 'text-blue-900' : 'text-slate-200'}`}

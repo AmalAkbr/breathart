@@ -226,7 +226,11 @@ const LandingPage = () => {
                     transition={{ delay: 1, duration: 1 }}
                     className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4 cursor-pointer z-20"
                     onClick={() => {
-                        window.scrollBy({ top: window.innerHeight, behavior: 'smooth' });
+                        if (window.__lenis) {
+                            window.__lenis.scrollTo(window.scrollY + window.innerHeight, { immediate: false });
+                        } else {
+                            window.scrollBy({ top: window.innerHeight, behavior: 'smooth' });
+                        }
                     }}
                 >
                     <span className="text-[10px] md:text-xs font-medium text-slate-400 uppercase tracking-[0.2em] hidden sm:block">Scroll to explore</span>

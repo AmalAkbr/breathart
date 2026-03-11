@@ -32,10 +32,14 @@ const ScrollToTopButton = () => {
     }, []);
 
     const scrollToTop = () => {
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-        });
+        if (window.__lenis) {
+            window.__lenis.scrollTo(0, { immediate: false });
+        } else {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
     };
 
     return (
