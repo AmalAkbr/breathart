@@ -83,14 +83,9 @@ const Footer = ({ isLanding = false }) => {
                     <div className="text-xs text-slate-500 text-center flex-1">
                         <span>
                             Developed by{' '}
-                            <a
-                                href="https://www.instagram.com/intellex.web?igsh=MXc4Z2Uwd243OHpqdA=="
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="font-bold text-accent-cyan hover:text-white transition-colors uppercase tracking-wider"
-                            >
-                                INTELLEX
-                            </a>
+                            <span className="font-bold text-accent-cyan tracking-wider">
+                                BREATHART GROUP
+                            </span>
                         </span>
                     </div>
 
