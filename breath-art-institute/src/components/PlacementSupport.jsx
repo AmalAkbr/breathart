@@ -124,21 +124,6 @@ const PlacementSupport = () => {
                                 ))}
                             </div>
                         </motion.div>
-                        
-                        {/* Floating Badge */}
-                        <motion.div
-                            animate={{ y: [0, -15, 0] }}
-                            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                            className="absolute -top-6 -right-4 md:-right-8 lg:-left-12 lg:top-12 z-20 bg-white p-4 rounded-2xl shadow-xl shadow-black/20 border border-slate-100 flex items-center gap-4"
-                        >
-                            <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-600">
-                                <TrendingUp className="w-6 h-6" />
-                            </div>
-                            <div>
-                                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Success Rate</p>
-                                <p className="text-2xl font-black text-slate-900 leading-none">94%</p>
-                            </div>
-                        </motion.div>
                     </div>
                 </motion.div>
             </div>
