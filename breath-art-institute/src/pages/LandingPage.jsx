@@ -31,6 +31,8 @@ const Courses = lazy(() => import('../components/Courses'));
 const GlobalPartners = lazy(() => import('../components/GlobalPartners'));
 const QuickContact = lazy(() => import('../components/QuickContact'));
 const Certifications = lazy(() => import('../components/Certifications'));
+const WhyAI = lazy(() => import('../components/WhyAI'));
+const PlacementSupport = lazy(() => import('../components/PlacementSupport'));
 
 // Fallback loader for below the fold content
 const SectionLoader = () => <div className="min-h-[200px]" aria-hidden="true" />;
@@ -139,11 +141,11 @@ const LandingPage = () => {
             </header>
 
             {/* Hero / About Section - Flexible Height filling remaining space */}
-            <section 
+            <section
                 className="relative w-full h-screen flex flex-col items-center justify-center text-center z-10 px-4 md:px-8 lg:px-12 pt-16 overflow-hidden"
-                style={{ 
-                    backgroundImage: `url(${bg2})`, 
-                    backgroundSize: 'cover', 
+                style={{
+                    backgroundImage: `url(${bg2})`,
+                    backgroundSize: 'cover',
                     backgroundPosition: 'center',
                     backgroundAttachment: 'fixed',
                     backgroundRepeat: 'no-repeat'
@@ -257,6 +259,12 @@ const LandingPage = () => {
 
                 {/* Certifications Section */}
                 <Certifications />
+
+                {/* Why AI Section */}
+                <WhyAI />
+
+                {/* Placement Support Section */}
+                <PlacementSupport />
 
                 {/* Academy / Enrollment Section (Moved from Hero) */}
                 <section className="relative z-20 px-4 md:px-8 lg:px-12 py-20 md:py-32 w-full bg-white text-center flex flex-col items-center justify-center theme-light-section overflow-hidden">
@@ -461,7 +469,7 @@ const LandingPage = () => {
                                     </div>
                                 </a>
 
-                                <a href="mailto:info@breathartinstitute.in" className="flex items-center gap-4 group p-4 md:p-5 rounded-2xl bg-white border border-slate-200 shadow-sm hover:border-accent-cyan hover:shadow-xl hover:shadow-accent-cyan/10 transition-all w-full">
+                                <a href="https://mail.google.com/mail/?view=cm&fs=1&to=info@breathartinstitute.in" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 group p-4 md:p-5 rounded-2xl bg-white border border-slate-200 shadow-sm hover:border-accent-cyan hover:shadow-xl hover:shadow-accent-cyan/10 transition-all w-full">
                                     <div className="w-12 h-12 md:w-14 md:h-14 shrink-0 rounded-xl bg-accent-cyan/10 flex items-center justify-center group-hover:bg-accent-cyan group-hover:text-white transition-colors text-accent-cyan">
                                         <Mail className="w-5 h-5 md:w-6 md:h-6" />
                                     </div>

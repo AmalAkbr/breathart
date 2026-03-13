@@ -102,7 +102,7 @@ const QuickContact = () => {
                                 whileInView={{ opacity: 1, x: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ delay: 0.4 }}
-                                href="mailto:info@breathartinstitute.in"
+                                href="https://mail.google.com/mail/?view=cm&fs=1&to=info@breathartinstitute.in" target="_blank" rel="noopener noreferrer"
                                 className="flex items-center gap-3 p-3 lg:p-4 rounded-xl bg-white border border-slate-200 shadow-sm hover:border-accent-blue/50 hover:bg-slate-50 transition-colors group"
                             >
                                 <div className="w-10 h-10 shrink-0 rounded-full bg-accent-blue/10 flex items-center justify-center text-accent-blue group-hover:scale-110 transition-transform">

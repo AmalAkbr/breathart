@@ -90,7 +90,7 @@ const ContactUsModal = ({ isOpen, onClose }) => {
                             {/* Emails */}
                             <div className="grid grid-cols-1 gap-3">
                                 <a
-                                    href="mailto:info@breathartinstitute.in"
+                                    href="https://mail.google.com/mail/?view=cm&fs=1&to=info@breathartinstitute.in" target="_blank" rel="noopener noreferrer"
                                     className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-accent-blue/40 hover:bg-accent-blue/5 transition-all group"
                                 >
                                     <div className="w-10 h-10 rounded-xl bg-accent-blue/15 flex items-center justify-center shrink-0 group-hover:bg-accent-blue/25 transition-colors">
@@ -102,7 +102,7 @@ const ContactUsModal = ({ isOpen, onClose }) => {
                                     </div>
                                 </a>
                                 <a
-                                    href="mailto:info@breathart.ae"
+                                    href="https://mail.google.com/mail/?view=cm&fs=1&to=info@breathart.ae" target="_blank" rel="noopener noreferrer"
                                     className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-accent-blue/40 hover:bg-accent-blue/5 transition-all group"
                                 >
                                     <div className="w-10 h-10 rounded-xl bg-accent-blue/15 flex items-center justify-center shrink-0 group-hover:bg-accent-blue/25 transition-colors">

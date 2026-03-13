@@ -107,36 +107,38 @@ const Navbar = () => {
                     }`}
             >
                 <div className={`w-full py-1 px-4 md:px-12 flex justify-between items-center transition-colors duration-300 ${isWhiteNav ? 'text-blue-900' : 'text-white'}`}>
-                    {/* Logo */}
-                    <Link
-                        to="/"
-                        onClick={(e) => {
-                            if (location.pathname === '/') {
-                                e.preventDefault();
-                            }
-                            if (window.__lenis) {
-                                window.__lenis.scrollTo(0, { immediate: false });
-                            } else {
-                                window.scrollTo({ top: 0, behavior: 'smooth' });
-                            }
-                        }}
-                    >
-                        <motion.div
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.5 }}
-                            className="flex items-center gap-2 cursor-pointer"
+                    {/* Logo Area */}
+                    <div className="flex-1 flex justify-start">
+                        <Link
+                            to="/"
+                            onClick={(e) => {
+                                if (location.pathname === '/') {
+                                    e.preventDefault();
+                                }
+                                if (window.__lenis) {
+                                    window.__lenis.scrollTo(0, { immediate: false });
+                                } else {
+                                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                                }
+                            }}
                         >
-                            <Logo className="w-14 h-14 md:w-16 md:h-16 scale-[1.3] origin-left" />
-                            <div className="flex flex-col">
-                                <span className="text-base md:text-xl font-heading font-bold text-gradient leading-tight">BreathArt Institute</span>
-                                <span className={`text-[9px] md:text-xs tracking-widest hidden sm:block transition-colors duration-300 ${isWhiteNav ? 'text-blue-800' : 'text-slate-300'}`}>LEARN | CREATE | GROW</span>
-                            </div>
-                        </motion.div>
-                    </Link>
+                            <motion.div
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ duration: 0.5 }}
+                                className="flex items-center gap-2 cursor-pointer"
+                            >
+                                <Logo className="w-14 h-14 md:w-16 md:h-16 scale-[1.3] origin-left" />
+                                <div className="flex flex-col">
+                                    <span className="text-base md:text-xl font-heading font-bold text-gradient leading-tight">BreathArt Institute</span>
+                                    <span className={`text-[9px] md:text-xs tracking-widest hidden sm:block transition-colors duration-300 ${isWhiteNav ? 'text-blue-800' : 'text-slate-300'}`}>LEARN | CREATE | GROW</span>
+                                </div>
+                            </motion.div>
+                        </Link>
+                    </div>
 
-                    {/* Desktop Nav */}
-                    <div className="hidden lg:flex items-center space-x-10">
+                    {/* Desktop Nav - Centralised */}
+                    <div className="hidden lg:flex flex-1 justify-center items-center space-x-8">
                         {navLinks.map((item, index) => {
                             const isInternalPage = ['About', 'Courses', 'Blogs', 'Careers', 'Brochure'].includes(item);
                             const path = item === 'Our Services' ? '/#tools' : isInternalPage ? `/${item.toLowerCase().replace(' ', '-')}` : (item === 'Home' ? '/' : `/#${item.toLowerCase().replace(' ', '-')}`);
@@ -170,7 +172,7 @@ const Navbar = () => {
                                             to={path}
                                             onClick={handleHomeClick}
                                             onMouseEnter={() => setHoveredItem(item)}
-                                            className={`transition-colors duration-300 text-xs uppercase tracking-widest font-medium relative group py-2 ${isWhiteNav ? 'text-blue-900 hover:text-accent-blue' : 'text-slate-200 hover:text-white'}`}
+                                            className={`transition-colors duration-300 text-[11px] uppercase tracking-widest font-medium relative group py-2 whitespace-nowrap ${isWhiteNav ? 'text-blue-900 hover:text-accent-blue' : 'text-slate-200 hover:text-white'}`}
                                         >
                                             {item}
                                             <span className={`absolute bottom-1 left-0 w-0 h-0.5 transition-all duration-300 group-hover:w-full ${isWhiteNav ? 'bg-accent-blue' : 'bg-accent-cyan'}`} />
@@ -179,7 +181,7 @@ const Navbar = () => {
                                         <a
                                             href={path}
                                             onMouseEnter={() => setHoveredItem(item)}
-                                            className={`transition-colors duration-300 text-xs uppercase tracking-widest font-medium relative group py-2 ${isWhiteNav ? 'text-blue-900 hover:text-accent-blue' : 'text-slate-200 hover:text-white'}`}
+                                            className={`transition-colors duration-300 text-[11px] uppercase tracking-widest font-medium relative group py-2 whitespace-nowrap ${isWhiteNav ? 'text-blue-900 hover:text-accent-blue' : 'text-slate-200 hover:text-white'}`}
                                         >
                                             {item}
                                             <span className={`absolute bottom-1 left-0 w-0 h-0.5 transition-all duration-300 group-hover:w-full ${isWhiteNav ? 'bg-accent-blue' : 'bg-accent-cyan'}`} />
@@ -190,8 +192,8 @@ const Navbar = () => {
                         })}
                     </div>
 
-                    {/* Right side */}
-                    <div className="flex items-center gap-2 md:gap-3">
+                    {/* Right side Area */}
+                    <div className="flex-1 flex items-center justify-end gap-2 md:gap-3">
                         <motion.button
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
@@ -268,18 +270,16 @@ const Navbar = () => {
                                 )}
 
                                 {hoveredItem === 'Our Services' && (
-                                    <div className="flex flex-row gap-24 w-full max-w-5xl">
-                                        <div className="w-full">
-                                            <h4 className={`text-sm font-bold tracking-wider mb-6 uppercase ${isWhiteNav ? 'text-slate-500' : 'text-slate-400'}`}>Professional Services</h4>
-                                            <ul className={`grid grid-cols-2 gap-x-12 gap-y-4 text-base font-medium ${isWhiteNav ? 'text-blue-900' : 'text-white'}`}>
-                                                <li><Link to="/#tools" className="hover:text-accent-cyan transition-colors">Digital Marketing Solutions</Link></li>
-                                                <li><Link to="/#tools" className="hover:text-accent-cyan transition-colors">Brand Identity & Strategy</Link></li>
-                                                <li><Link to="/#tools" className="hover:text-accent-cyan transition-colors">Web Design & Development</Link></li>
-                                                <li><Link to="/#tools" className="hover:text-accent-cyan transition-colors">Content Creation & Photography</Link></li>
-                                                <li><Link to="/#tools" className="hover:text-accent-cyan transition-colors">Search Engine Optimization</Link></li>
-                                                <li><Link to="/#tools" className="hover:text-accent-cyan transition-colors">Social Media Management</Link></li>
-                                            </ul>
-                                        </div>
+                                    <div className="w-full max-w-7xl mx-auto px-4">
+                                        <h4 className={`text-xs font-bold tracking-wider mb-6 uppercase text-center ${isWhiteNav ? 'text-slate-500' : 'text-slate-400'}`}>Professional Services</h4>
+                                        <ul className={`flex flex-wrap justify-between gap-6 text-sm font-medium ${isWhiteNav ? 'text-blue-900' : 'text-white'}`}>
+                                            <li className="flex-1 min-w-[150px] text-center"><Link to="/#tools" className="hover:text-accent-cyan transition-colors block py-2">Digital Marketing Solutions</Link></li>
+                                            <li className="flex-1 min-w-[150px] text-center"><Link to="/#tools" className="hover:text-accent-cyan transition-colors block py-2">Brand Identity & Strategy</Link></li>
+                                            <li className="flex-1 min-w-[150px] text-center"><Link to="/#tools" className="hover:text-accent-cyan transition-colors block py-2">Web Design & Development</Link></li>
+                                            <li className="flex-1 min-w-[150px] text-center"><Link to="/#tools" className="hover:text-accent-cyan transition-colors block py-2">Content Creation & Photography</Link></li>
+                                            <li className="flex-1 min-w-[150px] text-center"><Link to="/#tools" className="hover:text-accent-cyan transition-colors block py-2">Search Engine Optimization</Link></li>
+                                            <li className="flex-1 min-w-[150px] text-center"><Link to="/#tools" className="hover:text-accent-cyan transition-colors block py-2">Social Media Management</Link></li>
+                                        </ul>
                                     </div>
                                 )}
 
@@ -337,10 +337,10 @@ const Navbar = () => {
                                             <a href="tel:+918590144794" className={`flex items-center gap-2 text-xl font-medium mb-2 hover:text-accent-cyan transition-colors ${isWhiteNav ? 'text-blue-900' : 'text-white'}`}>
                                                 <Phone className="w-5 h-5" /> +91 8590 144 794
                                             </a>
-                                            <a href="mailto:info@breathartinstitute.in" className={`flex items-center gap-2 text-base mb-1 hover:text-accent-cyan transition-colors ${isWhiteNav ? 'text-slate-700' : 'text-slate-300'}`}>
+                                            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=info@breathartinstitute.in" target="_blank" rel="noopener noreferrer" className={`flex items-center gap-2 text-base mb-1 hover:text-accent-cyan transition-colors ${isWhiteNav ? 'text-slate-700' : 'text-slate-300'}`}>
                                                 <Mail className="w-4 h-4" /> info@breathartinstitute.in
                                             </a>
-                                            <a href="mailto:info@breathart.ae" className={`flex items-center gap-2 text-base mb-4 hover:text-accent-cyan transition-colors ${isWhiteNav ? 'text-slate-700' : 'text-slate-300'}`}>
+                                            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=info@breathart.ae" target="_blank" rel="noopener noreferrer" className={`flex items-center gap-2 text-base mb-4 hover:text-accent-cyan transition-colors ${isWhiteNav ? 'text-slate-700' : 'text-slate-300'}`}>
                                                 <Mail className="w-4 h-4" /> info@breathart.ae
                                             </a>
                                             <p className={`flex items-start gap-2 text-sm ${isWhiteNav ? 'text-slate-500' : 'text-slate-400'}`}>
@@ -457,7 +457,7 @@ const Navbar = () => {
                             <div className="w-full px-6 pb-20 flex flex-col gap-10">
                                 {/* Quick Links Section */}
                                 <div>
-                                    <h4 className={`text-xs font-bold tracking-wider mb-6 uppercase ${isWhiteNav ? 'text-slate-500' : 'text-slate-500'}`}>Quick Links</h4>
+                                    <h4 className={`text-xs font-bold tracking-wider mb-6 uppercase text-center ${isWhiteNav ? 'text-slate-500' : 'text-slate-500'}`}>Quick Links</h4>
                                     <div className="flex flex-col gap-4">
                                         {[
                                             { name: 'Home', path: '/' },
@@ -489,18 +489,16 @@ const Navbar = () => {
                                                         setTimeout(scrollFn, 100);
                                                     }
                                                 }}
-                                                className={`text-2xl font-bold py-2 transition-colors flex justify-between items-center group ${isWhiteNav ? 'text-blue-900' : 'text-slate-200'}`}
+                                                className={`text-xl font-bold py-2 transition-colors flex justify-center items-center group ${isWhiteNav ? 'text-blue-900' : 'text-slate-200'}`}
                                             >
                                                 {item.name}
-                                                <span className={`w-2 h-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity ${isWhiteNav ? 'bg-accent-blue' : 'bg-accent-cyan'}`} />
                                             </Link>
                                         ))}
                                         <button
                                             onClick={openContact}
-                                            className={`text-2xl font-bold py-2 transition-colors flex justify-between items-center group w-full text-left ${isWhiteNav ? 'text-blue-900 hover:text-accent-blue' : 'text-slate-200 hover:text-accent-cyan'}`}
+                                            className={`text-xl font-bold py-2 transition-colors flex justify-center items-center group w-full text-center ${isWhiteNav ? 'text-blue-900 hover:text-accent-blue' : 'text-slate-200 hover:text-accent-cyan'}`}
                                         >
                                             Contact Us
-                                            <span className={`w-2 h-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity ${isWhiteNav ? 'bg-accent-blue' : 'bg-accent-cyan'}`} />
                                         </button>
                                     </div>
                                 </div>
@@ -516,7 +514,7 @@ const Navbar = () => {
                                         <div>
                                             <p className="text-sm font-bold uppercase mb-1 text-accent-cyan">Get in Touch</p>
                                             <div className={`space-y-3 mt-4 ${isWhiteNav ? 'text-slate-600' : 'text-slate-400'}`}>
-                                                <a href="mailto:info@breathartinstitute.in" className="flex items-center gap-2 hover:text-accent-cyan transition-colors">
+                                                <a href="https://mail.google.com/mail/?view=cm&fs=1&to=info@breathartinstitute.in" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-accent-cyan transition-colors">
                                                     <Mail className="w-4 h-4" /> info@breathartinstitute.in
                                                 </a>
                                                 <a href="tel:+918590144794" className="flex items-center gap-2 hover:text-accent-cyan transition-colors">

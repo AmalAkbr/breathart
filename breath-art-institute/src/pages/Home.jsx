@@ -9,6 +9,8 @@ const About = lazy(() => import('../components/About'));
 const VisionMission = lazy(() => import('../components/VisionMission'));
 const Courses = lazy(() => import('../components/Courses'));
 const Certifications = lazy(() => import('../components/Certifications'));
+const WhyAI = lazy(() => import('../components/WhyAI'));
+const PlacementSupport = lazy(() => import('../components/PlacementSupport'));
 const Placement = lazy(() => import('../components/Placement'));
 const Mentors = lazy(() => import('../components/Mentors'));
 const DigitalMarketingCareer = lazy(() => import('../components/DigitalMarketingCareer'));
@@ -34,6 +36,8 @@ const Home = () => {
                 <VisionMission />
                 <Courses />
                 <Certifications />
+                <WhyAI />
+                <PlacementSupport />
                 <Placement />
                 <Mentors />
                 <DigitalMarketingCareer />

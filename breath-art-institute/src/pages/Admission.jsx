@@ -116,7 +116,7 @@ const Admission = () => {
                                 </div>
                                 <div>
                                     <h4 className="text-lg font-bold mb-1 text-slate-900">Email</h4>
-                                    <a href="mailto:info@breathartinstitute.in" className="text-slate-600 hover:text-accent-blue transition-colors font-medium">
+                                    <a href="https://mail.google.com/mail/?view=cm&fs=1&to=info@breathartinstitute.in" target="_blank" rel="noopener noreferrer" className="text-slate-600 hover:text-accent-blue transition-colors font-medium">
                                         info@breathartinstitute.in
                                     </a>
                                 </div>
