@@ -1,4 +1,13 @@
 {
+  "redirects": [
+    { "source": "/best-digital-marketing-courses", "destination": "/courses", "permanent": true },
+    { "source": "/best-digital-marketing-course-in-trivandrum", "destination": "/courses", "permanent": true },
+    { "source": "/best-institute-for-digital-marketing-with-placement-in-kerala", "destination": "/#placement", "permanent": true },
+    { "source": "/breathart-group", "destination": "/about", "permanent": true },
+    { "source": "/google-digital-marketing-certification", "destination": "/#certifications", "permanent": true },
+    { "source": "/best-digital-marketing-institute-in-kerala", "destination": "/", "permanent": true },
+    { "source": "/best-digital-marketing-academy-in-kerala", "destination": "/", "permanent": true }
+  ],
   "rewrites": [
     {
       "source": "/(.*)",

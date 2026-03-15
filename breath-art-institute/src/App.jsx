@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { useEffect, lazy, Suspense, useRef } from 'react';
 import Lenis from 'lenis';
 import Navbar from './components/Navbar';
@@ -59,6 +59,16 @@ const MainLayout = () => {
           <Route path="/careers" element={<Careers />} />
           <Route path="/admission" element={<Admission />} />
           <Route path="/brochure" element={<Brochure />} />
+          
+          {/* SEO Redirects */}
+          <Route path="/best-digital-marketing-courses" element={<Navigate to="/courses" replace />} />
+          <Route path="/best-digital-marketing-course-in-trivandrum" element={<Navigate to="/courses" replace />} />
+          <Route path="/best-institute-for-digital-marketing-with-placement-in-kerala" element={<Navigate to="/#placement" replace />} />
+          <Route path="/breathart-group" element={<Navigate to="/about" replace />} />
+          <Route path="/google-digital-marketing-certification" element={<Navigate to="/#certifications" replace />} />
+          <Route path="/best-digital-marketing-institute-in-kerala" element={<Navigate to="/" replace />} />
+          <Route path="/best-digital-marketing-academy-in-kerala" element={<Navigate to="/" replace />} />
+
         </Routes>
       </Suspense>
       <Footer />

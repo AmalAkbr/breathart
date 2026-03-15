@@ -4,7 +4,7 @@ import career from '../assets/career.webp';
 
 const Placement = () => {
     return (
-        <section className="py-12 md:py-20 relative overflow-hidden bg-white theme-light-section">
+        <section id="placement" className="py-12 md:py-20 relative overflow-hidden bg-white theme-light-section">
             {/* Background Decorators - Subtle and Light */}
             <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-sky-100/40 rounded-full blur-[80px] pointer-events-none transform-gpu" />
             <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-indigo-100/40 rounded-full blur-[80px] pointer-events-none transform-gpu" />
