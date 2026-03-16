@@ -26,15 +26,17 @@ const ScrollToTop = () => {
     if ('scrollRestoration' in window.history) {
       window.history.scrollRestoration = 'manual';
     }
-    if (window.location.hash) {
-      window.history.replaceState(null, '', window.location.pathname);
-    }
+    // if (window.location.hash) {
+    //   window.history.replaceState(null, '', window.location.pathname);
+    // }
 
     // Use Lenis for smooth top-scroll on route change, fall back to native
-    if (window.__lenis) {
-      window.__lenis.scrollTo(0, { immediate: true });
-    } else {
-      window.scrollTo(0, 0);
+    if (!window.location.hash) {
+      if (window.__lenis) {
+        window.__lenis.scrollTo(0, { immediate: true });
+      } else {
+        window.scrollTo(0, 0);
+      }
     }
 
     const handleBeforeUnload = () => window.scrollTo(0, 0);
@@ -59,15 +61,6 @@ const MainLayout = () => {
           <Route path="/careers" element={<Careers />} />
           <Route path="/admission" element={<Admission />} />
           <Route path="/brochure" element={<Brochure />} />
-          
-          {/* SEO Redirects */}
-          <Route path="/best-digital-marketing-courses" element={<Navigate to="/courses" replace />} />
-          <Route path="/best-digital-marketing-course-in-trivandrum" element={<Navigate to="/courses" replace />} />
-          <Route path="/best-institute-for-digital-marketing-with-placement-in-kerala" element={<Navigate to="/#placement" replace />} />
-          <Route path="/breathart-group" element={<Navigate to="/about" replace />} />
-          <Route path="/google-digital-marketing-certification" element={<Navigate to="/#certifications" replace />} />
-          <Route path="/best-digital-marketing-institute-in-kerala" element={<Navigate to="/" replace />} />
-          <Route path="/best-digital-marketing-academy-in-kerala" element={<Navigate to="/" replace />} />
 
         </Routes>
       </Suspense>
@@ -120,6 +113,19 @@ function App() {
               <LandingPage />
             </Suspense>
           } />
+
+
+          {/* SEO Redirects - Root Level */}
+          <Route path="/best-digital-marketing-courses" element={<Navigate to="/courses" replace />} />
+          <Route path="/best-digital-marketing-course-in-trivandrum" element={<Navigate to="/courses" replace />} />
+          <Route path="/best-institute-for-digital-marketing-with-placement-in-kerala" element={<Navigate to="/#placement" replace />} />
+          <Route path="/breathart-group" element={<Navigate to="/about" replace />} />
+          <Route path="/google-digital-marketing-certification" element={<Navigate to="/#certifications" replace />} />
+          <Route path="/best-digital-marketing-institute-in-kerala" element={<Navigate to="/" replace />} />
+          <Route path="/best-digital-marketing-academy-in-kerala" element={<Navigate to="/" replace />} />
+          <Route path="/graphic-design-course-in-trivandrum" element={<Navigate to="/#graphic-design" replace />} />
+          <Route path="/traditional-marketing-vs-digital-marketing" element={<Navigate to="/#digital-marketing-courses" replace />} />
+          <Route path="/digital-marketing-blogs" element={<Navigate to="/blogs" replace />} />
 
           {/* Main Website Routes (Wrapped with Navbar/Footer) */}
           <Route path="/*" element={<MainLayout />} />

@@ -6,7 +6,11 @@
     { "source": "/breathart-group", "destination": "/about", "permanent": true },
     { "source": "/google-digital-marketing-certification", "destination": "/#certifications", "permanent": true },
     { "source": "/best-digital-marketing-institute-in-kerala", "destination": "/", "permanent": true },
-    { "source": "/best-digital-marketing-academy-in-kerala", "destination": "/", "permanent": true }
+    { "source": "/best-digital-marketing-academy-in-kerala", "destination": "/", "permanent": true },
+    { "source": "/graphic-design-course-in-trivandrum", "destination": "/#graphic-design", "permanent": true },
+    { "source": "/traditional-marketing-vs-digital-marketing", "destination": "/#digital-marketing-courses", "permanent": true },
+    { "source": "/digital-marketing-blogs", "destination": "/blogs", "permanent": true }
+
   ],
   "rewrites": [
     {

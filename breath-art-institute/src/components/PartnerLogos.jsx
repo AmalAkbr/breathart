@@ -28,13 +28,13 @@ const PartnerLogos = () => {
                         >
                             {[...logos, ...logos, ...logos, ...logos].map((logo, index) => (
                                 <div key={index} className="flex flex-col items-center hover:scale-110 transition-transform duration-500 cursor-pointer flex-shrink-0">
-                                    <div className="h-14 w-auto flex items-center justify-center">
+                                    <div className="h-14 w-32 md:w-40 flex items-center justify-center">
                                         <img
                                             src={logo.src}
                                             alt={logo.name}
                                             loading="lazy"
                                             decoding="async"
-                                            className="h-full w-auto object-contain block filter brightness-90 hover:brightness-100 transition-all"
+                                            className="max-h-full max-w-full object-contain block filter brightness-90 hover:brightness-100 transition-all"
                                             onError={(e) => { e.target.style.display = 'none'; }}
                                         />
                                     </div>

@@ -1,49 +1,66 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
+// Certification Logos
+import adobeLogo from '../assets/partners/adobe.png';
+import appleLogo from '../assets/partners/apple.png';
+import autodeskLogo from '../assets/partners/autodesk.png';
+import ciscoLogo from '../assets/partners/cisco.png';
+import csbLogo from '../assets/partners/csb.png';
+import esbLogo from '../assets/partners/esb.png';
+import ic3Logo from '../assets/partners/ic3.png';
+import itsLogo from '../assets/partners/its.png';
+import intuitLogo from '../assets/partners/intuit.png';
+import msFundamentals from '../assets/partners/ms-fundamentals.png';
+import msOffice from '../assets/partners/ms-office.png';
+import msEducator from '../assets/partners/ms-educator.png';
+import pmiLogo from '../assets/partners/pmi.png';
+import unityLogo from '../assets/partners/unity.png';
+import metaLogo from '../assets/partners/meta.png';
+
+// Shuffled array to avoid clustering (especially Microsoft logos)
 const partnerLogos = [
-    { name: 'Adobe', url: 'https://breathartinstitute.in/wp-content/uploads/2025/08/1-2.png' },
-    { name: 'Apple', url: 'https://breathartinstitute.in/wp-content/uploads/2025/08/2-2.png' },
-    { name: 'Autodesk', url: 'https://breathartinstitute.in/wp-content/uploads/2025/08/3-2.png' },
-    { name: 'Cisco', url: 'https://breathartinstitute.in/wp-content/uploads/2025/08/4-2.png' },
-    { name: 'ESB', url: 'https://breathartinstitute.in/wp-content/uploads/2025/08/5-2.png' },
-    { name: 'Communication Skills', url: 'https://breathartinstitute.in/wp-content/uploads/2025/08/6-2.png' }
+    { name: 'Adobe', url: adobeLogo },
+    { name: 'Microsoft Fundamentals', url: msFundamentals },
+    { name: 'Apple', url: appleLogo },
+    { name: 'PMI', url: pmiLogo },
+    { name: 'Autodesk', url: autodeskLogo },
+    { name: 'Microsoft Office', url: msOffice },
+    { name: 'Cisco', url: ciscoLogo },
+    { name: 'Unity', url: unityLogo },
+    { name: 'Communication Skills for Business', url: csbLogo },
+    { name: 'Microsoft Educator', url: msEducator },
+    { name: 'Entrepreneurship and Small Business', url: esbLogo },
+    { name: 'Meta', url: metaLogo },
+    { name: 'IC3 Digital Literacy', url: ic3Logo },
+    { name: 'Intuit', url: intuitLogo },
+    { name: 'Information Technology Specialist', url: itsLogo },
 ];
 
 const GlobalPartners = () => {
     return (
-        <section className="py-12 bg-white border-y border-slate-100 theme-light-section relative z-20">
-            <div className="max-w-7xl mx-auto px-4 md:px-8 lg:px-12">
-                <div className="w-full bg-white rounded-2xl shadow-[0_4px_24px_rgba(0,0,0,0.06)] border border-slate-100 py-8 px-6 overflow-hidden relative">
+        <section className="py-8 bg-white theme-light-section relative z-20 overflow-hidden">
+            <div className="w-full max-w-[1600px] mx-auto px-4 md:px-12 relative">
+                {/* Gradient Fades for Marquee */}
+                <div className="absolute inset-y-0 left-0 w-24 md:w-32 bg-gradient-to-r from-white via-white/80 to-transparent z-10 pointer-events-none" />
+                <div className="absolute inset-y-0 right-0 w-24 md:w-32 bg-gradient-to-l from-white via-white/80 to-transparent z-10 pointer-events-none" />
 
-                    {/* Gradient Fades for Marquee */}
-                    <div className="absolute inset-y-0 left-0 w-16 md:w-32 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
-                    <div className="absolute inset-y-0 right-0 w-16 md:w-32 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
-
-                    <div className="flex overflow-hidden relative w-full">
-                        <motion.div
-                            className="flex gap-16 md:gap-24 items-center pr-16 md:pr-24 w-max"
-                            animate={{ x: ["0%", "-50%"] }}
-                            transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-                        >
-                            {/* Double the array for seamless infinite scroll */}
-                            {[...partnerLogos, ...partnerLogos].map((logo, index) => (
-                                <div key={index} className="flex-shrink-0 flex items-center justify-center transition-all duration-300">
-                                    <img
-                                        src={logo.url}
-                                        alt={logo.name}
-                                        className="h-10 md:h-14 lg:h-16 w-auto object-contain block mix-blend-multiply"
-                                        loading="lazy"
-                                        onError={(e) => {
-                                            // Fallback if the -2 missing or url changes
-                                            e.target.src = logo.url.replace('-2.png', '-2-150x150.png');
-                                        }}
-                                    />
-                                </div>
-                            ))}
-                        </motion.div>
-                    </div>
-                </div>
+                <motion.div
+                    className="flex gap-16 md:gap-24 items-center w-max will-change-transform"
+                    animate={{ x: ["0%", "-50%"] }}
+                    transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+                >
+                    {[...partnerLogos, ...partnerLogos, ...partnerLogos, ...partnerLogos].map((logo, index) => (
+                        <div key={index} className="flex-shrink-0 flex items-center justify-center h-14 w-32 md:w-40 transition-all duration-300 hover:scale-110">
+                            <img
+                                src={logo.url}
+                                alt={logo.name}
+                                className="max-h-full max-w-full object-contain block select-none"
+                                loading="lazy"
+                            />
+                        </div>
+                    ))}
+                </motion.div>
             </div>
         </section>
     );

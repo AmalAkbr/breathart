@@ -4,8 +4,8 @@ import crs1 from '../assets/crs1.webp';
 import crs2 from '../assets/crs2.webp';
 import EnrollModal from './EnrollModal';
 
-const CourseCard = ({ title, description }) => (
-    <div className="bg-gradient-to-br from-secondary via-slate-900/80 to-primary border border-white/10 p-8 rounded-2xl hover:border-accent-cyan/50 transition-all shadow-xl shadow-blue-900/10 hover:shadow-2xl hover:shadow-accent-cyan/20 group relative overflow-hidden flex flex-col h-full">
+const CourseCard = ({ title, description, id }) => (
+    <div id={id} className="bg-gradient-to-br from-secondary via-slate-900/80 to-primary border border-white/10 p-8 rounded-2xl hover:border-accent-cyan/50 transition-all shadow-xl shadow-blue-900/10 hover:shadow-2xl hover:shadow-accent-cyan/20 group relative overflow-hidden flex flex-col h-full">
         <div className="absolute top-0 right-0 w-32 h-32 bg-accent-cyan/20 blur-3xl -z-0 pointer-events-none"></div>
         <h3 className="text-xl font-heading font-bold mb-4 text-white group-hover:text-accent-cyan transition-colors relative z-10">{title}</h3>
         <p className="text-slate-300 mb-6 text-sm leading-relaxed relative z-10 flex-grow">{description}</p>
@@ -106,7 +106,7 @@ const Courses = () => {
                 </div>
 
                 {/* Specific Course Cards */}
-                <div className="text-center mb-10 md:mb-14">
+                <div id="digital-marketing-courses" className="text-center mb-10 md:mb-14">
                     <h3 className="text-3xl md:text-4xl font-heading font-bold text-slate-900">
                         Digital Marketing Course In Kerala
                     </h3>
@@ -121,6 +121,7 @@ const Courses = () => {
                         description="A practical course that teaches you how to run ads, manage social media, and optimize SEO. Perfect for beginners looking to start a career."
                     />
                     <CourseCard
+                        id="graphic-design"
                         title="Diploma in Graphic Design & Photography"
                         description="Become a skilled photographer and Graphic designer. Learn Adobe Creative Suite, composition, and visual storytelling techniques."
                     />
