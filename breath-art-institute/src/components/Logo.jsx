@@ -1,9 +1,7 @@
-import instituteLogo from '../assets/institute.png';
-
 const Logo = ({ className }) => {
     return (
         <img
-            src={instituteLogo}
+            src="/app/institute.png"
             alt="BreathArt Institute Logo"
             className={`${className} object-contain`}
         />

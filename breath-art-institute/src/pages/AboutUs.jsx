@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion';
 import Grainient from '../components/Grainient';
 import photographyImage from '../assets/photography.webp';
-import instituteImage from '../assets/institute.png';
 import marketingImage from '../assets/marketing.webp';
 import bgImage from '../assets/bg.webp';
 import RotatingText from '../components/RotatingText';
@@ -140,7 +139,7 @@ const AboutUs = () => {
                                     <img src={photographyImage} alt="Photography Studio" loading="lazy" decoding="async" className="w-full h-auto object-contain" />
                                 </div>
                                 <div className="flex items-center justify-center w-16 h-16 md:w-20 md:h-20 lg:w-full lg:h-auto flex-shrink-0">
-                                    <img src={instituteImage} alt="Education Institute" loading="lazy" decoding="async" className="w-full h-auto object-contain scale-[2.2]" />
+                                    <img src="/app/institute.png" alt="Education Institute" loading="lazy" decoding="async" className="w-full h-auto object-contain scale-[2.2]" />
                                 </div>
                                 <div className="flex items-center justify-center w-16 h-16 md:w-20 md:h-20 lg:w-full lg:h-auto flex-shrink-0">
                                     <img src={marketingImage} alt="Digital Marketing" loading="lazy" decoding="async" className="w-full h-auto object-contain" />
