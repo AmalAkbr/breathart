@@ -2,39 +2,38 @@ import React from 'react';
 import { motion } from 'framer-motion';
 
 // Certification Logos
-import adobeLogo from '../assets/partners/adobe.png';
-import appleLogo from '../assets/partners/apple.png';
-import autodeskLogo from '../assets/partners/autodesk.png';
-import ciscoLogo from '../assets/partners/cisco.png';
-import csbLogo from '../assets/partners/csb.png';
-import esbLogo from '../assets/partners/esb.png';
-import ic3Logo from '../assets/partners/ic3.png';
-import itsLogo from '../assets/partners/its.png';
-import intuitLogo from '../assets/partners/intuit.png';
-import msFundamentals from '../assets/partners/ms-fundamentals.png';
-import msOffice from '../assets/partners/ms-office.png';
-import msEducator from '../assets/partners/ms-educator.png';
-import pmiLogo from '../assets/partners/pmi.png';
-import unityLogo from '../assets/partners/unity.png';
-import metaLogo from '../assets/partners/meta.png';
+import ic1 from '../assets/ic1.png';
+import ic2 from '../assets/ic2.png';
+import ic3 from '../assets/ic3.png';
+import ic4 from '../assets/ic4.png';
+import ic5 from '../assets/ic5.png';
+import ic6 from '../assets/ic6.png';
+import ic7 from '../assets/ic7.png';
+import ic8 from '../assets/ic8.png';
+import ic9 from '../assets/ic9.png';
+import ic10 from '../assets/ic10.png';
+import ic11 from '../assets/ic11.png';
+import ic12 from '../assets/ic12.png';
+import ic13 from '../assets/ic13.png';
+import ic14 from '../assets/ic14.png';
+import ic15 from '../assets/ic15.png';
 
-// Shuffled array to avoid clustering (especially Microsoft logos)
 const partnerLogos = [
-    { name: 'Adobe', url: adobeLogo },
-    { name: 'Microsoft Fundamentals', url: msFundamentals },
-    { name: 'Apple', url: appleLogo },
-    { name: 'PMI', url: pmiLogo },
-    { name: 'Autodesk', url: autodeskLogo },
-    { name: 'Microsoft Office', url: msOffice },
-    { name: 'Cisco', url: ciscoLogo },
-    { name: 'Unity', url: unityLogo },
-    { name: 'Communication Skills for Business', url: csbLogo },
-    { name: 'Microsoft Educator', url: msEducator },
-    { name: 'Entrepreneurship and Small Business', url: esbLogo },
-    { name: 'Meta', url: metaLogo },
-    { name: 'IC3 Digital Literacy', url: ic3Logo },
-    { name: 'Intuit', url: intuitLogo },
-    { name: 'Information Technology Specialist', url: itsLogo },
+    { name: 'Partner 1', url: ic1, customClass: 'h-14 md:h-20' },
+    { name: 'Partner 2', url: ic2 },
+    { name: 'Partner 3', url: ic3, customClass: 'h-14 md:h-20' },
+    { name: 'Partner 4', url: ic4 },
+    { name: 'Partner 5', url: ic5 },
+    { name: 'Partner 6', url: ic6 },
+    { name: 'Partner 7', url: ic7 },
+    { name: 'Partner 8', url: ic8, customClass: 'h-16 md:h-24' }, // ITS icon was very large in PDF
+    { name: 'Partner 9', url: ic9 },
+    { name: 'Partner 10', url: ic10 },
+    { name: 'Partner 11', url: ic11, customClass: 'h-6 md:h-9' },
+    { name: 'Partner 12', url: ic12 },
+    { name: 'Partner 13', url: ic13, customClass: 'h-6 md:h-9' },
+    { name: 'Partner 14', url: ic14 },
+    { name: 'Partner 15', url: ic15, customClass: 'h-6 md:h-9' },
 ];
 
 const GlobalPartners = () => {
@@ -51,11 +50,11 @@ const GlobalPartners = () => {
                     transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
                 >
                     {[...partnerLogos, ...partnerLogos, ...partnerLogos, ...partnerLogos].map((logo, index) => (
-                        <div key={index} className="flex-shrink-0 flex items-center justify-center h-14 w-32 md:w-40 transition-all duration-300 hover:scale-110">
+                        <div key={index} className="flex-shrink-0 flex items-center justify-center transition-all duration-300 hover:scale-110">
                             <img
                                 src={logo.url}
                                 alt={logo.name}
-                                className="max-h-full max-w-full object-contain block select-none"
+                                className={`${logo.customClass || 'h-10 md:h-14'} w-auto max-w-[180px] object-contain block select-none`}
                                 loading="lazy"
                             />
                         </div>
