@@ -1,556 +1,1010 @@
-import { motion, AnimatePresence } from 'framer-motion';
-import { Facebook, Instagram, Linkedin, Twitter, Menu, X, Phone, Mail, MapPin, MessageCircle } from 'lucide-react';
-import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import Logo from './Logo';
-import ContactUsModal from './ContactUsModal';
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Facebook,
+  Instagram,
+  Linkedin,
+  Twitter,
+  Menu,
+  X,
+  Phone,
+  Mail,
+  MapPin,
+  MessageCircle,
+} from "lucide-react";
+import { useState, useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import Logo from "./Logo";
+import ContactUsModal from "./ContactUsModal";
+import { supabase } from "../supabase/client";
 
 const Navbar = () => {
-    const [menuOpen, setMenuOpen] = useState(false);
-    const [desktopMenuOpen, setDesktopMenuOpen] = useState(false);
-    const [contactOpen, setContactOpen] = useState(false);
-    const [scrolled, setScrolled] = useState(false);
-    const [isWhiteNav, setIsWhiteNav] = useState(false);
-    const [hoveredItem, setHoveredItem] = useState(null);
-    const location = useLocation();
-    const navLinks = ['Home', 'About', 'Courses', 'Our Services', 'Blogs', 'Careers', 'Brochure'];
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [desktopMenuOpen, setDesktopMenuOpen] = useState(false);
+  const [contactOpen, setContactOpen] = useState(false);
 
-    const openContact = () => {
-        setContactOpen(true);
-        setMenuOpen(false);    // close mobile drawer
-        setDesktopMenuOpen(false); // close side drawer
-        setHoveredItem(null);  // close mega-menu
-    };
+  const [scrolled, setScrolled] = useState(false);
+  const [isWhiteNav, setIsWhiteNav] = useState(false);
+  const [hoveredItem, setHoveredItem] = useState(null);
+  const [userEmail, setUserEmail] = useState(null);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const navLinks = [
+    "Home",
+    "About",
+    "Courses",
+    "Our Services",
+    "Blogs",
+    "Careers",
+    "Brochure",
+  ];
 
-    useEffect(() => {
-        let isThrottled = false;
-        const handleScroll = () => {
-            if (!isThrottled) {
-                isThrottled = true;
-                setTimeout(() => {
-                    setScrolled(window.scrollY > 20);
+  const openContact = () => {
+    setContactOpen(true);
+    setMenuOpen(false); // close mobile drawer
+    setDesktopMenuOpen(false); // close side drawer
+    setHoveredItem(null); // close mega-menu
+  };
 
-                    const lightSections = document.querySelectorAll('.theme-light-section');
-                    let isLight = false;
-                    for (let i = 0; i < lightSections.length; i++) {
-                        const rect = lightSections[i].getBoundingClientRect();
-                        // Check if 40px from top of viewport is inside this section
-                        if (rect.top <= 40 && rect.bottom >= 40) {
-                            isLight = true;
-                            break;
-                        }
-                    }
-                    setIsWhiteNav(isLight);
-                    isThrottled = false;
-                }, 50);
+  useEffect(() => {
+    let isThrottled = false;
+    const handleScroll = () => {
+      if (!isThrottled) {
+        isThrottled = true;
+        setTimeout(() => {
+          setScrolled(window.scrollY > 20);
+
+          const lightSections = document.querySelectorAll(
+            ".theme-light-section",
+          );
+          let isLight = false;
+          for (let i = 0; i < lightSections.length; i++) {
+            const rect = lightSections[i].getBoundingClientRect();
+            // Check if 40px from top of viewport is inside this section
+            if (rect.top <= 40 && rect.bottom >= 40) {
+              isLight = true;
+              break;
             }
-        };
-        window.addEventListener('scroll', handleScroll, { passive: true });
-        handleScroll();
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, [location.pathname]);
+          }
+          setIsWhiteNav(isLight);
+          isThrottled = false;
+        }, 50);
+      }
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [location.pathname]);
 
-    useEffect(() => {
-        if (location.hash) {
-            const id = location.hash.substring(1); // remove the '#'
-            setTimeout(() => {
-                const element = document.getElementById(id);
-                if (element) {
-                    if (window.__lenis) {
-                        window.__lenis.scrollTo(element, { immediate: false });
-                    } else {
-                        element.scrollIntoView({ behavior: 'smooth' });
-                    }
-                }
-            }, 100); // Small delay to ensure the page has rendered
+  useEffect(() => {
+    if (location.hash) {
+      const id = location.hash.substring(1); // remove the '#'
+      setTimeout(() => {
+        const element = document.getElementById(id);
+        if (element) {
+          if (window.__lenis) {
+            window.__lenis.scrollTo(element, { immediate: false });
+          } else {
+            element.scrollIntoView({ behavior: "smooth" });
+          }
         }
-    }, [location]);
+      }, 100); // Small delay to ensure the page has rendered
+    }
+  }, [location]);
 
-    // Lock background scroll whenever any overlay is visible
-    useEffect(() => {
-        const megaMenuOpen = hoveredItem && ['Courses', 'Our Services', 'Blogs', 'Careers', 'Contact Us'].includes(hoveredItem);
-        const anyOpen = megaMenuOpen || menuOpen || desktopMenuOpen || contactOpen;
-
-        if (anyOpen) {
-            if (window.__lenis) window.__lenis.stop();
-            document.body.style.overflow = 'hidden';
-            document.documentElement.style.overflow = 'hidden';
-            document.body.style.touchAction = 'none';
-        } else {
-            if (window.__lenis) window.__lenis.start();
-            document.body.style.overflow = '';
-            document.documentElement.style.overflow = '';
-            document.body.style.touchAction = '';
-        }
-
-        return () => {
-            if (window.__lenis) window.__lenis.start();
-            document.body.style.overflow = '';
-            document.documentElement.style.overflow = '';
-            document.body.style.touchAction = '';
-        };
-    }, [hoveredItem, menuOpen, desktopMenuOpen, contactOpen]);
-
-
-
-    return (
-        <>
-            <nav
-                onMouseLeave={() => setHoveredItem(null)}
-                className={`fixed top-0 w-full ${menuOpen ? 'z-[70]' : 'z-50'} transition-all duration-300 ${hoveredItem && ['Courses', 'Our Services', 'Blogs', 'Careers', 'Contact Us'].includes(hoveredItem)
-                    ? (isWhiteNav ? 'bg-white/80 backdrop-blur-3xl shadow-lg border-transparent' : 'bg-[#0a0f1a]/80 backdrop-blur-3xl shadow-xl border-transparent')
-                    : isWhiteNav
-                        ? 'bg-white/95 backdrop-blur-xl border-b border-slate-200 shadow-sm'
-                        : scrolled
-                            ? 'bg-[#0a192f]/80 backdrop-blur-xl border-b border-white/10 shadow-lg'
-                            : 'bg-transparent border-b border-transparent'
-                    }`}
-            >
-                <div className={`w-full py-1 px-4 md:px-12 flex justify-between items-center transition-colors duration-300 ${isWhiteNav ? 'text-blue-900' : 'text-white'}`}>
-                    {/* Logo Area */}
-                    <div className="flex-1 flex justify-start">
-                        <Link
-                            to="/"
-                            onClick={(e) => {
-                                if (location.pathname === '/') {
-                                    e.preventDefault();
-                                }
-                                if (window.__lenis) {
-                                    window.__lenis.scrollTo(0, { immediate: false });
-                                } else {
-                                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                                }
-                            }}
-                        >
-                            <motion.div
-                                initial={{ opacity: 0, x: -20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ duration: 0.5 }}
-                                className="flex items-center gap-2 cursor-pointer"
-                            >
-                                <Logo className="w-14 h-14 md:w-16 md:h-16 scale-[1.3] origin-left" />
-                                <div className="flex flex-col">
-                                    <span className="text-base md:text-xl font-heading font-bold text-gradient leading-tight">BreathArt Institute</span>
-                                    <span className={`text-[9px] md:text-xs tracking-widest hidden sm:block transition-colors duration-300 ${isWhiteNav ? 'text-blue-800' : 'text-slate-300'}`}>LEARN | CREATE | GROW</span>
-                                </div>
-                            </motion.div>
-                        </Link>
-                    </div>
-
-                    {/* Desktop Nav - Centralised */}
-                    <div className="hidden lg:flex flex-1 justify-center items-center space-x-8">
-                        {navLinks.map((item, index) => {
-                            const isInternalPage = ['About', 'Courses', 'Blogs', 'Careers', 'Brochure'].includes(item);
-                            const path = item === 'Our Services' ? '/#tools' : isInternalPage ? `/${item.toLowerCase().replace(' ', '-')}` : (item === 'Home' ? '/' : `/#${item.toLowerCase().replace(' ', '-')}`);
-
-                            const handleHomeClick = (e) => {
-                                if (item === 'Home') {
-                                    if (location.pathname === '/') {
-                                        e.preventDefault();
-                                    }
-                                    const scrollFn = () => {
-                                        if (window.__lenis) {
-                                            window.__lenis.scrollTo(0, { immediate: false });
-                                        } else {
-                                            window.scrollTo({ top: 0, behavior: 'smooth' });
-                                        }
-                                    };
-                                    scrollFn();
-                                    setTimeout(scrollFn, 100);
-                                }
-                            };
-
-                            return (
-                                <motion.div
-                                    key={item}
-                                    initial={{ opacity: 0, y: -10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                                >
-                                    {isInternalPage || item === 'Home' ? (
-                                        <Link
-                                            to={path}
-                                            onClick={handleHomeClick}
-                                            onMouseEnter={() => setHoveredItem(item)}
-                                            className={`transition-colors duration-300 text-[11px] uppercase tracking-widest font-medium relative group py-2 whitespace-nowrap ${isWhiteNav ? 'text-blue-900 hover:text-accent-blue' : 'text-slate-200 hover:text-white'}`}
-                                        >
-                                            {item}
-                                            <span className={`absolute bottom-1 left-0 w-0 h-0.5 transition-all duration-300 group-hover:w-full ${isWhiteNav ? 'bg-accent-blue' : 'bg-accent-cyan'}`} />
-                                        </Link>
-                                    ) : (
-                                        <a
-                                            href={path}
-                                            onMouseEnter={() => setHoveredItem(item)}
-                                            className={`transition-colors duration-300 text-[11px] uppercase tracking-widest font-medium relative group py-2 whitespace-nowrap ${isWhiteNav ? 'text-blue-900 hover:text-accent-blue' : 'text-slate-200 hover:text-white'}`}
-                                        >
-                                            {item}
-                                            <span className={`absolute bottom-1 left-0 w-0 h-0.5 transition-all duration-300 group-hover:w-full ${isWhiteNav ? 'bg-accent-blue' : 'bg-accent-cyan'}`} />
-                                        </a>
-                                    )}
-                                </motion.div>
-                            );
-                        })}
-                    </div>
-
-                    {/* Right side Area */}
-                    <div className="flex-1 flex items-center justify-end gap-2 md:gap-3">
-                        <motion.button
-                            initial={{ opacity: 0, x: 20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={openContact}
-                            className={`px-5 md:px-7 py-2.5 rounded-full font-bold text-sm transition-colors border hidden sm:block ${isWhiteNav ? 'border-blue-900/30 text-blue-900 hover:bg-blue-900/10' : 'border-white/30 text-white hover:bg-white/10'}`}
-                        >
-                            Contact Us
-                        </motion.button>
-                        <Link to="/admission" onMouseEnter={() => setHoveredItem(null)}>
-                            <motion.button
-                                initial={{ opacity: 0, x: 20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                                className="bg-gradient-to-r from-accent-cyan to-accent-blue text-white px-5 md:px-7 py-2.5 rounded-full font-bold shadow-lg shadow-accent-blue/20 text-sm hover:shadow-accent-cyan/40 transition-shadow"
-                            >
-                                Admission
-                            </motion.button>
-                        </Link>
-                        {/* Desktop Menu Icon */}
-                        <div
-                            onClick={() => setDesktopMenuOpen(true)}
-                            className={`hidden lg:flex items-center justify-center cursor-pointer transition-colors duration-300 ml-2 p-2 rounded-full ${isWhiteNav ? 'text-blue-900 hover:bg-blue-100 hover:text-accent-blue' : 'text-white hover:bg-white/10 hover:text-accent-cyan'}`}
-                        >
-                            <Menu className="w-6 h-6" />
-                        </div>
-                        {/* Mobile hamburger */}
-                        <button
-                            className={`lg:hidden p-2 rounded-lg transition-colors ${isWhiteNav ? 'text-blue-900 hover:bg-blue-100' : 'text-white hover:bg-white/10'}`}
-                            onClick={() => setMenuOpen(!menuOpen)}
-                            aria-label="Toggle menu"
-                        >
-                            {menuOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
-                        </button>
-                    </div>
-                </div>
-            </nav>
-
-            {/* Desktop Mega Menu Overlay */}
-            <AnimatePresence>
-                {hoveredItem && ['Courses', 'Our Services', 'Blogs', 'Careers', 'Contact Us'].includes(hoveredItem) && (
-                    <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.3, ease: 'easeInOut' }}
-                        onMouseEnter={() => setHoveredItem(hoveredItem)}
-                        onMouseLeave={() => setHoveredItem(null)}
-                        className={`fixed top-[73px] left-0 w-full z-40 overflow-hidden hidden lg:block ${isWhiteNav ? 'bg-white/70 backdrop-blur-3xl shadow-lg' : 'bg-[#0a0f1a]/60 backdrop-blur-3xl shadow-xl shadow-black/20'}`}
-                    >
-                        <div className="container mx-auto px-12 py-10">
-                            <motion.div
-                                initial={{ opacity: 0, y: -10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.1, duration: 0.3 }}
-                                className="w-full flex justify-center"
-                            >
-                                {hoveredItem === 'Courses' && (
-                                    <div className="flex flex-row gap-24 w-full max-w-5xl">
-                                        <div className="w-full">
-                                            <h4 className={`text-sm font-bold tracking-wider mb-6 uppercase ${isWhiteNav ? 'text-slate-500' : 'text-slate-400'}`}>Programs</h4>
-                                            <ul className={`grid grid-cols-2 gap-x-12 gap-y-4 text-base font-medium ${isWhiteNav ? 'text-blue-900' : 'text-white'}`}>
-                                                <li><Link to="/courses" className="hover:text-accent-cyan transition-colors">Master Diploma in AI Digital Marketing</Link></li>
-                                                <li><Link to="/courses" className="hover:text-accent-cyan transition-colors">Diploma in AI Digital Marketing</Link></li>
-                                                <li><Link to="/courses" className="hover:text-accent-cyan transition-colors">Certificate in Digital Marketing</Link></li>
-                                                <li><Link to="/courses" className="hover:text-accent-cyan transition-colors">Diploma in Photography</Link></li>
-                                                <li><Link to="/courses" className="hover:text-accent-cyan transition-colors">Diploma in Graphic Design</Link></li>
-                                                <li><Link to="/courses" className="hover:text-accent-cyan transition-colors">Integrated Diploma in Creative Media</Link></li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {hoveredItem === 'Our Services' && (
-                                    <div className="w-full max-w-7xl mx-auto px-4">
-                                        <h4 className={`text-xs font-bold tracking-wider mb-6 uppercase text-center ${isWhiteNav ? 'text-slate-500' : 'text-slate-400'}`}>Professional Services</h4>
-                                        <ul className={`flex flex-wrap justify-between gap-6 text-sm font-medium ${isWhiteNav ? 'text-blue-900' : 'text-white'}`}>
-                                            <li className="flex-1 min-w-[150px] text-center"><Link to="/#tools" className="hover:text-accent-cyan transition-colors block py-2">Digital Marketing Solutions</Link></li>
-                                            <li className="flex-1 min-w-[150px] text-center"><Link to="/#tools" className="hover:text-accent-cyan transition-colors block py-2">Brand Identity & Strategy</Link></li>
-                                            <li className="flex-1 min-w-[150px] text-center"><Link to="/#tools" className="hover:text-accent-cyan transition-colors block py-2">Web Design & Development</Link></li>
-                                            <li className="flex-1 min-w-[150px] text-center"><Link to="/#tools" className="hover:text-accent-cyan transition-colors block py-2">Content Creation & Photography</Link></li>
-                                            <li className="flex-1 min-w-[150px] text-center"><Link to="/#tools" className="hover:text-accent-cyan transition-colors block py-2">Search Engine Optimization</Link></li>
-                                            <li className="flex-1 min-w-[150px] text-center"><Link to="/#tools" className="hover:text-accent-cyan transition-colors block py-2">Social Media Management</Link></li>
-                                        </ul>
-                                    </div>
-                                )}
-
-                                {hoveredItem === 'Blogs' && (
-                                    <div className="flex flex-row gap-24 w-full max-w-5xl">
-                                        <div className="w-full">
-                                            <h4 className={`text-sm font-bold tracking-wider mb-6 uppercase ${isWhiteNav ? 'text-slate-500' : 'text-slate-400'}`}>Latest Articles</h4>
-                                            <ul className={`grid grid-cols-2 gap-x-12 gap-y-4 text-base font-medium ${isWhiteNav ? 'text-blue-900' : 'text-white'}`}>
-                                                {[
-                                                    "Start Your Journey with the Best Digital Marketing Academy in Attingal Today",
-                                                    "Best Digital Marketing Courses in Attingal with 100% Practical Training",
-                                                    "Enroll at the Best Digital Marketing Academy in Attingal for 100% Practical Learning",
-                                                    "Why Best Digital Marketing Courses Are in High Demand in Kerala",
-                                                    "Career Opportunities in Kerala After Completing a Digital Marketing Course",
-                                                    "Why Digital Marketing Course in Kerala Is the Smartest Career Choice in 2026",
-                                                    "Benefits of Learning AI-Powered Digital Marketing in Kerala",
-                                                    "Why a Graphic Designing Course in Kerala Is a Game-Changer for Your Career",
-                                                    "Top Reasons to Join the Best Digital Marketing Institute in Trivandrum",
-                                                    "Scope of Digital Marketing in Kerala and International Markets",
-                                                    "Best Digital Marketing Institute in Kerala – BreathArt Institute",
-                                                    "Digital Marketing Course with Placement",
-                                                    "Digital marketing certification",
-                                                    "Digital Marketing VS Traditional Marketing",
-                                                    "Future Of Digital Marketing",
-                                                    "Kerala’s First Marketing Institute with UAE Expertise",
-                                                    "Best Digital Marketing Course in Trivandrum"
-                                                ].map((title, idx) => (
-                                                    <li key={idx}>
-                                                        <Link to="/blogs" className="hover:text-accent-cyan transition-colors block truncate w-full" title={title}>
-                                                            {title}
-                                                        </Link>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {hoveredItem === 'Careers' && (
-                                    <div className="flex flex-row gap-24 w-full max-w-5xl">
-                                        <div>
-                                            <h4 className={`text-sm font-bold tracking-wider mb-6 uppercase ${isWhiteNav ? 'text-slate-500' : 'text-slate-400'}`}>Open Roles</h4>
-                                            <ul className={`space-y-4 text-lg font-medium ${isWhiteNav ? 'text-blue-900' : 'text-white'}`}>
-                                                <li><Link to="/careers" className="hover:text-accent-cyan transition-colors">Video Editor</Link></li>
-                                                <li><Link to="/careers" className="hover:text-accent-cyan transition-colors">Customer Care Executive</Link></li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {hoveredItem === 'Contact Us' && (
-                                    <div className="flex justify-between w-full max-w-5xl">
-                                        <div>
-                                            <h4 className={`text-sm font-bold tracking-wider mb-6 uppercase ${isWhiteNav ? 'text-slate-500' : 'text-slate-400'}`}>Get In Touch</h4>
-                                            <a href="tel:+918590144794" className={`flex items-center gap-2 text-xl font-medium mb-2 hover:text-accent-cyan transition-colors ${isWhiteNav ? 'text-blue-900' : 'text-white'}`}>
-                                                <Phone className="w-5 h-5" /> +91 8590 144 794
-                                            </a>
-                                            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=info@breathartinstitute.in" target="_blank" rel="noopener noreferrer" className={`flex items-center gap-2 text-base mb-1 hover:text-accent-cyan transition-colors ${isWhiteNav ? 'text-slate-700' : 'text-slate-300'}`}>
-                                                <Mail className="w-4 h-4" /> info@breathartinstitute.in
-                                            </a>
-                                            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=info@breathart.ae" target="_blank" rel="noopener noreferrer" className={`flex items-center gap-2 text-base mb-4 hover:text-accent-cyan transition-colors ${isWhiteNav ? 'text-slate-700' : 'text-slate-300'}`}>
-                                                <Mail className="w-4 h-4" /> info@breathart.ae
-                                            </a>
-                                            <p className={`flex items-start gap-2 text-sm ${isWhiteNav ? 'text-slate-500' : 'text-slate-400'}`}>
-                                                <MapPin className="w-4 h-4 mt-0.5 shrink-0" /> Karthika Tower, Attingal, Trivandrum
-                                            </p>
-                                            <h4 className={`text-sm font-bold tracking-wider mb-4 uppercase mt-6 ${isWhiteNav ? 'text-slate-500' : 'text-slate-400'}`}>Socials</h4>
-                                            <div className="flex gap-4">
-                                                <a href="https://www.instagram.com/breathart.institute/" target="_blank" rel="noopener noreferrer" className={`flex items-center gap-2 transition-colors ${isWhiteNav ? 'text-slate-700 hover:text-accent-blue' : 'text-slate-300 hover:text-accent-cyan'}`}>
-                                                    <Instagram className="w-5 h-5" /> Instagram
-                                                </a>
-                                                <a href="https://www.facebook.com/people/Breathart-institute-of-creative-technology/61579983401340/" target="_blank" rel="noopener noreferrer" className={`flex items-center gap-2 transition-colors ${isWhiteNav ? 'text-slate-700 hover:text-accent-blue' : 'text-slate-300 hover:text-accent-blue'}`}>
-                                                    <Facebook className="w-5 h-5" /> Facebook
-                                                </a>
-                                                <a href="https://www.linkedin.com/company/breathart-marketing-agency/" target="_blank" rel="noopener noreferrer" className={`flex items-center gap-2 transition-colors ${isWhiteNav ? 'text-slate-700 hover:text-accent-blue' : 'text-slate-300 hover:text-accent-blue'}`}>
-                                                    <Linkedin className="w-5 h-5" /> LinkedIn
-                                                </a>
-                                            </div>
-                                        </div>
-                                        <div className="w-[400px] h-[200px] rounded-xl overflow-hidden shadow-lg border border-white/10">
-                                            <iframe
-                                                src="https://maps.google.com/maps?q=Breathart%20Institute%20of%20Creative%20Technology%20%28BICT%29%20Karthika%20Tower%2C%20Opposite%20Wedland%20Weddings%2C%20Attingal&t=m&z=13&output=embed&iwloc=near"
-                                                width="100%"
-                                                height="100%"
-                                                className="border-0"
-                                                allowFullScreen=""
-                                                loading="lazy"
-                                                referrerPolicy="no-referrer-when-downgrade"
-                                                title="BreathArt Institute Location"
-                                            ></iframe>
-                                        </div>
-                                    </div>
-                                )}
-                            </motion.div>
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-
-            {/* Desktop Side Drawer (Menu) */}
-            <AnimatePresence>
-                {desktopMenuOpen && (
-                    <>
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            transition={{ duration: 0.3 }}
-                            onClick={() => setDesktopMenuOpen(false)}
-                            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] hidden lg:block"
-                        />
-                        <motion.div
-                            initial={{ x: '100%' }}
-                            animate={{ x: 0 }}
-                            exit={{ x: '100%' }}
-                            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                            className="fixed top-0 right-0 h-screen w-[320px] bg-[#1a1f2e] border-l border-white/10 shadow-2xl z-[70] hidden lg:flex flex-col overflow-y-auto"
-                        >
-                            <div className="p-6 flex justify-between items-center border-b border-white/10">
-                                <span className="text-white font-bold tracking-wider text-lg">MENU</span>
-                                <button
-                                    onClick={() => setDesktopMenuOpen(false)}
-                                    className="p-2 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
-                                >
-                                    <X className="w-6 h-6" />
-                                </button>
-                            </div>
-
-                            <div className="p-8 flex-grow flex flex-col gap-10">
-                                <div>
-                                    <h4 className="text-xs font-bold tracking-wider mb-6 uppercase text-slate-500">Quick Links</h4>
-                                    <ul className="flex flex-col gap-4 text-slate-200">
-                                        <li><Link to="/" onClick={() => setDesktopMenuOpen(false)} className="hover:text-accent-cyan transition-colors text-lg font-medium">Home</Link></li>
-                                        <li><Link to="/about" onClick={() => setDesktopMenuOpen(false)} className="hover:text-accent-cyan transition-colors text-lg font-medium">About Us</Link></li>
-                                        <li><Link to="/courses" onClick={() => setDesktopMenuOpen(false)} className="hover:text-accent-cyan transition-colors text-lg font-medium">Courses</Link></li>
-                                        <li><Link to="/#tools" onClick={() => setDesktopMenuOpen(false)} className="hover:text-accent-cyan transition-colors text-lg font-medium">Our Services</Link></li>
-                                        <li><Link to="/blogs" onClick={() => setDesktopMenuOpen(false)} className="hover:text-accent-cyan transition-colors text-lg font-medium">Blogs</Link></li>
-                                        <li><Link to="/careers" onClick={() => setDesktopMenuOpen(false)} className="hover:text-accent-cyan transition-colors text-lg font-medium">Careers</Link></li>
-                                        <li><Link to="/brochure" onClick={() => setDesktopMenuOpen(false)} className="hover:text-accent-cyan transition-colors text-lg font-medium">Brochure</Link></li>
-                                        <li><Link to="/admission" onClick={() => setDesktopMenuOpen(false)} className="hover:text-accent-cyan transition-colors text-lg font-medium">Admission</Link></li>
-                                        <li><button onClick={openContact} className="hover:text-accent-cyan transition-colors text-lg font-medium text-left">Contact Us</button></li>
-                                    </ul>
-                                </div>
-
-                                <div>
-                                    <h4 className="text-xs font-bold tracking-wider mb-6 uppercase text-slate-500">Featured Info</h4>
-                                    <div className="space-y-6">
-                                        <div>
-                                            <p className="text-sm font-bold uppercase mb-1 text-accent-cyan">Admissions Open</p>
-                                            <p className="text-sm text-slate-400">Enroll now for the upcoming batch of AI Digital Marketing.</p>
-                                        </div>
-                                        <div>
-                                            <p className="text-sm font-bold uppercase mb-1 text-accent-cyan">Get in Touch</p>
-                                            <p className="text-sm text-slate-400">hello@breathart.in<br />+91 98765 43210</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </motion.div>
-                    </>
-                )}
-            </AnimatePresence>
-
-            {/* Mobile Menu Drawer */}
-            <AnimatePresence>
-                {menuOpen && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className={`fixed inset-0 z-[60] lg:hidden backdrop-blur-3xl ${isWhiteNav ? 'bg-white/95' : 'bg-[#0a0f1a]/95'}`}
-                    >
-                        <div className="h-full w-full overflow-y-auto overscroll-contain pt-24 pb-20 px-6">
-                            <div className="w-full px-6 pb-20 flex flex-col gap-10">
-                                {/* Quick Links Section */}
-                                <div>
-                                    <h4 className={`text-xs font-bold tracking-wider mb-6 uppercase text-center ${isWhiteNav ? 'text-slate-500' : 'text-slate-500'}`}>Quick Links</h4>
-                                    <div className="flex flex-col gap-4">
-                                        {[
-                                            { name: 'Home', path: '/' },
-                                            { name: 'About Us', path: '/about' },
-                                            { name: 'Courses', path: '/courses' },
-                                            { name: 'Our Services', path: '/#tools' },
-                                            { name: 'Blogs', path: '/blogs' },
-                                            { name: 'Careers', path: '/careers' },
-                                            { name: 'Brochure', path: '/brochure' },
-                                            { name: 'Admission', path: '/admission' }
-                                        ].map((item) => (
-                                            <Link
-                                                key={item.name}
-                                                to={item.path}
-                                                onClick={(e) => {
-                                                    setMenuOpen(false);
-                                                    if (item.name === 'Home') {
-                                                        if (location.pathname === '/') {
-                                                            e.preventDefault();
-                                                        }
-                                                        const scrollFn = () => {
-                                                            if (window.__lenis) {
-                                                                window.__lenis.scrollTo(0, { immediate: false });
-                                                            } else {
-                                                                window.scrollTo({ top: 0, behavior: 'smooth' });
-                                                            }
-                                                        };
-                                                        scrollFn();
-                                                        setTimeout(scrollFn, 100);
-                                                    }
-                                                }}
-                                                className={`text-xl font-bold py-2 transition-colors flex justify-center items-center group ${isWhiteNav ? 'text-blue-900' : 'text-slate-200'}`}
-                                            >
-                                                {item.name}
-                                            </Link>
-                                        ))}
-                                        <button
-                                            onClick={openContact}
-                                            className={`text-xl font-bold py-2 transition-colors flex justify-center items-center group w-full text-center ${isWhiteNav ? 'text-blue-900 hover:text-accent-blue' : 'text-slate-200 hover:text-accent-cyan'}`}
-                                        >
-                                            Contact Us
-                                        </button>
-                                    </div>
-                                </div>
-
-                                {/* Featured Info Section */}
-                                <div>
-                                    <h4 className={`text-xs font-bold tracking-wider mb-6 uppercase ${isWhiteNav ? 'text-slate-500' : 'text-slate-500'}`}>Featured Info</h4>
-                                    <div className="space-y-6">
-                                        <div>
-                                            <p className="text-sm font-bold uppercase mb-1 text-accent-cyan">Admissions Open</p>
-                                            <p className={`text-sm ${isWhiteNav ? 'text-slate-600' : 'text-slate-400'}`}>Enroll now for the upcoming batch of AI Digital Marketing.</p>
-                                        </div>
-                                        <div>
-                                            <p className="text-sm font-bold uppercase mb-1 text-accent-cyan">Get in Touch</p>
-                                            <div className={`space-y-3 mt-4 ${isWhiteNav ? 'text-slate-600' : 'text-slate-400'}`}>
-                                                <a href="https://mail.google.com/mail/?view=cm&fs=1&to=info@breathartinstitute.in" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-accent-cyan transition-colors">
-                                                    <Mail className="w-4 h-4" /> info@breathartinstitute.in
-                                                </a>
-                                                <a href="tel:+918590144794" className="flex items-center gap-2 hover:text-accent-cyan transition-colors">
-                                                    <Phone className="w-4 h-4" /> +91 8590 144 794
-                                                </a>
-                                                <div className="flex items-start gap-2">
-                                                    <MapPin className="w-4 h-4 mt-0.5 shrink-0" />
-                                                    <span>Karthika Tower, Attingal, Trivandrum</span>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {/* Socials */}
-                                        <div className="pt-4 flex gap-4">
-                                            <a href="https://www.instagram.com/breathart.tools/" target="_blank" rel="noopener noreferrer" className={`p-2 rounded-full transition-colors ${isWhiteNav ? 'bg-slate-100 text-slate-600 hover:text-accent-blue' : 'bg-white/5 text-slate-400 hover:text-white'}`}>
-                                                <Instagram className="w-5 h-5" />
-                                            </a>
-                                            <a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer" className={`p-2 rounded-full transition-colors ${isWhiteNav ? 'bg-slate-100 text-slate-600 hover:text-accent-blue' : 'bg-white/5 text-slate-400 hover:text-white'}`}>
-                                                <Facebook className="w-5 h-5" />
-                                            </a>
-                                            <a href="https://www.linkedin.com/" target="_blank" rel="noopener noreferrer" className={`p-2 rounded-full transition-colors ${isWhiteNav ? 'bg-slate-100 text-slate-600 hover:text-accent-blue' : 'bg-white/5 text-slate-400 hover:text-white'}`}>
-                                                <Linkedin className="w-5 h-5" />
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-
-            {/* ── Contact Us Modal Popup ── */}
-            <ContactUsModal isOpen={contactOpen} onClose={() => setContactOpen(false)} />
-        </>
+  // Supabase auth state
+  useEffect(() => {
+    let mounted = true;
+    supabase.auth.getSession().then(({ data }) => {
+      if (!mounted) return;
+      setUserEmail(data.session?.user?.email || null);
+    });
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setUserEmail(session?.user?.email || null);
+      },
     );
+    return () => {
+      mounted = false;
+      listener?.subscription?.unsubscribe();
+    };
+  }, []);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    localStorage.removeItem("sb-access-token");
+    localStorage.removeItem("sb-refresh-token");
+    document.cookie = "sb-access-token=; Max-Age=0; path=/";
+    setUserEmail(null);
+    setMenuOpen(false);
+    setDesktopMenuOpen(false);
+    navigate("/");
+  };
+
+  // Lock background scroll whenever any overlay is visible
+  useEffect(() => {
+    const megaMenuOpen =
+      hoveredItem &&
+      ["Courses", "Our Services", "Blogs", "Careers", "Contact Us"].includes(
+        hoveredItem,
+      );
+    const anyOpen = megaMenuOpen || menuOpen || desktopMenuOpen || contactOpen;
+
+    if (anyOpen) {
+      if (window.__lenis) window.__lenis.stop();
+      document.body.style.overflow = "hidden";
+      document.documentElement.style.overflow = "hidden";
+      document.body.style.touchAction = "none";
+    } else {
+      if (window.__lenis) window.__lenis.start();
+      document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
+      document.body.style.touchAction = "";
+    }
+
+    return () => {
+      if (window.__lenis) window.__lenis.start();
+      document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
+      document.body.style.touchAction = "";
+    };
+  }, [hoveredItem, menuOpen, desktopMenuOpen, contactOpen]);
+
+  return (
+    <>
+      <nav
+        onMouseLeave={() => setHoveredItem(null)}
+        className={`fixed top-0 w-full  ${menuOpen ? "z-[70]" : "z-50"} transition-all duration-300 ${
+          hoveredItem &&
+          [
+            "Courses",
+            "Our Services",
+            "Blogs",
+            "Careers",
+            "Contact Us",
+          ].includes(hoveredItem)
+            ? isWhiteNav
+              ? "bg-white/80 backdrop-blur-3xl shadow-lg border-transparent"
+              : "bg-[#0a0f1a]/80 backdrop-blur-3xl shadow-xl border-transparent"
+            : isWhiteNav
+              ? "bg-white/95 backdrop-blur-xl border-b border-slate-200 shadow-sm"
+              : scrolled
+                ? "bg-[#0a192f]/80 backdrop-blur-xl border-b border-white/10 shadow-lg"
+                : "bg-transparent border-b border-transparent"
+        }`}
+      >
+        <div
+          className={`w-full py-1 px-4 md:px-12 flex justify-between items-center transition-colors duration-300 ${isWhiteNav ? "text-blue-900" : "text-white"}`}
+        >
+          {/* Logo Area */}
+          <div className="flex-1 flex justify-start">
+            <Link
+              to="/"
+              onClick={(e) => {
+                if (location.pathname === "/") {
+                  e.preventDefault();
+                }
+                if (window.__lenis) {
+                  window.__lenis.scrollTo(0, { immediate: false });
+                } else {
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }
+              }}
+            >
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5 }}
+                className="flex items-center gap-2 cursor-pointer"
+              >
+                <Logo className="w-14 h-14 md:w-16 md:h-16 scale-[1.3] origin-left" />
+                <div className="flex flex-col">
+                  <span className="text-base md:text-xl font-heading font-bold text-gradient leading-tight">
+                    BreathArt Institute
+                  </span>
+                  <span
+                    className={`text-[9px] md:text-xs tracking-widest hidden sm:block transition-colors duration-300 ${isWhiteNav ? "text-blue-800" : "text-slate-300"}`}
+                  >
+                    LEARN | CREATE | GROW
+                  </span>
+                </div>
+              </motion.div>
+            </Link>
+          </div>
+
+          {/* Desktop Nav - Centralised */}
+          <div className="hidden lg:flex flex-1 justify-center items-center space-x-8">
+            {navLinks.map((item, index) => {
+              const isInternalPage = [
+                "About",
+                "Courses",
+                "Blogs",
+                "Careers",
+                "Brochure",
+              ].includes(item);
+              const path =
+                item === "Our Services"
+                  ? "/#tools"
+                  : isInternalPage
+                    ? `/${item.toLowerCase().replace(" ", "-")}`
+                    : item === "Home"
+                      ? "/"
+                      : `/#${item.toLowerCase().replace(" ", "-")}`;
+
+              const handleHomeClick = (e) => {
+                if (item === "Home") {
+                  if (location.pathname === "/") {
+                    e.preventDefault();
+                  }
+                  const scrollFn = () => {
+                    if (window.__lenis) {
+                      window.__lenis.scrollTo(0, { immediate: false });
+                    } else {
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }
+                  };
+                  scrollFn();
+                  setTimeout(scrollFn, 100);
+                }
+              };
+
+              return (
+                <motion.div
+                  key={item}
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                >
+                  {isInternalPage || item === "Home" ? (
+                    <Link
+                      to={path}
+                      onClick={handleHomeClick}
+                      onMouseEnter={() => setHoveredItem(item)}
+                      className={`transition-colors duration-300 text-[11px] uppercase tracking-widest font-medium relative group py-2 whitespace-nowrap ${isWhiteNav ? "text-blue-900 hover:text-accent-blue" : "text-slate-200 hover:text-white"}`}
+                    >
+                      {item}
+                      <span
+                        className={`absolute bottom-1 left-0 w-0 h-0.5 transition-all duration-300 group-hover:w-full ${isWhiteNav ? "bg-accent-blue" : "bg-accent-cyan"}`}
+                      />
+                    </Link>
+                  ) : (
+                    <a
+                      href={path}
+                      onMouseEnter={() => setHoveredItem(item)}
+                      className={`transition-colors duration-300 text-[11px] uppercase tracking-widest font-medium relative group py-2 whitespace-nowrap ${isWhiteNav ? "text-blue-900 hover:text-accent-blue" : "text-slate-200 hover:text-white"}`}
+                    >
+                      {item}
+                      <span
+                        className={`absolute bottom-1 left-0 w-0 h-0.5 transition-all duration-300 group-hover:w-full ${isWhiteNav ? "bg-accent-blue" : "bg-accent-cyan"}`}
+                      />
+                    </a>
+                  )}
+                </motion.div>
+              );
+            })}
+          </div>
+
+          {/* Right side Area */}
+          <div className="flex-1 flex items-center justify-end gap-2 md:gap-3">
+            <Link to="/admission" onMouseEnter={() => setHoveredItem(null)}>
+              <motion.button
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                // className="hidden sm:block bg-gradient-to-r from-accent-cyan to-accent-blue text-white px-5 md:px-7 py-2.5 rounded-full font-bold shadow-lg shadow-accent-blue/20 text-sm hover:shadow-accent-cyan/40 transition-shadow"
+                 className={`px-5 md:px-7 py-2.5 rounded-full font-bold text-sm transition-colors border hidden sm:block ${isWhiteNav ? "border-blue-900/30 text-blue-900 hover:bg-blue-900/10" : "border-white/30 text-white hover:bg-white/10"}`}
+              >
+                Admission
+              </motion.button>
+            </Link>
+            {/* <motion.button
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={openContact}
+              className={`px-5 md:px-7 py-2.5 rounded-full font-bold text-sm transition-colors border hidden sm:block ${isWhiteNav ? "border-blue-900/30 text-blue-900 hover:bg-blue-900/10" : "border-white/30 text-white hover:bg-white/10"}`}
+            >
+              Contact Us
+            </motion.button> */}
+            {userEmail ? (
+              <div className="flex items-center gap-3">
+                <div
+                  className={`h-10 w-10 rounded-full flex items-center justify-center font-bold uppercase ${isWhiteNav ? "bg-blue-900 text-white" : "bg-white/15 text-white border border-white/20"}`}
+                >
+                  {userEmail.charAt(0).toUpperCase()}
+                </div>
+                <motion.button
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={handleLogout}
+                  className="bg-linear-to-r  from-accent-cyan to-accent-blue text-white px-5 md:px-7 py-2.5 rounded-full font-bold shadow-lg shadow-accent-blue/20 text-sm hover:shadow-accent-cyan/40 transition-shadow cursor-pointer"
+                >
+                  Logout
+                </motion.button>
+              </div>
+            ) : (
+              <Link to="/auth">
+                <motion.button
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="bg-linear-to-r  from-accent-cyan to-accent-blue text-white px-5 md:px-7 py-2.5 rounded-full font-bold shadow-lg shadow-accent-blue/20 text-sm hover:shadow-accent-cyan/40 transition-shadow cursor-pointer"
+                >
+                  {" Get Started"}
+                </motion.button>
+              </Link>
+            )}
+            {/* Desktop Menu Icon */}
+            <div
+              onClick={() => setDesktopMenuOpen(true)}
+              className={`hidden lg:flex items-center justify-center cursor-pointer transition-colors duration-300 ml-2 p-2 rounded-full ${isWhiteNav ? "text-blue-900 hover:bg-blue-100 hover:text-accent-blue" : "text-white hover:bg-white/10 hover:text-accent-cyan"}`}
+            >
+              <Menu className="w-6 h-6" />
+            </div>
+            {/* Mobile hamburger */}
+            <button
+              className={`lg:hidden p-2 rounded-lg transition-colors ${isWhiteNav ? "text-blue-900 hover:bg-blue-100" : "text-white hover:bg-white/10"}`}
+              onClick={() => setMenuOpen(!menuOpen)}
+              aria-label="Toggle menu"
+            >
+              {menuOpen ? (
+                <X className="w-7 h-7" />
+              ) : (
+                <Menu className="w-7 h-7" />
+              )}
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      {/* Desktop Mega Menu Overlay */}
+      <AnimatePresence>
+        {hoveredItem &&
+          [
+            "Courses",
+            "Our Services",
+            "Blogs",
+            "Careers",
+            "Contact Us",
+          ].includes(hoveredItem) && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+              onMouseEnter={() => setHoveredItem(hoveredItem)}
+              onMouseLeave={() => setHoveredItem(null)}
+              className={`fixed top-[73px] left-0 w-full z-40 overflow-hidden hidden lg:block ${isWhiteNav ? "bg-white/70 backdrop-blur-3xl shadow-lg" : "bg-[#0a0f1a]/60 backdrop-blur-3xl shadow-xl shadow-black/20"}`}
+            >
+              <div className="container mx-auto px-12 py-10">
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1, duration: 0.3 }}
+                  className="w-full flex justify-center"
+                >
+                  {hoveredItem === "Courses" && (
+                    <div className="flex flex-row gap-24 w-full max-w-5xl">
+                      <div className="w-full">
+                        <h4
+                          className={`text-sm font-bold tracking-wider mb-6 uppercase ${isWhiteNav ? "text-slate-500" : "text-slate-400"}`}
+                        >
+                          Programs
+                        </h4>
+                        <ul
+                          className={`grid grid-cols-2 gap-x-12 gap-y-4 text-base font-medium ${isWhiteNav ? "text-blue-900" : "text-white"}`}
+                        >
+                          <li>
+                            <Link
+                              to="/courses"
+                              className="hover:text-accent-cyan transition-colors"
+                            >
+                              Master Diploma in AI Digital Marketing
+                            </Link>
+                          </li>
+                          <li>
+                            <Link
+                              to="/courses"
+                              className="hover:text-accent-cyan transition-colors"
+                            >
+                              Diploma in AI Digital Marketing
+                            </Link>
+                          </li>
+                          <li>
+                            <Link
+                              to="/courses"
+                              className="hover:text-accent-cyan transition-colors"
+                            >
+                              Certificate in Digital Marketing
+                            </Link>
+                          </li>
+                          <li>
+                            <Link
+                              to="/courses"
+                              className="hover:text-accent-cyan transition-colors"
+                            >
+                              Diploma in Photography
+                            </Link>
+                          </li>
+                          <li>
+                            <Link
+                              to="/courses"
+                              className="hover:text-accent-cyan transition-colors"
+                            >
+                              Diploma in Graphic Design
+                            </Link>
+                          </li>
+                          <li>
+                            <Link
+                              to="/courses"
+                              className="hover:text-accent-cyan transition-colors"
+                            >
+                              Integrated Diploma in Creative Media
+                            </Link>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  )}
+
+                  {hoveredItem === "Our Services" && (
+                    <div className="w-full max-w-7xl mx-auto px-4">
+                      <h4
+                        className={`text-xs font-bold tracking-wider mb-6 uppercase text-center ${isWhiteNav ? "text-slate-500" : "text-slate-400"}`}
+                      >
+                        Professional Services
+                      </h4>
+                      <ul
+                        className={`flex flex-wrap justify-between gap-6 text-sm font-medium ${isWhiteNav ? "text-blue-900" : "text-white"}`}
+                      >
+                        <li className="flex-1 min-w-[150px] text-center">
+                          <Link
+                            to="/#tools"
+                            className="hover:text-accent-cyan transition-colors block py-2"
+                          >
+                            Digital Marketing Solutions
+                          </Link>
+                        </li>
+                        <li className="flex-1 min-w-[150px] text-center">
+                          <Link
+                            to="/#tools"
+                            className="hover:text-accent-cyan transition-colors block py-2"
+                          >
+                            Brand Identity & Strategy
+                          </Link>
+                        </li>
+                        <li className="flex-1 min-w-[150px] text-center">
+                          <Link
+                            to="/#tools"
+                            className="hover:text-accent-cyan transition-colors block py-2"
+                          >
+                            Web Design & Development
+                          </Link>
+                        </li>
+                        <li className="flex-1 min-w-[150px] text-center">
+                          <Link
+                            to="/#tools"
+                            className="hover:text-accent-cyan transition-colors block py-2"
+                          >
+                            Content Creation & Photography
+                          </Link>
+                        </li>
+                        <li className="flex-1 min-w-[150px] text-center">
+                          <Link
+                            to="/#tools"
+                            className="hover:text-accent-cyan transition-colors block py-2"
+                          >
+                            Search Engine Optimization
+                          </Link>
+                        </li>
+                        <li className="flex-1 min-w-[150px] text-center">
+                          <Link
+                            to="/#tools"
+                            className="hover:text-accent-cyan transition-colors block py-2"
+                          >
+                            Social Media Management
+                          </Link>
+                        </li>
+                      </ul>
+                    </div>
+                  )}
+
+                  {hoveredItem === "Blogs" && (
+                    <div className="flex flex-row gap-24 w-full max-w-5xl">
+                      <div className="w-full">
+                        <h4
+                          className={`text-sm font-bold tracking-wider mb-6 uppercase ${isWhiteNav ? "text-slate-500" : "text-slate-400"}`}
+                        >
+                          Latest Articles
+                        </h4>
+                        <ul
+                          className={`grid grid-cols-2 gap-x-12 gap-y-4 text-base font-medium ${isWhiteNav ? "text-blue-900" : "text-white"}`}
+                        >
+                          {[
+                            "Start Your Journey with the Best Digital Marketing Academy in Attingal Today",
+                            "Best Digital Marketing Courses in Attingal with 100% Practical Training",
+                            "Enroll at the Best Digital Marketing Academy in Attingal for 100% Practical Learning",
+                            "Why Best Digital Marketing Courses Are in High Demand in Kerala",
+                            "Career Opportunities in Kerala After Completing a Digital Marketing Course",
+                            "Why Digital Marketing Course in Kerala Is the Smartest Career Choice in 2026",
+                            "Benefits of Learning AI-Powered Digital Marketing in Kerala",
+                            "Why a Graphic Designing Course in Kerala Is a Game-Changer for Your Career",
+                            "Top Reasons to Join the Best Digital Marketing Institute in Trivandrum",
+                            "Scope of Digital Marketing in Kerala and International Markets",
+                            "Best Digital Marketing Institute in Kerala – BreathArt Institute",
+                            "Digital Marketing Course with Placement",
+                            "Digital marketing certification",
+                            "Digital Marketing VS Traditional Marketing",
+                            "Future Of Digital Marketing",
+                            "Kerala’s First Marketing Institute with UAE Expertise",
+                            "Best Digital Marketing Course in Trivandrum",
+                          ].map((title, idx) => (
+                            <li key={idx}>
+                              <Link
+                                to="/blogs"
+                                className="hover:text-accent-cyan transition-colors block truncate w-full"
+                                title={title}
+                              >
+                                {title}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  )}
+
+                  {hoveredItem === "Careers" && (
+                    <div className="flex flex-row gap-24 w-full max-w-5xl">
+                      <div>
+                        <h4
+                          className={`text-sm font-bold tracking-wider mb-6 uppercase ${isWhiteNav ? "text-slate-500" : "text-slate-400"}`}
+                        >
+                          Open Roles
+                        </h4>
+                        <ul
+                          className={`space-y-4 text-lg font-medium ${isWhiteNav ? "text-blue-900" : "text-white"}`}
+                        >
+                          <li>
+                            <Link
+                              to="/careers"
+                              className="hover:text-accent-cyan transition-colors"
+                            >
+                              Video Editor
+                            </Link>
+                          </li>
+                          <li>
+                            <Link
+                              to="/careers"
+                              className="hover:text-accent-cyan transition-colors"
+                            >
+                              Customer Care Executive
+                            </Link>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  )}
+
+                  {hoveredItem === "Contact Us" && (
+                    <div className="flex justify-between w-full max-w-5xl">
+                      <div>
+                        <h4
+                          className={`text-sm font-bold tracking-wider mb-6 uppercase ${isWhiteNav ? "text-slate-500" : "text-slate-400"}`}
+                        >
+                          Get In Touch
+                        </h4>
+                        <a
+                          href="tel:+918590144794"
+                          className={`flex items-center gap-2 text-xl font-medium mb-2 hover:text-accent-cyan transition-colors ${isWhiteNav ? "text-blue-900" : "text-white"}`}
+                        >
+                          <Phone className="w-5 h-5" /> +91 8590 144 794
+                        </a>
+                        <a
+                          href="https://mail.google.com/mail/?view=cm&fs=1&to=info@breathartinstitute.in"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={`flex items-center gap-2 text-base mb-1 hover:text-accent-cyan transition-colors ${isWhiteNav ? "text-slate-700" : "text-slate-300"}`}
+                        >
+                          <Mail className="w-4 h-4" />{" "}
+                          info@breathartinstitute.in
+                        </a>
+                        <a
+                          href="https://mail.google.com/mail/?view=cm&fs=1&to=info@breathart.ae"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={`flex items-center gap-2 text-base mb-4 hover:text-accent-cyan transition-colors ${isWhiteNav ? "text-slate-700" : "text-slate-300"}`}
+                        >
+                          <Mail className="w-4 h-4" /> info@breathart.ae
+                        </a>
+                        <p
+                          className={`flex items-start gap-2 text-sm ${isWhiteNav ? "text-slate-500" : "text-slate-400"}`}
+                        >
+                          <MapPin className="w-4 h-4 mt-0.5 shrink-0" />{" "}
+                          Karthika Tower, Attingal, Trivandrum
+                        </p>
+                        <h4
+                          className={`text-sm font-bold tracking-wider mb-4 uppercase mt-6 ${isWhiteNav ? "text-slate-500" : "text-slate-400"}`}
+                        >
+                          Socials
+                        </h4>
+                        <div className="flex gap-4">
+                          <a
+                            href="https://www.instagram.com/breathart.institute/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={`flex items-center gap-2 transition-colors ${isWhiteNav ? "text-slate-700 hover:text-accent-blue" : "text-slate-300 hover:text-accent-cyan"}`}
+                          >
+                            <Instagram className="w-5 h-5" /> Instagram
+                          </a>
+                          <a
+                            href="https://www.facebook.com/people/Breathart-institute-of-creative-technology/61579983401340/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={`flex items-center gap-2 transition-colors ${isWhiteNav ? "text-slate-700 hover:text-accent-blue" : "text-slate-300 hover:text-accent-blue"}`}
+                          >
+                            <Facebook className="w-5 h-5" /> Facebook
+                          </a>
+                          <a
+                            href="https://www.linkedin.com/company/breathart-marketing-agency/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={`flex items-center gap-2 transition-colors ${isWhiteNav ? "text-slate-700 hover:text-accent-blue" : "text-slate-300 hover:text-accent-blue"}`}
+                          >
+                            <Linkedin className="w-5 h-5" /> LinkedIn
+                          </a>
+                        </div>
+                      </div>
+                      <div className="w-[400px] h-[200px] rounded-xl overflow-hidden shadow-lg border border-white/10">
+                        <iframe
+                          src="https://maps.google.com/maps?q=Breathart%20Institute%20of%20Creative%20Technology%20%28BICT%29%20Karthika%20Tower%2C%20Opposite%20Wedland%20Weddings%2C%20Attingal&t=m&z=13&output=embed&iwloc=near"
+                          width="100%"
+                          height="100%"
+                          className="border-0"
+                          allowFullScreen=""
+                          loading="lazy"
+                          referrerPolicy="no-referrer-when-downgrade"
+                          title="BreathArt Institute Location"
+                        ></iframe>
+                      </div>
+                    </div>
+                  )}
+                </motion.div>
+              </div>
+            </motion.div>
+          )}
+      </AnimatePresence>
+
+      {/* Desktop Side Drawer (Menu) */}
+      <AnimatePresence>
+        {desktopMenuOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              onClick={() => setDesktopMenuOpen(false)}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] hidden lg:block"
+            />
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="fixed top-0 right-0 h-screen w-[320px] bg-[#1a1f2e] border-l border-white/10 shadow-2xl z-[70] hidden lg:flex flex-col overflow-y-auto"
+            >
+              <div className="p-6 flex justify-between items-center border-b border-white/10">
+                <span className="text-white font-bold tracking-wider text-lg">
+                  MENU
+                </span>
+                <button
+                  onClick={() => setDesktopMenuOpen(false)}
+                  className="p-2 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              <div className="p-8 flex-grow flex flex-col gap-10">
+                <div>
+                  <h4 className="text-xs font-bold tracking-wider mb-6 uppercase text-slate-500">
+                    Quick Links
+                  </h4>
+                  <ul className="flex flex-col gap-4 text-slate-200">
+                    <li>
+                      <Link
+                        to="/"
+                        onClick={() => setDesktopMenuOpen(false)}
+                        className="hover:text-accent-cyan transition-colors text-lg font-medium"
+                      >
+                        Home
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        to="/about"
+                        onClick={() => setDesktopMenuOpen(false)}
+                        className="hover:text-accent-cyan transition-colors text-lg font-medium"
+                      >
+                        About Us
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        to="/courses"
+                        onClick={() => setDesktopMenuOpen(false)}
+                        className="hover:text-accent-cyan transition-colors text-lg font-medium"
+                      >
+                        Courses
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        to="/#tools"
+                        onClick={() => setDesktopMenuOpen(false)}
+                        className="hover:text-accent-cyan transition-colors text-lg font-medium"
+                      >
+                        Our Services
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        to="/blogs"
+                        onClick={() => setDesktopMenuOpen(false)}
+                        className="hover:text-accent-cyan transition-colors text-lg font-medium"
+                      >
+                        Blogs
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        to="/careers"
+                        onClick={() => setDesktopMenuOpen(false)}
+                        className="hover:text-accent-cyan transition-colors text-lg font-medium"
+                      >
+                        Careers
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        to="/brochure"
+                        onClick={() => setDesktopMenuOpen(false)}
+                        className="hover:text-accent-cyan transition-colors text-lg font-medium"
+                      >
+                        Brochure
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        to="/admission"
+                        onClick={() => setDesktopMenuOpen(false)}
+                        className="hover:text-accent-cyan transition-colors text-lg font-medium"
+                      >
+                        Admission
+                      </Link>
+                    </li>
+                    <li>
+                      <button
+                        onClick={openContact}
+                        className="hover:text-accent-cyan transition-colors text-lg font-medium text-left"
+                      >
+                        Contact Us
+                      </button>
+                    </li>
+                    <li>
+                      {userEmail ? (
+                        <button
+                          onClick={handleLogout}
+                          className="hover:text-accent-cyan transition-colors text-lg font-medium text-left"
+                        >
+                          Logout
+                        </button>
+                      ) : (
+                        <Link
+                          to="/auth"
+                          onClick={() => setDesktopMenuOpen(false)}
+                          className="hover:text-accent-cyan transition-colors text-lg font-medium"
+                        >
+                          Login
+                        </Link>
+                      )}
+                    </li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h4 className="text-xs font-bold tracking-wider mb-6 uppercase text-slate-500">
+                    Featured Info
+                  </h4>
+                  <div className="space-y-6">
+                    <div>
+                      <p className="text-sm font-bold uppercase mb-1 text-accent-cyan">
+                        Admissions Open
+                      </p>
+                      <p className="text-sm text-slate-400">
+                        Enroll now for the upcoming batch of AI Digital
+                        Marketing.
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold uppercase mb-1 text-accent-cyan">
+                        Get in Touch
+                      </p>
+                      <p className="text-sm text-slate-400">
+                        hello@breathart.in
+                        <br />
+                        +91 98765 43210
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Mobile Menu Drawer */}
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className={`fixed inset-0 z-[60] lg:hidden backdrop-blur-3xl ${isWhiteNav ? "bg-white/95" : "bg-[#0a0f1a]/95"}`}
+          >
+            <div className="h-full w-full overflow-y-auto overscroll-contain pt-24 pb-20 px-6">
+              <div className="w-full px-6 pb-20 flex flex-col gap-10">
+                {/* Quick Links Section */}
+                <div>
+                  <h4
+                    className={`text-xs font-bold tracking-wider mb-6 uppercase text-center ${isWhiteNav ? "text-slate-500" : "text-slate-500"}`}
+                  >
+                    Quick Links
+                  </h4>
+                  <div className="flex flex-col gap-4">
+                    {[
+                      { name: "Home", path: "/" },
+                      { name: "About Us", path: "/about" },
+                      { name: "Courses", path: "/courses" },
+                      { name: "Our Services", path: "/#tools" },
+                      { name: "Blogs", path: "/blogs" },
+                      { name: "Careers", path: "/careers" },
+                      { name: "Brochure", path: "/brochure" },
+                      { name: "Admission", path: "/admission" },
+                    ].map((item) => (
+                      <Link
+                        key={item.name}
+                        to={item.path}
+                        onClick={(e) => {
+                          setMenuOpen(false);
+                          if (item.name === "Home") {
+                            if (location.pathname === "/") {
+                              e.preventDefault();
+                            }
+                            const scrollFn = () => {
+                              if (window.__lenis) {
+                                window.__lenis.scrollTo(0, {
+                                  immediate: false,
+                                });
+                              } else {
+                                window.scrollTo({ top: 0, behavior: "smooth" });
+                              }
+                            };
+                            scrollFn();
+                            setTimeout(scrollFn, 100);
+                          }
+                        }}
+                        className={`text-xl font-bold py-2 transition-colors flex justify-center items-center group ${isWhiteNav ? "text-blue-900" : "text-slate-200"}`}
+                      >
+                        {item.name}
+                      </Link>
+                    ))}
+                    <button
+                      onClick={openContact}
+                      className={`text-xl font-bold py-2 transition-colors flex justify-center items-center group w-full text-center ${isWhiteNav ? "text-blue-900 hover:text-accent-blue" : "text-slate-200 hover:text-accent-cyan"}`}
+                    >
+                      Contact Us
+                    </button>
+                  </div>
+                </div>
+
+                {/* Featured Info Section */}
+                <div>
+                  <h4
+                    className={`text-xs font-bold tracking-wider mb-6 uppercase ${isWhiteNav ? "text-slate-500" : "text-slate-500"}`}
+                  >
+                    Featured Info
+                  </h4>
+                  <div className="space-y-6">
+                    <div>
+                      <p className="text-sm font-bold uppercase mb-1 text-accent-cyan">
+                        Admissions Open
+                      </p>
+                      <p
+                        className={`text-sm ${isWhiteNav ? "text-slate-600" : "text-slate-400"}`}
+                      >
+                        Enroll now for the upcoming batch of AI Digital
+                        Marketing.
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold uppercase mb-1 text-accent-cyan">
+                        Get in Touch
+                      </p>
+                      <div
+                        className={`space-y-3 mt-4 ${isWhiteNav ? "text-slate-600" : "text-slate-400"}`}
+                      >
+                        <a
+                          href="https://mail.google.com/mail/?view=cm&fs=1&to=info@breathartinstitute.in"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-2 hover:text-accent-cyan transition-colors"
+                        >
+                          <Mail className="w-4 h-4" />{" "}
+                          info@breathartinstitute.in
+                        </a>
+                        <a
+                          href="tel:+918590144794"
+                          className="flex items-center gap-2 hover:text-accent-cyan transition-colors"
+                        >
+                          <Phone className="w-4 h-4" /> +91 8590 144 794
+                        </a>
+                        <div className="flex items-start gap-2">
+                          <MapPin className="w-4 h-4 mt-0.5 shrink-0" />
+                          <span>Karthika Tower, Attingal, Trivandrum</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Socials */}
+                    <div className="pt-4 flex gap-4">
+                      <a
+                        href="https://www.instagram.com/breathart.tools/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`p-2 rounded-full transition-colors ${isWhiteNav ? "bg-slate-100 text-slate-600 hover:text-accent-blue" : "bg-white/5 text-slate-400 hover:text-white"}`}
+                      >
+                        <Instagram className="w-5 h-5" />
+                      </a>
+                      <a
+                        href="https://www.facebook.com/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`p-2 rounded-full transition-colors ${isWhiteNav ? "bg-slate-100 text-slate-600 hover:text-accent-blue" : "bg-white/5 text-slate-400 hover:text-white"}`}
+                      >
+                        <Facebook className="w-5 h-5" />
+                      </a>
+                      <a
+                        href="https://www.linkedin.com/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`p-2 rounded-full transition-colors ${isWhiteNav ? "bg-slate-100 text-slate-600 hover:text-accent-blue" : "bg-white/5 text-slate-400 hover:text-white"}`}
+                      >
+                        <Linkedin className="w-5 h-5" />
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── Contact Us Modal Popup ── */}
+      <ContactUsModal
+        isOpen={contactOpen}
+        onClose={() => setContactOpen(false)}
+      />
+    </>
+  );
 };
 
 export default Navbar;
