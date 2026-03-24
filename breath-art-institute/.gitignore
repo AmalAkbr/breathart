@@ -26,3 +26,6 @@ dist-ssr
 skills-*.json
 
 skills-lock.json
+
+.agents/
+.agents/*
