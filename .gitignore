@@ -22,6 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+<<<<<<< HEAD
 .env
 skills-*.json
 
@@ -29,3 +30,6 @@ skills-lock.json
 
 .agents/
 .agents/*
+=======
+.env
+>>>>>>> 802f1237c1367465fec66226c2e00bff047052b3
