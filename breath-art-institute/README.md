@@ -1,16 +1,38 @@
-# React + Vite
+**Breath Art Institute**
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+- React + Vite frontend with Supabase Postgres backend via Drizzle ORM.
+- Animated marketing site components, forms for login/register, and Supabase auth/data wiring.
 
-Currently, two official plugins are available:
+## Stack
+- React 19, Vite 7
+- Styling: Tailwind (v4), custom CSS components
+- Animations: Framer Motion, GSAP
+- Data: Supabase Postgres via Drizzle ORM
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Quick Start
+1) Install deps: `npm install`
+2) Env: copy .env.example to .env and set `DATABASE_URL` (Supabase connection string). Keep keys private.
+3) Dev server: `npm run dev`
 
-## React Compiler
+## Environment
+- `.env.example` shows required vars including `DATABASE_URL`.
+- Use the Supabase connection string (with password) for `DATABASE_URL`.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Drizzle (Supabase Postgres)
+- Schema: [drizzle/schema.ts](drizzle/schema.ts)
+- Config: [drizzle.config.ts](drizzle.config.ts) (migrations output to `drizzle/migrations`)
+- Commands:
+  - Generate SQL: `npm run drizzle:generate`
+  - Apply migrations: `npm run drizzle:migrate`
 
-## Expanding the ESLint configuration
+## Scripts
+- `npm run dev` – start Vite dev server
+- `npm run build` – production build
+- `npm run preview` – preview production build
+- `npm run lint` – run eslint
+- `npm run drizzle:generate` – generate migration SQL
+- `npm run drizzle:migrate` – apply migrations
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Notes
+- Do not commit secrets. Keep Supabase keys and database passwords in `.env`.
+- If you need to inspect or seed data, connect with your Supabase connection string; Drizzle migrations live in `drizzle/migrations`.
