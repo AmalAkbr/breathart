@@ -1,0 +1,23 @@
+{
+  "name": "Breath Art Institute",
+  "short_name": "BreathArt",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "description": "Breath Art Institute web app",
+  "icons": [
+    {
+      "src": "/app/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/app/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "background_color": "#0d1b2e",
+  "theme_color": "#0d1b2e",
+  "display": "standalone"
+}
