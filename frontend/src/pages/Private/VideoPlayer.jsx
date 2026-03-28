@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { X, Play, Pause, Volume2, VolumeX } from 'lucide-react';
+import { X, Play, Pause, Volume2, VolumeX, Maximize2, Minimize2 } from 'lucide-react';
 import { getAuthToken, videoAPI } from '../../utils/apiClient';
 import { toast } from '../../utils/toast';
 import SecurityBlankScreen from '../../components/SecurityBlankScreen';
@@ -20,6 +20,7 @@ const VideoPlayer = () => {
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(0.8);
   const [speed, setSpeed] = useState(1);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   const handleLoadedMetadata = () => {
     const videoEl = videoRef.current;
@@ -201,6 +202,48 @@ const VideoPlayer = () => {
     }
   };
 
+  const toggleFullscreen = () => {
+    setIsFullscreen(!isFullscreen);
+    if (!isFullscreen) {
+      // Entering fullscreen
+      document.documentElement.style.overflow = 'hidden';
+      if (typeof document !== 'undefined' && document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen().catch(() => {
+          // Fallback if native fullscreen not supported
+        });
+      }
+    } else {
+      // Exiting fullscreen
+      document.documentElement.style.overflow = 'auto';
+      if (typeof document !== 'undefined' && document.fullscreenElement) {
+        document.exitFullscreen().catch(() => {
+          // Fallback
+        });
+      }
+    }
+  };
+
+  // Handle F11 and Escape keys
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'F11' || e.key === 'f11') {
+        e.preventDefault();
+        setIsFullscreen(!isFullscreen);
+        toggleFullscreen();
+      } else if (e.key === 'Escape' && isFullscreen) {
+        e.preventDefault();
+        setIsFullscreen(false);
+        document.documentElement.style.overflow = 'auto';
+        if (typeof document !== 'undefined' && document.fullscreenElement) {
+          document.exitFullscreen().catch(() => {});
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isFullscreen]);
+
   if (isProdEnv && isDevtoolsOpen) {
     return <SecurityBlankScreen />;
   }
@@ -242,150 +285,304 @@ const VideoPlayer = () => {
     );
   }
 
-  return (
-    <div className="min-h-screen bg-black/95 text-white" ref={playerRef}>
-      {/* Header with close button */}
-      <div className="bg-linear-to-b from-black/80 to-transparent px-6 py-4 flex justify-between items-start">
-        <div className="flex-1">
-          <h1 className="text-2xl md:text-3xl font-bold">{video.title}</h1>
-          <p className="text-white/60 mt-1">{video.description}</p>
-        </div>
-        <button
-          onClick={() => navigate('/videos')}
-          className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition shrink-0"
-          title="Back to library"
-        >
-          <X size={24} />
-        </button>
-      </div>
+  // Fullscreen modal view
+  if (isFullscreen) {
+    return (
+      <div className="fixed inset-0 bg-black z-50 w-screen h-screen overflow-hidden">
+        <div className="relative w-full h-full bg-black flex items-center justify-center group">
+          <video
+            ref={videoRef}
+            src={video.videoUrl || video.video_url}
+            className="w-full h-full object-contain"
+            onContextMenu={handleVideoContextMenu}
+            onDragStart={handleDragStart}
+            controls={false}
+            playsInline
+            disablePictureInPicture
+            controlsList={isProdEnv ? 'nodownload noplaybackrate noremoteplayback' : 'noplaybackrate noremoteplayback'}
+            style={{
+              userSelect: 'none',
+              WebkitUserSelect: 'none',
+              MozUserSelect: 'none',
+            }}
+          />
 
-      {/* Video Player Container */}
-      <div className="relative w-full bg-black aspect-video flex items-center justify-center overflow-hidden">
-        <video
-          ref={videoRef}
-          src={video.videoUrl || video.video_url}
-          className="w-full h-full"
-          onContextMenu={handleVideoContextMenu}
-          onDragStart={handleDragStart}
-          onLoadedMetadata={handleLoadedMetadata}
-          onTimeUpdate={handleTimeUpdate}
-          onPlay={handlePlayEvt}
-          onPause={handlePauseEvt}
-          controls={false}
-          playsInline
-          disablePictureInPicture
-          controlsList={isProdEnv ? 'nodownload noplaybackrate noremoteplayback' : 'noplaybackrate noremoteplayback'}
-          style={{
-            userSelect: 'none',
-            WebkitUserSelect: 'none',
-            MozUserSelect: 'none',
-            backgroundColor: 'black',
-          }}
-        />
-
-        {/* Custom Controls */}
-        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent px-4 py-3 flex flex-col gap-2">
-          {/* Progress */}
-          <div className="flex items-center gap-3">
-            <span className="text-xs text-white/70 tabular-nums w-16 text-right">
-              {new Date(progress * 1000).toISOString().substr(14, 5)}
-            </span>
-            <input
-              type="range"
-              min={0}
-              max={duration > 0 ? duration : Math.max(progress + 1, 1)}
-              step={0.1}
-              value={Math.min(progress, duration || Math.max(progress, 0))}
-              onChange={(e) => handleSeek(Number(e.target.value))}
-              className="w-full accent-blue-400 cursor-pointer"
-            />
-            <span className="text-xs text-white/70 tabular-nums w-16">
-              {duration ? new Date(duration * 1000).toISOString().substr(14, 5) : '00:00'}
-            </span>
+          {/* Top Overlay - Title & Close */}
+          <div className="absolute inset-x-0 top-0 bg-linear-to-b from-black/60 to-transparent px-4 py-3 flex justify-between items-start opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
+            <div className="flex-1 pr-4">
+              <h1 className="text-2xl font-bold line-clamp-2">{video.title}</h1>
+            </div>
+            <button
+              onClick={toggleFullscreen}
+              className="p-2 rounded-lg bg-white/10 hover:bg-white/30 transition shrink-0"
+              title="Exit Fullscreen (Esc)"
+            >
+              <Minimize2 size={24} />
+            </button>
           </div>
 
-          {/* Buttons */}
-          <div className="flex items-center justify-between gap-3 flex-wrap">
-            <div className="flex items-center gap-2">
-              <button
-                onClick={togglePlay}
-                className="px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 border border-white/15 transition"
-              >
-                {isPlaying ? <Pause size={18} /> : <Play size={18} />}
-              </button>
-
-              <button
-                onClick={() => handleSeek(Math.max(progress - 10, 0))}
-                className="px-3 py-2 rounded-lg bg-white/5 hover:bg-white/15 border border-white/10 transition text-xs font-semibold flex items-center gap-1"
-              >
-                <span aria-hidden>-10s</span>
-              </button>
-              <button
-                onClick={() => handleSeek(Math.min(progress + 10, duration || 0))}
-                className="px-3 py-2 rounded-lg bg-white/5 hover:bg-white/15 border border-white/10 transition text-xs font-semibold flex items-center gap-1"
-              >
-                <span aria-hidden>+10s</span>
-              </button>
-
-              <button
-                onClick={toggleMute}
-                className="px-3 py-2 rounded-lg bg-white/5 hover:bg-white/15 border border-white/10 transition"
-              >
-                {volume === 0 ? <VolumeX size={18} /> : <Volume2 size={18} />}
-              </button>
+          {/* Bottom Controls Overlay */}
+          <div className="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/90 via-black/40 to-transparent px-4 py-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
+            {/* Progress Bar */}
+            <div className="flex items-center gap-2 group/progress">
               <input
                 type="range"
                 min={0}
-                max={1}
-                step={0.01}
-                value={volume}
-                onChange={(e) => handleVolumeChange(Number(e.target.value))}
-                className="w-28 accent-blue-400 cursor-pointer"
+                max={duration > 0 ? duration : Math.max(progress + 1, 1)}
+                step={0.1}
+                value={Math.min(progress, duration || Math.max(progress, 0))}
+                onChange={(e) => handleSeek(Number(e.target.value))}
+                className="w-full accent-red-500 cursor-pointer h-1 group-hover/progress:h-2 transition-all"
+                style={{
+                  background: `linear-gradient(to right, #ef4444 0%, #ef4444 ${
+                    duration > 0 ? (progress / duration) * 100 : 0
+                  }%, rgba(255,255,255,0.2) ${duration > 0 ? (progress / duration) * 100 : 0}%, rgba(255,255,255,0.2) 100%)`
+                }}
               />
             </div>
 
-            <div className="flex items-center gap-2">
-              <select
-                value={speed}
-                onChange={(e) => changeSpeed(Number(e.target.value))}
-                className="bg-white/10 border border-white/15 text-sm rounded-lg px-3 py-2 text-white focus:outline-none"
-              >
-                {[0.5, 0.75, 1, 1.25, 1.5, 2].map((s) => (
-                  <option key={s} value={s}>{s}x</option>
-                ))}
-              </select>
+            {/* Control Buttons */}
+            <div className="flex items-center justify-between gap-2 text-sm">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={togglePlay}
+                  className="p-2 rounded bg-white/10 hover:bg-white/20 transition"
+                  title={isPlaying ? 'Pause (k)' : 'Play (k)'}
+                >
+                  {isPlaying ? <Pause size={20} /> : <Play size={20} />}
+                </button>
+
+                <button
+                  onClick={() => handleSeek(Math.max(progress - 10, 0))}
+                  className="px-3 py-2 rounded bg-white/5 hover:bg-white/15 transition text-sm font-semibold"
+                  title="Back 10s (j)"
+                >
+                  -10s
+                </button>
+                
+                <button
+                  onClick={() => handleSeek(Math.min(progress + 10, duration || 0))}
+                  className="px-3 py-2 rounded bg-white/5 hover:bg-white/15 transition text-sm font-semibold"
+                  title="Forward 10s (l)"
+                >
+                  +10s
+                </button>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={toggleMute}
+                    className="p-2 rounded bg-white/5 hover:bg-white/15 transition"
+                    title={volume === 0 ? 'Unmute (m)' : 'Mute (m)'}
+                  >
+                    {volume === 0 ? <VolumeX size={20} /> : <Volume2 size={20} />}
+                  </button>
+                  <input
+                    type="range"
+                    min={0}
+                    max={1}
+                    step={0.01}
+                    value={volume}
+                    onChange={(e) => handleVolumeChange(Number(e.target.value))}
+                    className="w-24 accent-red-500 cursor-pointer"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 ml-auto">
+                <span className="text-white/70 tabular-nums">
+                  {new Date(progress * 1000).toISOString().substr(14, 5)} / {duration ? new Date(duration * 1000).toISOString().substr(14, 5) : '00:00'}
+                </span>
+                
+                <select
+                  value={speed}
+                  onChange={(e) => changeSpeed(Number(e.target.value))}
+                  className="bg-white/10 border border-white/15 text-sm rounded px-2 py-1 text-white focus:outline-none hover:bg-white/20 transition"
+                >
+                  {[0.5, 0.75, 1, 1.25, 1.5, 2].map((s) => (
+                    <option key={s} value={s}>{s}x</option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
         </div>
       </div>
+    );
+  }
 
-      {/* Info Section */}
-      <div className="p-6 border-t border-white/10">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-          <div>
-            <p className="text-white/50">Duration</p>
-            <p className="font-semibold">
-              {video.duration || video.duration === 0
-                ? `${Math.floor((video.duration || 0) / 60)}:${(Math.floor((video.duration || 0) % 60)).toString().padStart(2, '0')}`
-                : 'N/A'}
+  return (
+    <div className="min-h-screen bg-linear-to-b from-[#06060a] via-[#0a0a0f] to-[#0a0a0f] text-white" ref={playerRef}>
+      {/* YouTube-style compact layout */}
+      <div className="w-full max-w-6xl mx-auto px-2 sm:px-4 lg:px-6 py-3 sm:py-4">
+        
+        {/* Video Player Container - YouTube style */}
+        <div className="relative w-full bg-black rounded-xl overflow-hidden shadow-2xl group">
+          <div className="relative w-full bg-black aspect-video flex items-center justify-center overflow-hidden">
+            <video
+              ref={videoRef}
+              src={video.videoUrl || video.video_url}
+              className="w-full h-full"
+              onContextMenu={handleVideoContextMenu}
+              onDragStart={handleDragStart}
+              onLoadedMetadata={handleLoadedMetadata}
+              onTimeUpdate={handleTimeUpdate}
+              onPlay={handlePlayEvt}
+              onPause={handlePauseEvt}
+              controls={false}
+              playsInline
+              autoPlay
+              disablePictureInPicture
+              controlsList={isProdEnv ? 'nodownload noplaybackrate noremoteplayback' : 'noplaybackrate noremoteplayback'}
+              style={{
+                userSelect: 'none',
+                WebkitUserSelect: 'none',
+                MozUserSelect: 'none',
+                backgroundColor: 'black',
+              }}
+            />
+
+            {/* Top Overlay - Title & Close (appears on hover) */}
+            <div className="absolute inset-x-0 top-0 bg-linear-to-b from-black/60 to-transparent px-4 py-3 flex justify-between items-start opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
+              <div className="flex-1 pr-4">
+                <h1 className="text-lg sm:text-xl font-bold line-clamp-2">{video.title}</h1>
+              </div>
+              <button
+                onClick={() => navigate('/videos')}
+                className="p-2 rounded-lg bg-white/10 hover:bg-white/30 transition shrink-0"
+                title="Back to library"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Bottom Controls Overlay */}
+            <div className="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/90 via-black/40 to-transparent px-3 sm:px-4 py-2 sm:py-3 flex flex-col gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
+              {/* Progress Bar */}
+              <div className="flex items-center gap-2 group/progress">
+                <input
+                  type="range"
+                  min={0}
+                  max={duration > 0 ? duration : Math.max(progress + 1, 1)}
+                  step={0.1}
+                  value={Math.min(progress, duration || Math.max(progress, 0))}
+                  onChange={(e) => handleSeek(Number(e.target.value))}
+                  className="w-full accent-red-500 cursor-pointer h-1 group-hover/progress:h-1.5 transition-all"
+                  style={{
+                    background: `linear-gradient(to right, #ef4444 0%, #ef4444 ${
+                      duration > 0 ? (progress / duration) * 100 : 0
+                    }%, rgba(255,255,255,0.2) ${duration > 0 ? (progress / duration) * 100 : 0}%, rgba(255,255,255,0.2) 100%)`
+                  }}
+                />
+              </div>
+
+              {/* Control Buttons */}
+              <div className="flex items-center justify-between gap-2 text-xs sm:text-sm">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <button
+                    onClick={togglePlay}
+                    className="p-1.5 sm:p-2 rounded bg-white/10 hover:bg-white/20 transition"
+                    title={isPlaying ? 'Pause (k)' : 'Play (k)'}
+                  >
+                    {isPlaying ? <Pause size={16} /> : <Play size={16} />}
+                  </button>
+
+                  <button
+                    onClick={() => handleSeek(Math.max(progress - 10, 0))}
+                    className="hidden sm:flex px-2 py-1.5 rounded bg-white/5 hover:bg-white/15 transition text-xs font-semibold items-center gap-1"
+                    title="Back 10s (j)"
+                  >
+                    -10s
+                  </button>
+                  
+                  <button
+                    onClick={() => handleSeek(Math.min(progress + 10, duration || 0))}
+                    className="hidden sm:flex px-2 py-1.5 rounded bg-white/5 hover:bg-white/15 transition text-xs font-semibold items-center gap-1"
+                    title="Forward 10s (l)"
+                  >
+                    +10s
+                  </button>
+
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      onClick={toggleMute}
+                      className="p-1.5 sm:p-2 rounded bg-white/5 hover:bg-white/15 transition"
+                      title={volume === 0 ? 'Unmute (m)' : 'Mute (m)'}
+                    >
+                      {volume === 0 ? <VolumeX size={16} /> : <Volume2 size={16} />}
+                    </button>
+                    <input
+                      type="range"
+                      min={0}
+                      max={1}
+                      step={0.01}
+                      value={volume}
+                      onChange={(e) => handleVolumeChange(Number(e.target.value))}
+                      className="w-16 sm:w-20 accent-red-500 cursor-pointer"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-1.5 ml-auto">
+                  <span className="text-white/70 tabular-nums">
+                    {new Date(progress * 1000).toISOString().substr(14, 5)} / {duration ? new Date(duration * 1000).toISOString().substr(14, 5) : '00:00'}
+                  </span>
+                  
+                  <button
+                    onClick={toggleFullscreen}
+                    className="p-1.5 sm:p-2 rounded bg-white/5 hover:bg-white/15 transition"
+                    title={isFullscreen ? 'Exit Fullscreen (F11)' : 'Fullscreen (F11)'}
+                  >
+                    {isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
+                  </button>
+
+                  <select
+                    value={speed}
+                    onChange={(e) => changeSpeed(Number(e.target.value))}
+                    className="bg-white/10 border border-white/15 text-xs rounded px-2 py-1 text-white focus:outline-none hover:bg-white/20 transition"
+                  >
+                    {[0.5, 0.75, 1, 1.25, 1.5, 2].map((s) => (
+                      <option key={s} value={s}>{s}x</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Info Section - Compact */}
+        <div className="mt-4 sm:mt-6 max-w-6xl">
+          <div className="bg-white/5 backdrop-blur border border-white/10 rounded-lg p-4 sm:p-6">
+            <h2 className="text-xl sm:text-2xl font-bold mb-2">{video.title}</h2>
+            <p className="text-white/70 text-sm sm:text-base leading-relaxed mb-4">
+              {video.description || 'No description provided'}
+            </p>
+            
+            {/* Meta Info */}
+            <div className="flex flex-wrap gap-4 text-xs sm:text-sm text-white/50 border-t border-white/10 pt-4">
+              <div>
+                <span className="text-white/70">Duration:</span>{' '}
+                {video.duration || video.duration === 0
+                  ? `${Math.floor((video.duration || 0) / 60)}:${(Math.floor((video.duration || 0) % 60)).toString().padStart(2, '0')}`
+                  : 'N/A'}
+              </div>
+              <div>
+                <span className="text-white/70">Category:</span> {video.category || 'General'}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Security Notice */}
+        {isProdEnv && (
+          <div className="mt-4 sm:mt-6 px-4 sm:px-6 py-3 sm:py-4 bg-linear-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-lg">
+            <p className="text-xs sm:text-sm text-white/70 flex items-start gap-2">
+              <span className="text-lg shrink-0">🔒</span>
+              <span>This video is protected. Recording and downloading are disabled.</span>
             </p>
           </div>
-          <div>
-            <p className="text-white/50">Description</p>
-            <p className="font-semibold line-clamp-2">{video.description || 'No description provided'}</p>
-          </div>
-        </div>
+        )}
       </div>
-
-      {/* Security Notice */}
-      {isProdEnv && (
-        <div className="px-6 py-4 bg-linear-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-lg mx-6 mb-6 mt-4">
-          <p className="text-xs text-white/70 flex items-start gap-2">
-            <span className="text-lg">🔒</span>
-            <span>This video is protected. Recording, downloading, and developer tools are disabled. Attempting to use them will terminate your session.</span>
-          </p>
-        </div>
-      )}
     </div>
   );
 };

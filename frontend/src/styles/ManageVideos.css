@@ -398,6 +398,32 @@
 
 .loading p { margin: 0; }
 
+.upload-progress-compact {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.progress-bar-mini {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+  transition: width 0.3s ease;
+  border-radius: 2px;
+}
+
+.text-xs {
+  font-size: 12px;
+}
+
 .upload-overlay {
   position: fixed;
   inset: 0;

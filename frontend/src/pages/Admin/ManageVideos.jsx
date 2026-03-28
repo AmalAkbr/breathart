@@ -1,9 +1,10 @@
 // frontend/src/pages/Admin/ManageVideos.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Edit2, Trash2, Search, Loader, Filter, Clock, Play, Layers, X } from 'lucide-react';
 import { getAuthToken } from '../../utils/apiClient';
 import { toast } from '../../utils/toast';
 import { getVideoDurationInSecondsFromFile } from '../../utils/videoDuration';
+import { io } from 'socket.io-client';
 import '../../styles/ManageVideos.css';
 
 const ManageVideos = () => {
@@ -27,9 +28,118 @@ const ManageVideos = () => {
   const [uploadProgress, setUploadProgress] = useState({ video: 0, loaded: 0, total: 0 });
   const [uploadStage, setUploadStage] = useState('uploading');
   const isVideoUploading = uploading.video;
+  const socketRef = useRef(null);
+  const currentVideoUploadIdRef = useRef(null);
+
+  const getSocketServerUrl = () => {
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+    return apiUrl.replace(/\/api\/?$/, '');
+  };
+
+  const createUploadId = () => {
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+      return crypto.randomUUID();
+    }
+    return `upload_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+  };
+
+  const mapClientProgressToUi = (percent) => {
+    const clamped = Math.max(0, Math.min(100, percent));
+    return Math.round((clamped / 100) * 45);
+  };
+
+  const mapR2ProgressToUi = (percent) => {
+    const clamped = Math.max(0, Math.min(100, percent));
+    return Math.min(99, 45 + Math.round((clamped / 100) * 54));
+  };
 
   useEffect(() => {
     fetchVideos();
+  }, []);
+
+  // Setup Socket.IO for upload progress tracking
+  useEffect(() => {
+    const token = getAuthToken();
+    if (!token) {
+      return undefined;
+    }
+
+    const socket = io(getSocketServerUrl(), {
+      transports: ['websocket', 'polling'],
+      auth: { token },
+      withCredentials: true,
+    });
+
+    socketRef.current = socket;
+
+    const onStage = (payload = {}) => {
+      if (!payload.uploadId || payload.uploadId !== currentVideoUploadIdRef.current) {
+        return;
+      }
+
+      if (payload.stage === 'r2_uploading') {
+        setUploadStage('processing');
+      } else if (payload.stage === 'cancelled') {
+        setUploadStage('cancelled');
+      }
+    };
+
+    const onProgress = (payload = {}) => {
+      if (!payload.uploadId || payload.uploadId !== currentVideoUploadIdRef.current) {
+        return;
+      }
+
+      if (payload.phase !== 'r2') {
+        return;
+      }
+
+      const backendPercent = Number(payload.percent) || 0;
+      const mapped = mapR2ProgressToUi(backendPercent);
+
+      setUploadStage('processing');
+      setUploadProgress({
+        loaded: Number(payload.loaded) || 0,
+        total: Number(payload.total) || 0,
+        video: mapped,
+      });
+    };
+
+    const onCompleted = (payload = {}) => {
+      if (!payload.uploadId || payload.uploadId !== currentVideoUploadIdRef.current) {
+        return;
+      }
+
+      setUploadStage('completed');
+      setUploadProgress((prev) => ({
+        ...prev,
+        video: Math.max(prev.video, 99),
+      }));
+    };
+
+    const onError = (payload = {}) => {
+      if (!payload.uploadId || payload.uploadId !== currentVideoUploadIdRef.current) {
+        return;
+      }
+
+      setUploadStage('error');
+      if (payload.message) {
+        toast.error(payload.message);
+      }
+    };
+
+    socket.on('upload:stage', onStage);
+    socket.on('upload:progress', onProgress);
+    socket.on('upload:completed', onCompleted);
+    socket.on('upload:error', onError);
+
+    return () => {
+      socket.off('upload:stage', onStage);
+      socket.off('upload:progress', onProgress);
+      socket.off('upload:completed', onCompleted);
+      socket.off('upload:error', onError);
+      socket.disconnect();
+      socketRef.current = null;
+    };
   }, []);
 
   const fetchVideos = async () => {
@@ -241,6 +351,8 @@ const ManageVideos = () => {
     try {
       setUploading((p) => ({ ...p, video: true }));
       setUploadStage('uploading');
+      const uploadId = createUploadId();
+      currentVideoUploadIdRef.current = uploadId;
       setUploadProgress({
         video: 0,
         loaded: 0,
@@ -251,6 +363,12 @@ const ManageVideos = () => {
       const fd = new FormData();
       fd.append('video', file);
       fd.append('title', editForm.title || 'video');
+      fd.append('uploadId', uploadId);
+
+      // Subscribe to upload progress via socket
+      if (socketRef.current?.connected) {
+        socketRef.current.emit('upload:subscribe', { uploadId });
+      }
 
       const shouldAutoFillDuration = !Number(editForm.duration);
       const detectedDuration = shouldAutoFillDuration
@@ -262,8 +380,9 @@ const ManageVideos = () => {
         fd,
         token,
         ({ percent, loaded, total }) => {
+          const mapped = mapClientProgressToUi(percent);
           setUploadProgress({
-            video: Math.min(percent, 99),
+            video: Math.min(mapped, 45),
             loaded,
             total,
           });
@@ -307,6 +426,7 @@ const ManageVideos = () => {
       setUploading((p) => ({ ...p, video: false }));
       setUploadStage('uploading');
       setUploadProgress({ video: 0, loaded: 0, total: 0 });
+      currentVideoUploadIdRef.current = null;
     }
   };
 
@@ -474,8 +594,20 @@ const ManageVideos = () => {
                   placeholder="https://...video.mp4"
                 />
                 <div className="inline-upload">
-                  <input type="file" accept="video/mp4,video/webm,video/x-msvideo,video/quicktime" onChange={(e) => uploadVideoFile(e.target.files?.[0])} />
-                  {uploading.video && <span className="muted">Uploading...</span>}
+                  <input type="file" accept="video/mp4,video/webm,video/x-msvideo,video/quicktime" onChange={(e) => uploadVideoFile(e.target.files?.[0])} disabled={uploading.video} />
+                  {uploading.video && (
+                    <div className="upload-progress-compact">
+                      <div className="progress-bar-mini">
+                        <div className="progress-fill" style={{ width: `${uploadProgress.video}%` }} />
+                      </div>
+                      <span className="muted text-xs">{uploadProgress.video}% - {uploadStage}</span>
+                      {uploadProgress.total > 0 && (
+                        <span className="muted text-xs">
+                          {(uploadProgress.loaded / 1024 / 1024).toFixed(1)}MB / {(uploadProgress.total / 1024 / 1024).toFixed(1)}MB
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </div>
               </label>
               <div className="modal-grid">
