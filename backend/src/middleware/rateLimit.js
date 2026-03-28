@@ -16,8 +16,10 @@ export const generalLimiter = rateLimit({
   standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
   skip: (req) => {
-    // Skip rate limiting for health checks
-    return req.path === '/api/health';
+    // Skip rate limiting for health checks and static assets
+    if (req.path === '/api/health') return true;
+    if (req.path.startsWith('/assets')) return true;
+    return false;
   }
 });
 

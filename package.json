@@ -12,9 +12,6 @@
     "build:frontend": "cd frontend && npm run build",
     "preview": "cd frontend && npm run preview",
     "lint": "cd frontend && npm run lint",
-    "migrate:generate": "dotenv -e ./backend/.env -- drizzle-kit generate --config ./drizzle.config.cjs",
-    "migrate:run": "dotenv -e ./backend/.env -- drizzle-kit migrate --config ./drizzle.config.cjs",
-    "make-admin": "dotenv -e ./backend/.env -- tsx scripts/create-admin.js",
     "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install"
   },
   "keywords": [
