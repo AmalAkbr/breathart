@@ -78,6 +78,7 @@ const CreateExam = () => {
     const { startDate, endDate } = examData;
 
     if (!title) return (setError("Exam title is required"), false);
+    if (title.length < 3) return (setError("Exam title must be at least 3 characters"), false);
     if (!googleFormLink)
       return (setError("Google Form link is required"), false);
     if (!description) return (setError("Description is required"), false);
