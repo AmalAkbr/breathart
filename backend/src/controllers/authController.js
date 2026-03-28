@@ -338,7 +338,7 @@ export const forgotPassword = async (req, res) => {
       });
     }
 
-    // Generate reset token
+    // Generate reset token (only token)
     const resetToken = user.generatePasswordResetToken();
     await user.save();
 
@@ -347,9 +347,9 @@ export const forgotPassword = async (req, res) => {
     // Generate reset link
     const resetLink = `${env.FRONTEND_URL}/auth/reset-password?token=${resetToken}`;
 
-    // Send reset email
+    // Send reset email (pass both link and token)
     try {
-      await sendPasswordResetEmail(user.email, user.fullName, resetLink);
+      await sendPasswordResetEmail(user.email, user.fullName, resetLink, resetToken);
       console.log('[FORGOT PASSWORD] ✅ Reset email sent successfully');
     } catch (emailError) {
       console.error('[FORGOT PASSWORD] ❌ Error sending reset email:', emailError.message);
@@ -368,6 +368,65 @@ export const forgotPassword = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error processing password reset request',
+      error: error.message
+    });
+  }
+};
+
+/**
+ * POST /api/auth/verify-reset-token - Verify password reset token
+ */
+export const verifyResetToken = async (req, res) => {
+  try {
+    const { token } = req.body;
+
+    if (!token) {
+      return res.status(400).json({
+        success: false,
+        message: 'Token is required'
+      });
+    }
+
+    console.log('[VERIFY TOKEN] Verifying reset token');
+
+    // Hash the token
+    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+    // Find user with token
+    const user = await User.findOne({
+      passwordResetToken: hashedToken,
+    }).select('+passwordResetToken +passwordResetExpiry email');
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid reset token'
+      });
+    }
+
+    // Check if token is expired
+    if (user.passwordResetExpiry < new Date()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Reset token has expired'
+      });
+    }
+
+    console.log('[VERIFY TOKEN] ✅ Token valid for:', user.email);
+
+    res.json({
+      success: true,
+      message: 'Token is valid',
+      data: {
+        email: user.email,
+        userId: user._id
+      }
+    });
+  } catch (error) {
+    console.error('[VERIFY TOKEN] Error:', error.message);
+    res.status(500).json({
+      success: false,
+      message: 'Error verifying token',
       error: error.message
     });
   }
@@ -404,8 +463,10 @@ export const resetPassword = async (req, res) => {
     console.log('[RESET PASSWORD] Processing password reset');
 
     // Find user with token
+    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+    
     const user = await User.findOne({
-      passwordResetToken: require('crypto').createHash('sha256').update(token).digest('hex'),
+      passwordResetToken: hashedToken,
     }).select('+passwordResetToken +passwordResetExpiry');
 
     if (!user) {

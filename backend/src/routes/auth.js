@@ -4,6 +4,7 @@ import {
   login,
   verifyEmail,
   forgotPassword,
+  verifyResetToken,
   resetPassword,
   resendVerificationEmail,
   getProfile,
@@ -56,6 +57,13 @@ router.post(
   passwordResetLimiter,
   validateRequest(validationSchemas.forgotPassword),
   forgotPassword
+);
+
+// POST /api/auth/verify-reset-token (Rate limited: 3 attempts per 30 min)
+router.post(
+  '/verify-reset-token',
+  passwordResetLimiter,
+  verifyResetToken
 );
 
 // POST /api/auth/reset-password (Rate limited: 3 attempts per 30 min)

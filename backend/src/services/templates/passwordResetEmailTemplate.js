@@ -1,4 +1,6 @@
-export const passwordResetEmailTemplate = ({ resetUrl }) => {
+export const passwordResetEmailTemplate = ({ resetUrl, resetToken }) => {
+  // Extract token from URL if not provided separately
+  const token = resetToken || (resetUrl?.match(/token=([^&]+)/) || [])[1] || 'N/A';
   const html = `
     <!DOCTYPE html>
     <html lang="en">
@@ -87,6 +89,27 @@ export const passwordResetEmailTemplate = ({ resetUrl }) => {
             border-radius: 6px;
             font-size: 13px;
             color: #7a5c0f;
+          }  .token-section {
+            background: #f8fafb;
+            border-left: 4px solid #1a237e;
+            padding: 16px;
+            margin: 24px 0;
+            border-radius: 6px;
+          }
+          .token-section p {
+            font-size: 13px;
+            color: #555;
+            margin-bottom: 8px;
+          }
+          .token {
+            font-family: 'Courier New', monospace;
+            background: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            word-break: break-all;
+            color: #1a237e;
+            font-weight: 600;
+            font-size: 12px;
           }
           .security-warning strong {
             color: #7a5c0f;
@@ -135,11 +158,17 @@ export const passwordResetEmailTemplate = ({ resetUrl }) => {
               <div class="greeting">Hello,</div>
 
               <p class="intro-text">
-                We received a request to reset your account password. Click the button below to create a new password. This link is valid for 24 hours.
+                We received a request to reset your account password. Click the button below to create a new password. This link is valid for 20 minutes.
               </p>
 
               <div class="cta-section">
                 <a href="${resetUrl}" class="cta-button" style="color:#FFF;">Reset Password</a>
+              </div>
+
+              <div class="token-section">
+                <p><strong>Manual Entry (if button doesn't work):</strong></p>
+                <p>Copy this token and paste it in the password reset form:</p>
+                <div class="token" style="font-family: 'Courier New', monospace; background: white; padding: 12px; border-radius: 4px; word-break: break-all; color: #1a237e; font-weight: 600; font-size: 13px; margin-top: 8px;">${token}</div>
               </div>
 
               <div class="security-warning">
@@ -169,12 +198,16 @@ PASSWORD RESET REQUEST
 
 Hello,
 
-We received a request to reset your account password. Please visit the link below to create a new password. This link is valid for 24 hours.
+We received a request to reset your account password. Please visit the link below to create a new password. This link is valid for 20 minutes.
 
-RESET PASSWORD
-================================================================================
-
+RESET PASSWORD (Click the link or method 1):
 ${resetUrl}
+
+MANUAL ENTRY (If button doesn't work - method 2):
+Copy this token and paste it in the password reset form:
+${token}
+
+Security Note: Do not share this token or link with anyone.
 
 SECURITY NOTE
 ================================================================================

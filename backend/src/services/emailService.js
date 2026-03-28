@@ -52,15 +52,16 @@ export const sendVerificationEmail = async (email, fullName = 'User', verificati
  * Send password reset email to user
  * @param {string} email - User email
  * @param {string} fullName - User's full name
- * @param {string} resetUrl - Full password reset link
+ * @param {string} resetUrl - Full password reset link with token
+ * @param {string} resetToken - Plain reset token for manual entry
  * @returns {Promise<object>} - Nodemailer response
  */
-export const sendPasswordResetEmail = async (email, fullName = 'User', resetUrl) => {
+export const sendPasswordResetEmail = async (email, fullName = 'User', resetUrl, resetToken) => {
   if (!email || !resetUrl) {
     throw new Error('Missing parameters: email, resetUrl');
   }
 
-  const { subject, text, html } = passwordResetEmailTemplate({ resetUrl });
+  const { subject, text, html } = passwordResetEmailTemplate({ resetUrl, resetToken });
 
   const mailOptions = {
     from: `${env.FROM_EMAIL}`,

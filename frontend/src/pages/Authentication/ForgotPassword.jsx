@@ -58,16 +58,34 @@ export default function ForgotPassword() {
     setValidationErrors({});
     setIsSubmitting(true);
 
-    const validation = validateToken(tokenInput);
-    if (!validation.isValid) {
-      setValidationErrors(validation);
+    if (!tokenInput.trim()) {
+      setValidationErrors({ token: 'Token is required' });
       setIsSubmitting(false);
       return;
     }
 
-    // Move to password entry step (in production, you might validate token with backend here)
-    setStep('password');
-    setIsSubmitting(false);
+    try {
+      setError(null);
+      // Verify token with backend
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/auth/verify-reset-token`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: tokenInput }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Move to password entry step
+        setStep('password');
+      } else {
+        setError(data.message || 'Invalid or expired token');
+      }
+    } catch (err) {
+      setError('Error verifying token. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // ===== STEP 3: Reset Password =====
@@ -91,9 +109,9 @@ export default function ForgotPassword() {
     try {
       setError(null);
       const response = await authAPI.resetPassword(
-        userEmail,
         tokenInput,
-        passwordData.password
+        passwordData.password,
+        passwordData.confirmPassword
       );
 
       if (response.success) {
@@ -127,7 +145,7 @@ export default function ForgotPassword() {
             <h1 className="text-3xl font-bold text-white mb-2">Reset Password</h1>
             <p className="text-gray-400">
               {step === 'email' && 'Enter your email to receive a reset link'}
-              {step === 'token' && 'Check your email for the reset code'}
+              {step === 'token' && 'Check your email and paste the reset token'}
               {step === 'password' && 'Create your new password'}
               {step === 'success' && 'Password reset successful'}
             </p>
@@ -198,10 +216,10 @@ export default function ForgotPassword() {
             <form onSubmit={handleTokenSubmit} className="space-y-5">
               <div>
                 <p className="text-sm text-gray-400 mb-4">
-                  We've sent a reset code to <span className="font-semibold text-white">{userEmail}</span>
+                  We've sent a reset token to <span className="font-semibold text-white">{userEmail}</span>
                 </p>
                 <label htmlFor="token" className="block text-sm font-medium text-gray-300 mb-2">
-                  Reset Code
+                  Reset Token
                 </label>
                 <input
                   type="text"
@@ -213,7 +231,7 @@ export default function ForgotPassword() {
                       setValidationErrors(prev => ({ ...prev, token: '' }));
                     }
                   }}
-                  placeholder="Enter 6-digit code"
+                  placeholder="Paste your reset token from the email"
                   className={`w-full px-4 py-3 rounded-lg bg-gray-700/50 border transition-colors
                     ${
                       validationErrors.token
@@ -245,7 +263,7 @@ export default function ForgotPassword() {
                     disabled:from-gray-600 disabled:to-gray-600 disabled:cursor-not-allowed
                     text-white font-semibold rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
                 >
-                  {isSubmitting ? 'Verifying...' : 'Verify Code'}
+                  {isSubmitting ? 'Verifying...' : 'Verify Token'}
                 </button>
               </div>
             </form>
