@@ -10,6 +10,7 @@ import {
   Settings,
   BarChart3,
   House,
+  FilmIcon,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import "../styles/AdminNav.css";
@@ -161,6 +162,12 @@ const AdminNav = ({ activeSection, setActiveSection, user, onLogout, isOpen = fa
           <button className="home-button" title="Logout">
             <House size={18} />
             <span>Home</span>
+          </button>
+        </Link>
+        <Link to={'/videos'}>
+          <button className="film-button" title="Logout">
+            <FilmIcon size={18} />
+            <span>Videos</span>
           </button>
         </Link>
         <button className="logout-button" onClick={onLogout} title="Logout">

@@ -5,10 +5,21 @@ import { User } from '../models/User.js';
 import { sendBulkExamInvitations } from './emailService.js';
 
 /**
- * Get all exams created by admin
+ * Get all exams created by admin (IDOR-protected)
  */
 export const getAllExams = async (adminId) => {
-  const query = adminId ? { $or: [{ createdBy: adminId }, { createdBy: { $exists: false } }, { createdBy: null }] } : {};
+  if (!adminId) {
+    throw new Error('Admin ID required');
+  }
+
+  // Only return exams created by this specific admin (or legacy exams without createdBy)
+  const query = {
+    $or: [
+      { createdBy: adminId },
+      { createdBy: { $exists: false } },
+      { createdBy: null }
+    ]
+  };
 
   const exams = await Exam.find(query)
     .sort({ createdAt: -1 })
@@ -18,13 +29,39 @@ export const getAllExams = async (adminId) => {
 };
 
 /**
- * Get single exam with participants and user details
+ * Verify exam ownership - IDOR protection
  */
-export const getExamWithParticipants = async (examId) => {
+export const verifyExamOwnership = async (examId, adminId) => {
+  if (!examId || !adminId) {
+    throw new Error('Invalid exam ID or admin ID');
+  }
+
+  const exam = await Exam.findById(examId);
+  if (!exam) {
+    throw new Error('Exam not found');
+  }
+
+  // Check ownership (allow non-owned legacy exams to be viewed)
+  if (exam.createdBy && exam.createdBy.toString() !== adminId.toString()) {
+    throw new Error('You do not have permission to access this exam');
+  }
+
+  return exam;
+};
+
+/**
+ * Get single exam with participants and user details (IDOR-protected)
+ */
+export const getExamWithParticipants = async (examId, adminId = null) => {
   const exam = await Exam.findById(examId).populate('createdBy', 'fullName email');
 
   if (!exam) {
     throw new Error('Exam not found');
+  }
+
+  // Verify ownership if adminId provided (for API requests)
+  if (adminId && exam.createdBy && exam.createdBy._id.toString() !== adminId.toString()) {
+    throw new Error('You do not have permission to access this exam');
   }
 
   const participants = await ExamParticipant.find({ examId })
@@ -77,13 +114,18 @@ export const createExam = async (examData, adminId) => {
 };
 
 /**
- * Add participants to exam
+ * Add participants to exam (IDOR-protected)
  */
-export const addParticipants = async (examId, studentIds) => {
+export const addParticipants = async (examId, studentIds, adminId = null) => {
   // Verify exam exists
   const exam = await Exam.findById(examId);
   if (!exam) {
     throw new Error('Exam not found');
+  }
+
+  // Verify ownership (IDOR protection)
+  if (adminId && exam.createdBy && exam.createdBy.toString() !== adminId.toString()) {
+    throw new Error('You do not have permission to modify this exam');
   }
 
   // Verify students exist
@@ -116,12 +158,17 @@ export const addParticipants = async (examId, studentIds) => {
 };
 
 /**
- * Send exam invitations to students
+ * Send exam invitations to students (IDOR-protected)
  */
-export const sendExamInvitations = async (examId, studentIds = null) => {
+export const sendExamInvitations = async (examId, studentIds = null, adminId = null) => {
   const exam = await Exam.findById(examId);
   if (!exam) {
     throw new Error('Exam not found');
+  }
+
+  // Verify ownership (IDOR protection)
+  if (adminId && exam.createdBy && exam.createdBy.toString() !== adminId.toString()) {
+    throw new Error('You do not have permission to send invitations for this exam');
   }
 
   // Get participants and their details
@@ -178,9 +225,20 @@ export const sendExamInvitations = async (examId, studentIds = null) => {
 };
 
 /**
- * Update exam
+ * Update exam (IDOR-protected)
  */
-export const updateExam = async (examId, updateData) => {
+export const updateExam = async (examId, updateData, adminId = null) => {
+  // Verify exam exists
+  const exam = await Exam.findById(examId);
+  if (!exam) {
+    throw new Error('Exam not found');
+  }
+
+  // Verify ownership (IDOR protection)
+  if (adminId && exam.createdBy && exam.createdBy.toString() !== adminId.toString()) {
+    throw new Error('You do not have permission to modify this exam');
+  }
+
   const dataToUpdate = {
     updatedAt: new Date(),
   };
@@ -192,24 +250,35 @@ export const updateExam = async (examId, updateData) => {
   if (updateData.endDate !== undefined) dataToUpdate.endDate = updateData.endDate || null;
   if (updateData.status) dataToUpdate.status = updateData.status;
 
-  const exam = await Exam.findByIdAndUpdate(
+  const updatedExam = await Exam.findByIdAndUpdate(
     examId,
     dataToUpdate,
     { returnDocument: 'after' }
   );
 
-  if (!exam) throw new Error('Exam not found');
-  return exam;
+  if (!updatedExam) throw new Error('Exam not found');
+  return updatedExam;
 };
 
 /**
- * Delete exam (cascades to participants)
+ * Delete exam (IDOR-protected, cascades to participants)
  */
-export const deleteExam = async (examId) => {
-  const exam = await Exam.findByIdAndDelete(examId);
-  if (!exam) throw new Error('Exam not found');
+export const deleteExam = async (examId, adminId = null) => {
+  // Verify exam exists
+  const exam = await Exam.findById(examId);
+  if (!exam) {
+    throw new Error('Exam not found');
+  }
+
+  // Verify ownership (IDOR protection)
+  if (adminId && exam.createdBy && exam.createdBy.toString() !== adminId.toString()) {
+    throw new Error('You do not have permission to delete this exam');
+  }
+
+  // Delete the exam
+  await Exam.findByIdAndDelete(examId);
   
-  // Delete all participants for this exam
+  // Delete all participants for this exam (cascade)
   await ExamParticipant.deleteMany({ examId });
   
   return { message: 'Exam deleted successfully' };

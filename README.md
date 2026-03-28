@@ -1,66 +1,51 @@
-# Breath Art Institute
+# Breath Art Institute - Full Stack Platform
 
-**A modern, high-performance marketing and educational platform built with React, Vite, and Supabase.**
-
-Breath Art Institute is a full-stack web application designed to showcase digital marketing and training courses with user authentication, course enrollment, and interactive animated components. The platform combines a responsive React frontend with a secure Supabase Postgres backend, featuring real-time authentication, dynamic course content, and a seamless user experience.
+A modern, high-performance educational and marketing platform combining React frontend with MongoDB backend. Features user authentication, course management, image optimization, and real-time notifications.
 
 ---
 
-## ✨ Features
+## 📋 Project Overview
 
-- **User Authentication** – Secure sign-up and login via Supabase Auth with email verification
-- **Session Management** – Persistent session handling with automatic redirect logic
-- **Responsive Design** – Mobile-first layout using Tailwind CSS with custom animations
-- **Advanced Animations** – Smooth, GPU-accelerated animations using Framer Motion and GSAP
-- **Database Integration** – Type-safe Drizzle ORM queries to Supabase Postgres
-- **Course Management** – Browse, filter, and enroll in courses
-- **Contact & Inquiry Forms** – Modal-based contact, enrollment, and job application flows
-- **Blog Section** – Read articles and industry insights
-- **SEO Optimizations** – URL redirects and metadata for better search engine visibility
-- **Real-time Notifications** – WhatsApp integration and in-app messaging
+**Breath Art Institute** is a comprehensive web application for digital marketing education with:
+- **MongoDB** backend with JWT authentication
+- **React + Vite** frontend with smooth animations
+- **ImageKit** CDN for optimized image delivery
+- **Email verification** and password reset flows
+- **WebP conversion** for automatic image optimization
+- **Responsive design** with Tailwind CSS
 
 ---
 
-## 🛠️ Technology Stack
-
-| Category | Technology |
-|----------|-----------|
-| **Frontend** | React 19, Vite 7, React Router |
-| **Styling** | Tailwind CSS v4, PostCSS |
-| **Animations** | Framer Motion, GSAP, Lenis (smooth scroll) |
-| **Backend** | Supabase Postgres, Node.js |
-| **Database** | Drizzle ORM (type-safe query builder) |
-| **Authentication** | Supabase Auth (email) |
-| **Linting** | ESLint |
-| **Build Tool** | Vite |
-
----
-
-## 📋 Project Structure
+## 🏗️ Architecture
 
 ```
-breath-art-institute/
-├── src/
-│   ├── components/          # Reusable UI components (Hero, Navbar, Footer, etc.)
-│   ├── pages/               # Full-page views (Home, Courses, Admission, Auth)
-│   ├── pages/Authentication/
-│   │   ├── Form.jsx         # Login/Register form with validation
-│   │   └── Protected.jsx    # Auth gate (redirects logged-in users)
-│   ├── supabase/
-│   │   └── client.js        # Supabase client initialization
-│   ├── assets/              # Images, logos, extracted files
-│   ├── App.jsx              # Main router configuration
-│   ├── main.jsx             # React entry point
-│   └── index.css            # Global styles
-├── drizzle/
-│   ├── schema.ts            # Drizzle ORM database schema
-│   └── migrations/          # SQL migration files
-├── public/                  # Static files (manifest, favicon)
-├── package.json             # Dependencies and npm scripts
-├── vite.config.js           # Vite configuration
-├── drizzle.config.ts        # Drizzle configuration
-├── postcss.config.js        # PostCSS plugins
-└── README.md                # This file
+breathart/
+├── backend/                          # Node.js Express server
+│   ├── src/
+│   │   ├── config/                  # Database & env config
+│   │   ├── models/                  # MongoDB schemas (User, Video, etc.)
+│   │   ├── controllers/             # Business logic
+│   │   ├── routes/                  # API endpoints
+│   │   ├── middleware/              # Auth, validation, file upload
+│   │   ├── utils/                   # Helpers (email, image processing)
+│   │   └── index.js                 # Main server file
+│   ├── package.json
+│   ├── .env
+│   └── WEBP_CONVERSION.md           # Image processing docs
+│
+├── frontend/                         # React + Vite app
+│   ├── src/
+│   │   ├── components/              # Reusable React components
+│   │   ├── pages/                   # Full-page views
+│   │   ├── store/                   # Zustand state management
+│   │   ├── utils/                   # API client, helpers
+│   │   ├── App.jsx                  # Router configuration
+│   │   └── main.jsx                 # React entry point
+│   ├── package.json
+│   ├── vite.config.js
+│   └── index.html
+│
+└── README.md                         # This file
 ```
 
 ---
@@ -69,156 +54,168 @@ breath-art-institute/
 
 ### Prerequisites
 - Node.js 18+ and npm/yarn
-- Supabase project with Postgres database
-- Modern browser (Chrome, Firefox, Safari, Edge)
+- MongoDB (local or Atlas)
+- ImageKit account (for image optimization)
 
-### Installation
+### 1. Clone Repository
+```bash
+git clone <repo-url>
+cd breathart
+```
 
-1. **Clone and install dependencies:**
-   ```bash
-   npm install
-   ```
+### 2. Backend Setup
 
-2. **Set up environment variables:**
-   - Copy `.env.example` to `.env`
-   - Add your Supabase credentials:
-     ```
-     VITE_SUPABASE_URL=https://your-project.supabase.co
-     VITE_SUPABASE_ANON_KEY=your-anon-key
-     DATABASE_URL=postgres://user:password@db.supabase.co/postgres
-     ```
+```bash
+cd backend
 
-3. **Start the development server:**
-   ```bash
-   npm run dev
-   ```
-   The app will be available at `http://localhost:5173`
+# Install dependencies
+npm install
+
+# Create .env file
+# Copy the required variables from section below
+
+# Start backend (runs on port 3001)
+npm run dev
+```
+
+### 3. Frontend Setup
+
+```bash
+cd ../frontend
+
+# Install dependencies
+npm install
+
+# Create .env.local
+VITE_API_URL=http://localhost:3001/api
+
+# Start development server (runs on port 5173)
+npm run dev
+```
 
 ---
 
-## 📦 Environment Setup
+## 🛠️ Technology Stack
 
-### Required Environment Variables
-
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `VITE_SUPABASE_URL` | Supabase project URL | `https://project.supabase.co` |
-| `VITE_SUPABASE_ANON_KEY` | Supabase anon key (public) | Starts with `eyJ...` |
-| `DATABASE_URL` | Postgres connection string | `postgres://user:pwd@host/db` |
-
-**⚠️ Security Note:** Keep private keys and database passwords in `.env` and never commit them to version control.
+| Component | Technology |
+|-----------|-----------|
+| **Frontend** | React 19, Vite, React Router |
+| **Backend** | Node.js, Express, MongoDB |
+| **Database** | MongoDB (Mongoose ODM) |
+| **Authentication** | JWT + Email verification |
+| **Image Optimization** | ImageKit + Sharp (WebP) |
+| **Email** | Nodemailer (Gmail SMTP) |
+| **Styling** | Tailwind CSS |
+| **Animations** | Framer Motion |
 
 ---
 
-## 🗄️ Database (Drizzle ORM + Supabase)
+## 📦 Environment Variables
 
-### Schema Definition
-- **Location:** [drizzle/schema.ts](drizzle/schema.ts)
-- **Type-safe queries** with Drizzle ORM
-- **Automatic migrations** tracked in `drizzle/migrations/`
-
-### Database Commands
-
-```bash
-# Generate new migration from schema changes
-npm run drizzle:generate
-
-# Apply pending migrations to database
-npm run drizzle:migrate
-
-# View migrations log
-npm run drizzle:status
-
-# Open Prisma Studio (if using Prisma)
-npm run studio
+### Backend (.env)
+```
+PORT=3001
+NODE_ENV=development
+MONGODB_URI=mongodb://localhost:27017/breathart
+JWT_SECRET=your-secret-key-here
+SESSION_SECRET=your-session-secret-here
+EMAIL_SERVICE=gmail
+EMAIL_USER=your-email@gmail.com
+EMAIL_PASSWORD=your-app-password
+IMAGEKIT_PUBLIC_KEY=your-public-key
+IMAGEKIT_PRIVATE_KEY=your-private-key
+IMAGEKIT_URL_ENDPOINT=https://ik.imagekit.io/your-endpoint/
+FRONTEND_URL=http://localhost:5173
 ```
 
-### Connect to Database
-
-Use the Supabase connection string from your `.env`:
-```bash
-psql $DATABASE_URL
+### Frontend (.env.local)
 ```
+VITE_API_URL=http://localhost:3001/api
+```
+
+---
+
+## 📚 Documentation
+
+- **[Backend README](./backend/README.md)** - API endpoints, authentication, database
+- **[Frontend README](./frontend/README.md)** - Components, state management, styling  
+- **[Image Optimization](./backend/WEBP_CONVERSION.md)** - WebP conversion and upload
+
+---
+
+## 🔐 Authentication
+
+- **JWT Authentication** with 7-day expiry
+- **Email Verification** required before login
+- **Password Reset** via email link
+- **HTTP-only Cookies** for session management
+- **Password Hashing** with bcryptjs
 
 ---
 
 ## 📜 NPM Scripts
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start Vite dev server (hot reload) |
-| `npm run build` | Build for production (optimized) |
-| `npm run preview` | Preview production build locally |
-| `npm run lint` | Run ESLint code quality checks |
-| `npm run drizzle:generate` | Generate SQL migration from schema |
-| `npm run drizzle:migrate` | Apply migrations to database |
+### Backend
+```bash
+npm run dev          # Start development server (port 3001)
+npm run start        # Start production server
+```
+
+### Frontend
+```bash
+npm run dev          # Start dev server (port 5173)
+npm run build        # Build for production
+npm run preview      # Preview production build
+```
 
 ---
 
-## 🔐 Authentication Flow
+## 🚀 Deployment
 
-1. **Sign Up** → User registers with email → Verification link sent
-2. **Email Verification** → User clicks link → Session established
-3. **Protected Routes** → Logged-in users redirected from `/auth` → Can view profile details
-4. **Session Persistence** → Token stored in Supabase → Auto-restore on page refresh
-5. **Sign Out** → Clears tokens → Redirects to `/auth`
+### Backend (VPS/Heroku)
+```bash
+npm install
+npm start
+# Configure production .env variables
+```
 
-**Auth Components:**
-- [src/pages/Authentication/Form.jsx](src/pages/Authentication/Form.jsx) – Login/Register form with validation
-- [src/pages/Authentication/Protected.jsx](src/pages/Authentication/Protected.jsx) – Auth gate & user details display
+### Frontend (Vercel/Netlify)
+```bash
+npm run build
+# Deploy dist/ folder
+# Set VITE_API_URL to production API
+```
 
 ---
 
-## 🎨 Component Highlights
+## 🔒 Security
 
-| Component | Purpose |
-|-----------|---------|
-| `Navbar` | Navigation with auth-aware session (avatar + logout) |
-| `Hero` | Animated hero section with CTA |
-| `Courses` | Course listing with filtering |
-| `Placement` | Placement statistics & testimonials |
-| `Footer` | Links and contact info |
-| `Grainient`, `Plasma`, `Aurora` | Advanced animated backgrounds |
-| `RotatingText`, `ShinyText` | Text animation effects |
+✅ **Implemented:**
+- JWT authentication with expiry
+- Email verification required
+- Password hashing with bcryptjs
+- HTTP-only secure cookies
+- CORS protection
+- Helmet security headers
+- Input validation with JOI
 
 ---
 
 ## 🐛 Troubleshooting
 
-### "process is not defined"
-- **Cause:** Using CommonJS `process` in Vite
-- **Fix:** Use `import.meta.env` instead
-
-### Supabase connection errors
-- Verify `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in `.env`
-- Restart dev server after env changes: `npm run dev`
-
-### Migration conflicts
-- Reset migrations: `npm run drizzle:migrate` (applies all migrations in order)
-- Check `drizzle/migrations/` for manual adjustments if needed
-
----
-
-## 🤝 Contributing
-
-1. Create a feature branch: `git checkout -b feature/your-feature`
-2. Make changes and test thoroughly
-3. Commit with descriptive messages: `git commit -m "feat: add new feature"`
-4. Push to your branch and open a pull request
+| Issue | Solution |
+|-------|----------|
+| MongoDB connection error | Ensure MongoDB running: `mongod` |
+| Email not sending | Check EMAIL_USER/PASSWORD in .env |
+| Images not uploading | Verify ImageKit credentials |
+| Frontend can't reach backend | Check VITE_API_URL and CORS |
 
 ---
 
 ## 📝 License
 
-This project is proprietary software. All rights reserved by Breath Art Institute.
+Proprietary software. All rights reserved by Breath Art Institute.
 
 ---
 
-## 📞 Support
-
-For issues, questions, or feature requests, contact the development team or open an issue on the project repository.
-
----
-
-**Last Updated:** March 2026  
-**Built with ❤️ by Breath Art Institute**
+**Last Updated:** March 2026

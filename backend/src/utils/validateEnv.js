@@ -27,7 +27,7 @@ const REQUIRED_ENV_VARS = {
   EMAIL_SERVICE: { required: true, type: 'string', description: 'Email service provider' },
   EMAIL_USER: { required: true, type: 'string', description: 'Email service username' },
   EMAIL_PASSWORD: { required: true, type: 'string', description: 'Email service password' },
-  EMAIL_FROM: { required: false, type: 'string', description: 'Email from address' },
+  FROM_EMAIL: { required: false, type: 'string', description: 'Email from address' },
   SUPPORT_EMAIL: { required: false, type: 'string', description: 'Support email address' },
 
   // ImageKit

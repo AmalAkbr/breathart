@@ -57,8 +57,8 @@ export const env = {
   EMAIL_SERVICE: process.env.EMAIL_SERVICE || 'gmail',
   EMAIL_USER: process.env.EMAIL_USER,
   EMAIL_PASSWORD: process.env.EMAIL_PASSWORD,
-  EMAIL_FROM_NAME: process.env.EMAIL_FROM_NAME || 'Breath Art Institute',
-  EMAIL_FROM_EMAIL: process.env.EMAIL_FROM_EMAIL || 'noreply@breathart.com',
+  FROM_EMAIL_NAME: process.env.FROM_EMAIL_NAME || 'Breath Art Institute',
+  FROM_EMAIL: process.env.FROM_EMAIL || 'noreply@breathart.com',
 
   // ImageKit
   IMAGEKIT_PUBLIC_KEY: process.env.IMAGEKIT_PUBLIC_KEY,

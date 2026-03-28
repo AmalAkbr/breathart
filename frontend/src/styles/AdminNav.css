@@ -301,7 +301,7 @@
 
 /* Logout Button */
 .logout-button,
-.home-button {
+.home-button,.film-button {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -324,6 +324,12 @@
   border-color: rgba(102, 234, 234, 0.4);
   color: #fca5f5;
   box-shadow: 0 4px 12px rgba(102, 197, 234, 0.2);
+}
+.film-button {
+  background: rgba(141, 173, 241, 0.15);
+  border-color: rgba(89, 68, 207, 0.4);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(47, 34, 160, 0.2);
 }
 .home-button:hover {
   background: rgba(102, 234, 212, 0.15);

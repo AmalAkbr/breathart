@@ -27,16 +27,18 @@ export const getAllExams = async (req, res) => {
 export const getExamDetail = async (req, res) => {
   try {
     const { id } = req.params;
-    const { exam, participants } = await examService.getExamWithParticipants(id);
+    const adminId = req.admin._id;
+
+    const { exam, participants } = await examService.getExamWithParticipants(id, adminId);
     res.json({
       success: true,
       data: { exam, participants }
     });
   } catch (error) {
     console.error('Error fetching exam:', error);
-    res.status(404).json({
+    res.status(error.message.includes('permission') ? 403 : 404).json({
       success: false,
-      message: 'Exam not found',
+      message: error.message || 'Exam not found',
       error: error.message
     });
   }
@@ -104,6 +106,7 @@ export const addParticipants = async (req, res) => {
   try {
     const { id } = req.params;
     const { studentIds } = req.body;
+    const adminId = req.admin._id;
 
     if (!studentIds || !Array.isArray(studentIds) || studentIds.length === 0) {
       return res.status(400).json({
@@ -112,7 +115,7 @@ export const addParticipants = async (req, res) => {
       });
     }
 
-    const participants = await examService.addParticipants(id, studentIds);
+    const participants = await examService.addParticipants(id, studentIds, adminId);
 
     res.status(201).json({
       success: true,
@@ -121,7 +124,7 @@ export const addParticipants = async (req, res) => {
     });
   } catch (error) {
     console.error('Error adding participants:', error);
-    res.status(500).json({
+    res.status(error.message.includes('permission') ? 403 : 500).json({
       success: false,
       message: 'Error adding participants',
       error: error.message
@@ -136,7 +139,9 @@ export const sendInvitations = async (req, res) => {
   try {
     const { id } = req.params;
     const { studentIds } = req.body || {};
-    const result = await examService.sendExamInvitations(id, studentIds);
+    const adminId = req.admin._id;
+
+    const result = await examService.sendExamInvitations(id, studentIds, adminId);
 
     res.json({
       success: true,
@@ -148,7 +153,7 @@ export const sendInvitations = async (req, res) => {
     });
   } catch (error) {
     console.error('Error sending invitations:', error);
-    res.status(500).json({
+    res.status(error.message.includes('permission') ? 403 : 500).json({
       success: false,
       message: 'Error sending invitations',
       error: error.message
@@ -162,7 +167,9 @@ export const sendInvitations = async (req, res) => {
 export const updateExam = async (req, res) => {
   try {
     const { id } = req.params;
-    const exam = await examService.updateExam(id, req.body);
+    const adminId = req.admin._id;
+
+    const exam = await examService.updateExam(id, req.body, adminId);
 
     res.json({
       success: true,
@@ -171,7 +178,7 @@ export const updateExam = async (req, res) => {
     });
   } catch (error) {
     console.error('Error updating exam:', error);
-    res.status(500).json({
+    res.status(error.message.includes('permission') ? 403 : 500).json({
       success: false,
       message: 'Error updating exam',
       error: error.message
@@ -185,7 +192,9 @@ export const updateExam = async (req, res) => {
 export const deleteExam = async (req, res) => {
   try {
     const { id } = req.params;
-    await examService.deleteExam(id);
+    const adminId = req.admin._id;
+
+    await examService.deleteExam(id, adminId);
 
     res.json({
       success: true,
@@ -193,7 +202,7 @@ export const deleteExam = async (req, res) => {
     });
   } catch (error) {
     console.error('Error deleting exam:', error);
-    res.status(500).json({
+    res.status(error.message.includes('permission') ? 403 : 500).json({
       success: false,
       message: 'Error deleting exam',
       error: error.message

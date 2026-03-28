@@ -15,6 +15,14 @@ import adminRoutes from './routes/admin.js';
 
 // Import middleware
 import { errorHandler, notFoundHandler } from './middleware/auth.js';
+import { 
+  generalLimiter, 
+  authLimiter, 
+  emailVerificationLimiter, 
+  passwordResetLimiter,
+  uploadLimiter,
+  adminLimiter 
+} from './middleware/rateLimit.js';
 
 // Import cron job service
 import { initCleanupCron } from './services/cropJobService.js';
@@ -41,19 +49,50 @@ try {
 }
 
 // ==============================================
-// SECURITY MIDDLEWARE
+// SECURITY MIDDLEWARE - HELMET CONFIGURATION
 // ==============================================
 
-app.use(helmet());
+// Enhanced helmet with strict CSP and security headers
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"], // Adjust as needed
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:", "https:"],
+      connectSrc: ["'self'", env.FRONTEND_URL],
+      frameSrc: ["'none'"], // Prevent clickjacking
+      objectSrc: ["'none'"],
+      upgradeInsecureRequests: [],
+    },
+  },
+  crossOriginEmbedderPolicy: true,
+  crossOriginOpenerPolicy: true,
+  crossOriginResourcePolicy: { policy: "cross-origin" },
+  dnsPrefetchControl: true,
+  frameguard: { action: 'deny' },
+  hidePoweredBy: true,
+  hsts: {
+    maxAge: 31536000, // 1 year
+    includeSubDomains: true,
+    preload: true,
+  },
+  ieNoOpen: true,
+  noSniff: true,
+  referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+  xssFilter: true,
+}));
+
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(cookieParser());
 
-console.log('✅ Security middleware configured');
+console.log('✅ Security middleware configured with helmet');
 
 // ==============================================
-// CORS CONFIGURATION
+// CORS CONFIGURATION (MUST BE BEFORE RATE LIMITING)
 // ==============================================
+// CORS must be applied before rate limiters to allow OPTIONS preflight requests
 
 const allowedOrigins = [
   env.FRONTEND_URL,
@@ -63,18 +102,44 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
+    const isAllowed = !origin || allowedOrigins.includes(origin);
+    if (isAllowed) {
       callback(null, true);
     } else {
+      console.warn(`❌ CORS blocked origin: ${origin}`);
       callback(new Error('CORS not allowed'));
     }
   },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token'],
+  optionsSuccessStatus: 200, // For compatibility with older browsers
 }));
 
-console.log('✅ CORS configured');
+console.log('✅ CORS configured for origins:', allowedOrigins);
+
+// ==============================================
+// RATE LIMITING MIDDLEWARE
+// ==============================================
+// Applied AFTER CORS so preflight OPTIONS requests are never rate limited
+
+// Apply general rate limiter to all requests (but not OPTIONS)
+app.use((req, res, next) => {
+  if (req.method === 'OPTIONS') {
+    return next(); // Skip rate limiting for preflight requests
+  }
+  generalLimiter(req, res, next);
+});
+
+// Apply strict rate limiter to admin endpoints (but not OPTIONS)
+app.use('/api/admin', (req, res, next) => {
+  if (req.method === 'OPTIONS') {
+    return next(); // Skip rate limiting for preflight requests
+  }
+  adminLimiter(req, res, next);
+});
+
+console.log('✅ Rate limiting configured');
 
 // ==============================================
 // REQUEST LOGGING

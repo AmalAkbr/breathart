@@ -14,6 +14,11 @@ import {
   validateRequest,
   validationSchemas,
 } from '../middleware/auth.js';
+import {
+  authLimiter,
+  emailVerificationLimiter,
+  passwordResetLimiter,
+} from '../middleware/rateLimit.js';
 
 const router = express.Router();
 
@@ -21,40 +26,49 @@ const router = express.Router();
  * Public Routes
  */
 
-// POST /api/auth/signup
+// POST /api/auth/signup (Rate limited: 5 attempts per 15 min)
 router.post(
   '/signup',
+  authLimiter,
   validateRequest(validationSchemas.signup),
   signup
 );
 
-// POST /api/auth/login
+// POST /api/auth/login (Rate limited: 5 attempts per 15 min)
 router.post(
   '/login',
+  authLimiter,
   validateRequest(validationSchemas.login),
   login
 );
 
-// POST /api/auth/verify-email
-router.post('/verify-email', verifyEmail);
+// POST /api/auth/verify-email (Rate limited: 3 attempts per hour)
+router.post(
+  '/verify-email',
+  emailVerificationLimiter,
+  verifyEmail
+);
 
-// POST /api/auth/forgot-password
+// POST /api/auth/forgot-password (Rate limited: 3 attempts per 30 min)
 router.post(
   '/forgot-password',
+  passwordResetLimiter,
   validateRequest(validationSchemas.forgotPassword),
   forgotPassword
 );
 
-// POST /api/auth/reset-password
+// POST /api/auth/reset-password (Rate limited: 3 attempts per 30 min)
 router.post(
   '/reset-password',
+  passwordResetLimiter,
   validateRequest(validationSchemas.resetPassword),
   resetPassword
 );
 
-// POST /api/auth/resend-verification
+// POST /api/auth/resend-verification (Rate limited: 3 attempts per hour)
 router.post(
   '/resend-verification',
+  emailVerificationLimiter,
   validateRequest(validationSchemas.forgotPassword),
   resendVerificationEmail
 );

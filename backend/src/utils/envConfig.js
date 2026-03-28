@@ -59,7 +59,7 @@ export const emailConfig = {
   service: env.EMAIL_SERVICE,
   user: env.EMAIL_USER,
   password: env.EMAIL_PASSWORD,
-  from: env.EMAIL_FROM || env.EMAIL_USER,
+  from: env.FROM_EMAIL || env.EMAIL_USER,
   supportEmail: env.SUPPORT_EMAIL
 };
 

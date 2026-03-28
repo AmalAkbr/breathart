@@ -1,5 +1,5 @@
 import { User } from '../models/User.js';
-import { sendVerificationEmail, sendPasswordResetEmail } from '../utils/emailService.js';
+import { sendVerificationEmail, sendPasswordResetEmail } from '../services/emailService.js';
 import jwt from 'jsonwebtoken';
 import { env } from '../utils/envConfig.js';
 import crypto from 'crypto';
@@ -26,10 +26,10 @@ export const signup = async (req, res) => {
       });
     }
 
-    if (password.length < 6) {
+    if (password.length < 8) {
       return res.status(400).json({
         success: false,
-        message: 'Password must be at least 6 characters long'
+        message: 'Password must be at least 8 characters long'
       });
     }
 
@@ -75,7 +75,7 @@ export const signup = async (req, res) => {
     const token = jwt.sign(
       { userId: user._id, email: user.email, role: user.role, isAdmin: user.isAdmin },
       env.JWT_SECRET,
-      { expiresIn: env.JWT_EXPIRE || '7d' }
+      { expiresIn: env.JWT_EXPIRY || '7d' }
     );
 
     // Set secure HTTP-only cookie
@@ -171,7 +171,7 @@ export const verifyEmail = async (req, res) => {
     const token = jwt.sign(
       { userId: user._id, email: user.email, role: user.role, isAdmin: user.isAdmin },
       env.JWT_SECRET,
-      { expiresIn: env.JWT_EXPIRE || '7d' }
+      { expiresIn: env.JWT_EXPIRY || '7d' }
     );
 
     // Set secure HTTP-only cookie
@@ -254,7 +254,7 @@ export const login = async (req, res) => {
     if (!user.isActive) {
       return res.status(403).json({
         success: false,
-        message: 'Your account has been deactivated'
+        message: 'Your account has been deactivated, Please contact admin'
       });
     }
 
@@ -269,7 +269,7 @@ export const login = async (req, res) => {
         isAdmin: user.isAdmin,
       },
       env.JWT_SECRET,
-      { expiresIn: '7d' }
+      { expiresIn: env.JWT_EXPIRY || '7d' }
     );
 
     // Update last login

@@ -417,11 +417,9 @@ const CreateExam = () => {
           </div>
         </div>
 
-        <div className="form-actions">
           <button type="submit" className="btn btn--primary" disabled={loading || selectedStudents.size === 0}>
             {loading ? 'Creating & Sending...' : 'Create Exam & Send Emails'}
           </button>
-        </div>
       </form>
 
       {inviteResult && (
