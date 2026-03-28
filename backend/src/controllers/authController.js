@@ -1,4 +1,6 @@
 import { User } from '../models/User.js';
+import { Exam } from '../models/Exam.js';
+import { ExamParticipant } from '../models/ExamParticipant.js';
 import { sendVerificationEmail, sendPasswordResetEmail } from '../services/emailService.js';
 import jwt from 'jsonwebtoken';
 import { env } from '../utils/envConfig.js';
@@ -537,6 +539,56 @@ export const getProfile = async (req, res) => {
       success: false,
       message: 'Error fetching profile',
       error: error.message
+    });
+  }
+};
+
+/**
+ * GET /api/auth/exam-notifications - Get exam notifications for logged-in user
+ */
+export const getExamNotifications = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+
+    const participants = await ExamParticipant.find({
+      userId,
+      emailSent: true,
+    })
+      .sort({ emailSentAt: -1, createdAt: -1 })
+      .populate({
+        path: 'examId',
+        model: Exam,
+        select: 'title description googleFormLink startDate endDate status createdAt updatedAt',
+      })
+      .lean();
+
+    const notifications = participants
+      .filter((participant) => participant.examId)
+      .map((participant) => ({
+        participantId: participant._id,
+        examId: participant.examId._id,
+        title: participant.examId.title,
+        description: participant.examId.description,
+        googleFormLink: participant.examId.googleFormLink,
+        startDate: participant.examId.startDate,
+        endDate: participant.examId.endDate,
+        examStatus: participant.examId.status,
+        emailSentAt: participant.emailSentAt,
+        submitted: participant.submitted,
+        submittedAt: participant.submittedAt,
+        createdAt: participant.createdAt,
+      }));
+
+    return res.json({
+      success: true,
+      data: notifications,
+    });
+  } catch (error) {
+    console.error('[GET EXAM NOTIFICATIONS] Error:', error.message);
+    return res.status(500).json({
+      success: false,
+      message: 'Error fetching exam notifications',
+      error: error.message,
     });
   }
 };

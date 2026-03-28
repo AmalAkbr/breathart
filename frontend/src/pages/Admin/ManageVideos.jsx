@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Edit2, Trash2, Search, Loader, Filter, Clock, Play, Layers, X } from 'lucide-react';
 import { getAuthToken } from '../../utils/apiClient';
 import { toast } from '../../utils/toast';
+import { getVideoDurationInSecondsFromFile } from '../../utils/videoDuration';
 import '../../styles/ManageVideos.css';
 
 const ManageVideos = () => {
@@ -23,6 +24,8 @@ const ManageVideos = () => {
     thumbnailFileId: '',
   });
   const [uploading, setUploading] = useState({ thumbnail: false, video: false });
+  const [uploadProgress, setUploadProgress] = useState({ video: 0, loaded: 0, total: 0 });
+  const [uploadStage, setUploadStage] = useState('uploading');
   const isVideoUploading = uploading.video;
 
   useEffect(() => {
@@ -97,6 +100,66 @@ const ManageVideos = () => {
     const { name, value } = e.target;
     setEditForm((prev) => ({ ...prev, [name]: value }));
   };
+
+  const formatBytes = (bytes = 0) => {
+    if (!bytes || bytes <= 0) return '0 B';
+    const units = ['B', 'KB', 'MB', 'GB'];
+    const index = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1);
+    const value = bytes / (1024 ** index);
+    return `${value.toFixed(index === 0 ? 0 : 1)} ${units[index]}`;
+  };
+
+  const uploadWithProgress = (url, formDataObj, token, onProgress, onStageChange) =>
+    new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', url, true);
+      xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+
+      xhr.upload.onloadstart = () => {
+        onStageChange?.('uploading');
+      };
+
+      xhr.upload.onprogress = (event) => {
+        if (!event.lengthComputable) return;
+
+        const percent = Math.round((event.loaded / event.total) * 100);
+        onProgress?.({
+          percent,
+          loaded: event.loaded,
+          total: event.total,
+        });
+      };
+
+      xhr.upload.onload = () => {
+        onStageChange?.('processing');
+      };
+
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          try {
+            onStageChange?.('completed');
+            resolve(JSON.parse(xhr.responseText));
+          } catch {
+            reject(new Error('Invalid response from server'));
+          }
+          return;
+        }
+
+        let message = `Upload failed (${xhr.status})`;
+        try {
+          const parsed = JSON.parse(xhr.responseText);
+          if (parsed?.error) {
+            message = parsed.error;
+          }
+        } catch {
+          // Ignore JSON parse errors and keep default message
+        }
+        reject(new Error(message));
+      };
+
+      xhr.onerror = () => reject(new Error('Network error during upload'));
+      xhr.send(formDataObj);
+    });
 
   const saveEdit = async (override = {}) => {
     try {
@@ -177,29 +240,73 @@ const ManageVideos = () => {
     if (!file) return;
     try {
       setUploading((p) => ({ ...p, video: true }));
+      setUploadStage('uploading');
+      setUploadProgress({
+        video: 0,
+        loaded: 0,
+        total: file.size || 0,
+      });
+
       const token = getAuthToken();
       const fd = new FormData();
       fd.append('video', file);
       fd.append('title', editForm.title || 'video');
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/upload/video-file`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
-        body: fd,
-      });
-      const data = await res.json();
-      if (!res.ok || !data.success) throw new Error(data.error || 'Video upload failed');
+
+      const shouldAutoFillDuration = !Number(editForm.duration);
+      const detectedDuration = shouldAutoFillDuration
+        ? await getVideoDurationInSecondsFromFile(file)
+        : 0;
+
+      const data = await uploadWithProgress(
+        `${import.meta.env.VITE_API_URL}/upload/video-file`,
+        fd,
+        token,
+        ({ percent, loaded, total }) => {
+          setUploadProgress({
+            video: Math.min(percent, 99),
+            loaded,
+            total,
+          });
+        },
+        (stage) => setUploadStage(stage)
+      );
+
+      if (!data?.success) {
+        throw new Error(data?.error || 'Video upload failed');
+      }
+
       setEditForm((prev) => ({
         ...prev,
         videoUrl: data.data.videoUrl,
+        duration: !Number(prev.duration) && detectedDuration > 0
+          ? detectedDuration
+          : prev.duration,
       }));
+
       // Persist immediately so the new video URL is saved
-      await saveEdit({ videoUrl: data.data.videoUrl, __silent: true });
-      toast.success('Video updated');
+      const savePayload = { videoUrl: data.data.videoUrl, __silent: true };
+      if (shouldAutoFillDuration && detectedDuration > 0) {
+        savePayload.duration = detectedDuration;
+      }
+      await saveEdit(savePayload);
+
+      setUploadProgress((prev) => ({
+        ...prev,
+        video: 100,
+      }));
+
+      toast.success(
+        shouldAutoFillDuration && detectedDuration > 0
+          ? 'Video updated and duration auto-filled'
+          : 'Video updated'
+      );
     } catch (err) {
       console.error('Video upload error:', err);
       toast.error(err.message || 'Video upload failed');
     } finally {
       setUploading((p) => ({ ...p, video: false }));
+      setUploadStage('uploading');
+      setUploadProgress({ video: 0, loaded: 0, total: 0 });
     }
   };
 
@@ -409,9 +516,25 @@ const ManageVideos = () => {
         <div className="upload-overlay" role="status" aria-live="polite">
           <div className="upload-overlay__panel">
             <Loader className="spin" size={28} />
-            <div>
+            <div className="upload-overlay__content">
               <p className="upload-title">Uploading video…</p>
-              <p className="upload-hint">Please wait — controls are locked while we save your file.</p>
+              <p className="upload-hint">
+                {uploadStage === 'processing'
+                  ? 'Upload complete. Processing and saving on server...'
+                  : 'Please wait — controls are locked while we save your file.'}
+              </p>
+              <div className="upload-progress-track" aria-hidden="true">
+                <div
+                  className="upload-progress-fill"
+                  style={{ width: `${uploadProgress.video}%` }}
+                />
+              </div>
+              <div className="upload-progress-meta">
+                <span>{uploadProgress.video}%</span>
+                <span>
+                  {formatBytes(uploadProgress.loaded)} / {formatBytes(uploadProgress.total)}
+                </span>
+              </div>
             </div>
           </div>
         </div>

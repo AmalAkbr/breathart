@@ -1,51 +1,54 @@
 // frontend/src/pages/Admin/exams/CreateExam.jsx
-import React, { useState, useEffect, useMemo } from 'react';
-import { Users, AlertCircle, CheckCircle, Search } from 'lucide-react';
-import { getAuthToken } from '../../../utils/apiClient';
-import { toast } from '../../../utils/toast';
-import '../../../styles/CreateExam.css';
+import React, { useState, useEffect, useMemo } from "react";
+import { Users, AlertCircle, CheckCircle, Search } from "lucide-react";
+import { getAuthToken } from "../../../utils/apiClient";
+import { toast } from "../../../utils/toast";
+import "../../../styles/CreateExam.css";
 
 const CreateExam = () => {
   const [examData, setExamData] = useState({
-    title: '',
-    googleFormLink: '',
-    description: '',
-    startDate: '',
-    endDate: '',
+    title: "",
+    googleFormLink: "",
+    description: "",
+    startDate: "",
+    endDate: "",
   });
 
   const [students, setStudents] = useState([]);
   const [selectedStudents, setSelectedStudents] = useState(new Set());
-  const [studentSearch, setStudentSearch] = useState('');
+  const [studentSearch, setStudentSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
   const [inviteResult, setInviteResult] = useState(null);
-  const [createdExamTitle, setCreatedExamTitle] = useState('');
+  const [createdExamTitle, setCreatedExamTitle] = useState("");
 
   const getAuthHeaders = (includeJson = false) => {
     const token = getAuthToken();
     const headers = {};
-    if (includeJson) headers['Content-Type'] = 'application/json';
+    if (includeJson) headers["Content-Type"] = "application/json";
     if (token) headers.Authorization = `Bearer ${token}`;
     return headers;
   };
 
   const normalizeStudent = (student) => ({
     id: student?._id || student?.id,
-    fullName: student?.fullName || student?.full_name || 'Unknown',
-    email: student?.email || '',
+    fullName: student?.fullName || student?.full_name || "Unknown",
+    email: student?.email || "",
   });
 
   useEffect(() => {
     const loadStudents = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/admin/students`, {
-          headers: getAuthHeaders(),
-        });
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/admin/students`,
+          {
+            headers: getAuthHeaders(),
+          },
+        );
 
-        if (!response.ok) throw new Error('Failed to fetch students');
+        if (!response.ok) throw new Error("Failed to fetch students");
 
         const data = await response.json();
         const list = data?.data || data?.students || [];
@@ -56,7 +59,6 @@ const CreateExam = () => {
         setLoading(false);
       }
     };
-
     loadStudents();
   }, []);
 
@@ -75,28 +77,30 @@ const CreateExam = () => {
     const description = examData.description.trim();
     const { startDate, endDate } = examData;
 
-    if (!title) return setError('Exam title is required'), false;
-    if (!googleFormLink) return setError('Google Form link is required'), false;
-    if (!description) return setError('Description is required'), false;
-    if (selectedStudents.size === 0) return setError('Select at least one participant'), false;
-    if (!startDate) return setError('Start date is required'), false;
-    if (!endDate) return setError('End date is required'), false;
+    if (!title) return (setError("Exam title is required"), false);
+    if (!googleFormLink)
+      return (setError("Google Form link is required"), false);
+    if (!description) return (setError("Description is required"), false);
+    if (selectedStudents.size === 0)
+      return (setError("Select at least one participant"), false);
+    if (!startDate) return (setError("Start date is required"), false);
+    if (!endDate) return (setError("End date is required"), false);
 
     try {
       new URL(googleFormLink);
     } catch {
-      setError('Invalid Google Form URL');
+      setError("Invalid Google Form URL");
       return false;
     }
 
     const start = new Date(startDate);
     const end = new Date(endDate);
     if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
-      setError('Please enter valid start and end dates');
+      setError("Please enter valid start and end dates");
       return false;
     }
     if (start >= end) {
-      setError('End date must be after start date');
+      setError("End date must be after start date");
       return false;
     }
     return true;
@@ -121,20 +125,25 @@ const CreateExam = () => {
     setInviteResult(null);
 
     try {
-      const createResponse = await fetch(`${import.meta.env.VITE_API_URL}/admin/exams`, {
-        method: 'POST',
-        headers: getAuthHeaders(true),
-        body: JSON.stringify({
-          title: examData.title.trim(),
-          googleFormLink: examData.googleFormLink.trim(),
-          description: examData.description.trim(),
-          startDate: examData.startDate,
-          endDate: examData.endDate,
-        }),
-      });
+      const createResponse = await fetch(
+        `${import.meta.env.VITE_API_URL}/admin/exams`,
+        {
+          method: "POST",
+          headers: getAuthHeaders(true),
+          body: JSON.stringify({
+            title: examData.title.trim(),
+            googleFormLink: examData.googleFormLink.trim(),
+            description: examData.description.trim(),
+            startDate: examData.startDate,
+            endDate: examData.endDate,
+          }),
+        },
+      );
 
       if (!createResponse.ok) {
-        throw new Error(await parseApiError(createResponse, 'Failed to create exam'));
+        throw new Error(
+          await parseApiError(createResponse, "Failed to create exam"),
+        );
       }
 
       const created = await createResponse.json();
@@ -142,7 +151,7 @@ const CreateExam = () => {
       const examId = exam?._id || exam?.id;
 
       if (!examId) {
-        throw new Error('Exam created but ID not returned');
+        throw new Error("Exam created but ID not returned");
       }
 
       const studentIds = Array.from(selectedStudents);
@@ -150,52 +159,60 @@ const CreateExam = () => {
       const addParticipantsResponse = await fetch(
         `${import.meta.env.VITE_API_URL}/admin/exams/${examId}/add-participants`,
         {
-          method: 'POST',
+          method: "POST",
           headers: getAuthHeaders(true),
           body: JSON.stringify({ studentIds }),
-        }
+        },
       );
 
       if (!addParticipantsResponse.ok) {
-        throw new Error(await parseApiError(addParticipantsResponse, 'Failed to add participants'));
+        throw new Error(
+          await parseApiError(
+            addParticipantsResponse,
+            "Failed to add participants",
+          ),
+        );
       }
 
       const sendResponse = await fetch(
         `${import.meta.env.VITE_API_URL}/admin/exams/${examId}/send-invitations`,
         {
-          method: 'POST',
+          method: "POST",
           headers: getAuthHeaders(true),
           body: JSON.stringify({ studentIds }),
-        }
+        },
       );
 
       if (!sendResponse.ok) {
-        throw new Error(await parseApiError(sendResponse, 'Failed to send invitations'));
+        throw new Error(
+          await parseApiError(sendResponse, "Failed to send invitations"),
+        );
       }
 
       const invitationPayload = await sendResponse.json();
-      const results = invitationPayload?.data?.results || invitationPayload?.results || { success: [], failed: [] };
+      const results = invitationPayload?.data?.results ||
+        invitationPayload?.results || { success: [], failed: [] };
 
       setInviteResult(results);
       setCreatedExamTitle(exam.title || examData.title.trim());
       setSuccess(true);
 
       toast.success(
-        `Exam created and invitations sent. Success: ${results.success?.length || 0}, Failed: ${results.failed?.length || 0}`
+        `Exam created and invitations sent. Success: ${results.success?.length || 0}, Failed: ${results.failed?.length || 0}`,
       );
 
       setExamData({
-        title: '',
-        googleFormLink: '',
-        description: '',
-        startDate: '',
-        endDate: '',
+        title: "",
+        googleFormLink: "",
+        description: "",
+        startDate: "",
+        endDate: "",
       });
-      setStudentSearch('');
+      setStudentSearch("");
       setSelectedStudents(new Set());
     } catch (err) {
       setError(err.message);
-      toast.error(err.message || 'Failed to create exam and send invitations');
+      toast.error(err.message || "Failed to create exam and send invitations");
     } finally {
       setLoading(false);
     }
@@ -219,14 +236,15 @@ const CreateExam = () => {
 
   const handleClearSelection = () => setSelectedStudents(new Set());
 
-  const filteredStudents = students.filter((student) =>
-    student.fullName.toLowerCase().includes(studentSearch.toLowerCase()) ||
-    student.email.toLowerCase().includes(studentSearch.toLowerCase())
+  const filteredStudents = students.filter(
+    (student) =>
+      student.fullName.toLowerCase().includes(studentSearch.toLowerCase()) ||
+      student.email.toLowerCase().includes(studentSearch.toLowerCase()),
   );
 
   const selectedStudentList = useMemo(
     () => students.filter((student) => selectedStudents.has(student.id)),
-    [students, selectedStudents]
+    [students, selectedStudents],
   );
 
   return (
@@ -236,7 +254,9 @@ const CreateExam = () => {
           <Users size={32} />
         </div>
         <h1>Create Exam</h1>
-        <p className="step-indicator">Create exam + pick participants + send emails in one click</p>
+        <p className="step-indicator">
+          Create exam + pick participants + send emails in one click
+        </p>
       </header>
 
       {error && (
@@ -293,14 +313,16 @@ const CreateExam = () => {
             placeholder="Enter exam description"
             disabled={loading}
             required
-            rows={4}
+            rows={3}
           />
         </div>
 
         <div className="participants-section">
           <div className="participants-head">
             <h3>Select Participants</h3>
-            <p>Click a student name to add/remove. Hover a name to view email.</p>
+            <p>
+              Click a student name to add/remove. Hover a name to view email.
+            </p>
           </div>
 
           <div className="participants-toolbar">
@@ -317,10 +339,18 @@ const CreateExam = () => {
             <div className="students-count">
               Selected: {selectedStudents.size} / {students.length}
               <div className="bulk-actions">
-                <button type="button" onClick={handleBulkSelect} disabled={filteredStudents.length === 0}>
+                <button
+                  type="button"
+                  onClick={handleBulkSelect}
+                  disabled={filteredStudents.length === 0}
+                >
                   Select visible
                 </button>
-                <button type="button" onClick={handleClearSelection} disabled={selectedStudents.size === 0}>
+                <button
+                  type="button"
+                  onClick={handleClearSelection}
+                  disabled={selectedStudents.size === 0}
+                >
                   Clear
                 </button>
               </div>
@@ -329,7 +359,9 @@ const CreateExam = () => {
 
           <div className="selected-chips">
             {selectedStudentList.length === 0 ? (
-              <span className="selected-empty">No participants selected yet</span>
+              <span className="selected-empty">
+                No participants selected yet
+              </span>
             ) : (
               selectedStudentList.map((student) => (
                 <button
@@ -364,7 +396,9 @@ const CreateExam = () => {
                     return (
                       <tr
                         key={student.id}
-                        className={selected ? 'student-row selected' : 'student-row'}
+                        className={
+                          selected ? "student-row selected" : "student-row"
+                        }
                         onClick={() => handleStudentToggle(student.id)}
                       >
                         <td>
@@ -376,7 +410,10 @@ const CreateExam = () => {
                           />
                         </td>
                         <td>
-                          <span className="student-name-hover" title={student.email}>
+                          <span
+                            className="student-name-hover"
+                            title={student.email}
+                          >
                             {student.fullName}
                           </span>
                         </td>
@@ -417,9 +454,13 @@ const CreateExam = () => {
           </div>
         </div>
 
-          <button type="submit" className="btn btn--primary" disabled={loading || selectedStudents.size === 0}>
-            {loading ? 'Creating & Sending...' : 'Create Exam & Send Emails'}
-          </button>
+        <button
+          type="submit"
+          className="btn btn--primary"
+          disabled={loading || selectedStudents.size === 0}
+        >
+          {loading ? "Creating & Sending..." : "Create Exam & Send Emails"}
+        </button>
       </form>
 
       {inviteResult && (

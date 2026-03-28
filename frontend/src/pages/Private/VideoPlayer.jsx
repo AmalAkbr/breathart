@@ -1,21 +1,20 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { X, Play, Pause, Volume2, VolumeX } from 'lucide-react';
 import { getAuthToken, videoAPI } from '../../utils/apiClient';
 import { toast } from '../../utils/toast';
+import SecurityBlankScreen from '../../components/SecurityBlankScreen';
+import { useDevtoolsShield } from '../../hooks/useDevtoolsShield';
 
 const VideoPlayer = () => {
   const { videoId } = useParams();
   const navigate = useNavigate();
-  const isProdEnv =
-    (import.meta.env && import.meta.env.VITE_NODE_ENV === 'production') ||
-    import.meta.env?.VITE_NODE_ENV === 'production';
+  const { isProduction: isProdEnv, isDevtoolsOpen } = useDevtoolsShield();
   const [video, setVideo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const videoRef = useRef(null);
   const playerRef = useRef(null);
-  const devtoolsCheckIntervalRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -39,78 +38,16 @@ const VideoPlayer = () => {
   const handlePlayEvt = () => setIsPlaying(true);
   const handlePauseEvt = () => setIsPlaying(false);
 
-  // Handle DevTools Detection
-  const handleDevtoolsDetected = useCallback(() => {
-    console.error('❌ Developer tools detected. Access denied.');
-    if (devtoolsCheckIntervalRef.current) {
-      clearInterval(devtoolsCheckIntervalRef.current);
-    }
-    alert('⚠️ Developer tools are not allowed. Returning to home page.');
-    navigate('/', { replace: true });
-  }, [navigate]);
 
-  // DevTools Detection
   useEffect(() => {
-    if (!isProdEnv) return undefined;
+    if (!isProdEnv || !isDevtoolsOpen) {
+      return;
+    }
 
-    // Disable right-click context menu
-    const handleContextMenu = (e) => {
-      e.preventDefault();
-      return false;
-    };
-
-    // Disable F12, Ctrl+Shift+I, Ctrl+Shift+C, Ctrl+Shift+K
-    const handleKeyDown = (e) => {
-      if (
-        e.key === 'F12' ||
-        (e.ctrlKey && e.shiftKey && e.key === 'I') ||
-        (e.ctrlKey && e.shiftKey && e.key === 'C') ||
-        (e.ctrlKey && e.shiftKey && e.key === 'K') ||
-        (e.ctrlKey && e.shiftKey && e.key === 'J')
-      ) {
-        e.preventDefault();
-        handleDevtoolsDetected();
-        return false;
-      }
-    };
-
-    // Detect if DevTools is already open
-    const checkDevtools = () => {
-      const devtools = { open: false };
-      const threshold = 160;
-
-      const check = () => {
-        if (window.outerWidth - window.innerWidth > threshold ||
-            window.outerHeight - window.innerHeight > threshold) {
-          if (!devtools.open) {
-            devtools.open = true;
-            handleDevtoolsDetected();
-          }
-        } else {
-          devtools.open = false;
-        }
-      };
-
-      return check;
-    };
-
-    const devtoolsCheck = checkDevtools();
-
-    // Event listeners
-    document.addEventListener('contextmenu', handleContextMenu);
-    document.addEventListener('keydown', handleKeyDown);
-    
-    // Check for devtools periodically
-    devtoolsCheckIntervalRef.current = setInterval(devtoolsCheck, 500);
-
-    return () => {
-      document.removeEventListener('contextmenu', handleContextMenu);
-      document.removeEventListener('keydown', handleKeyDown);
-      if (devtoolsCheckIntervalRef.current) {
-        clearInterval(devtoolsCheckIntervalRef.current);
-      }
-    };
-  }, [handleDevtoolsDetected, navigate, isProdEnv]);
+    if (videoRef.current) {
+      videoRef.current.pause();
+    }
+  }, [isDevtoolsOpen, isProdEnv]);
 
   // Check authentication and fetch video
   useEffect(() => {
@@ -263,6 +200,10 @@ const VideoPlayer = () => {
       videoRef.current.playbackRate = val;
     }
   };
+
+  if (isProdEnv && isDevtoolsOpen) {
+    return <SecurityBlankScreen />;
+  }
 
   if (loading) {
     return (

@@ -16,6 +16,36 @@ A modern, high-performance educational and marketing platform combining React fr
 
 ---
 
+## ✨ Key Features
+
+### 🎥 Video Upload & Management
+- **Real-time Upload Progress** - Byte-accurate progress tracking (capped at 99% during transfer, 100% on success)
+- **Network Speed Check** - Automatic pre-upload diagnostics for download speed & backend connectivity
+- **Smart Slow Network Handling** - User-friendly warnings with actionable suggestions when network is slow
+- **Auto Duration Detection** - Automatically extracts & fills video duration from selected files
+- **Cancel Upload Anytime** - Stop mid-upload with automatic cleanup of partially uploaded files
+- **Leave-Page Protection** - Confirms before navigating away during active uploads
+
+### 🛡️ Content Security
+- **DevTools Detection** - Prevents content viewing/piracy in production when DevTools opened
+- **Blank Security Screen** - Shows protective lock screen when DevTools detected
+- **Portfolio Protection** - Blocks keyboard shortcuts & context menu inspection
+
+### 🎨 Upload Features
+- **Thumbnail Upload to ImageKit** - Optimized image storage with automatic WebP conversion
+- **Video Upload to Cloudflare R2** - Fast video delivery via S3-compatible storage
+- **Error Recovery** - Meaningful error messages for network issues (ECONNRESET → user-friendly)
+- **File Cleanup on Cancel** - Removes thumbnails from ImageKit, videos from R2, DB records
+
+### 📊 User Experience
+- **Drag & Drop Upload** - Intuitive file selection with drag-and-drop support
+- **File Preview** - See thumbnail/video preview before uploading
+- **URL Input Option** - Upload via file OR paste external URLs
+- **Responsive Design** - Works seamlessly on desktop & mobile
+- **Toast Notifications** - Real-time feedback for all operations
+
+---
+
 ## 🏗️ Architecture
 
 ```
@@ -187,7 +217,35 @@ npm run build
 ```
 
 ---
+## 🌐 Network Speed Check System
 
+### How It Works
+Before uploading a video, the system automatically tests your internet connection:
+
+1. **Download Speed Test** - Measures frontend internet bandwidth
+2. **Backend Connectivity Check** - Verifies server is responding properly
+3. **Smart Status Display** - Shows results with user-friendly feedback
+
+### Network Status Levels
+
+| Status | Threshold | Action |
+|--------|-----------|--------|
+| ✅ **Excellent** | Download ≥ 1 Mbps, Latency < 5s | Upload proceeds automatically |
+| ⚠️ **Warning** | Download < 1 Mbps OR Latency > 5s | User can fix network or proceed anyway |
+| ❌ **Error** | Check failed to complete | Retry or proceed with caution |
+
+### User-Friendly Messages
+- **Slow Download**: "Moving closer to your router • Closing other apps using network • Switching to stronger WiFi"
+- **Slow Backend**: "Wait a few moments and try again • Check if server is overloaded • Refresh and retry"
+- **Connection Error**: Clear explanation with option to retry check
+
+### Endpoints
+- **`GET /api/upload/check-speed`** - Lightweight connectivity test (no auth required)
+- **`POST /api/upload/video-file`** - Upload video to Cloudflare R2
+- **`POST /api/upload/thumbnail`** - Upload thumbnail to ImageKit
+- **`POST /api/upload/cancel-upload`** - Cleanup partially uploaded files
+
+---
 ## 🔒 Security
 
 ✅ **Implemented:**
@@ -198,6 +256,24 @@ npm run build
 - CORS protection
 - Helmet security headers
 - Input validation with JOI
+- **DevTools Detection & Blocking** (Production only)
+- **Content Protection** from inspection/piracy
+- **Keyboard Shortcut Prevention** (F12, Ctrl+Shift+I, etc.)
+
+---
+
+## � Utilities & Helpers
+
+### Frontend Utilities
+- **`utils/networkSpeedCheck.js`** - Download speed test, backend connectivity check
+- **`utils/videoDuration.js`** - Extract video metadata without backend
+- **`hooks/useDevtoolsShield.js`** - DevTools detection hook for production
+- **`components/SecurityBlankScreen.jsx`** - Blank lock screen for content protection
+
+### Backend Services
+- **`utils/cloudflareR2Helper.js`** - R2 upload with error normalization
+- **`utils/imagekitHelper.js`** - ImageKit upload & deletion
+- **`services/uploadService.js`** - Upload orchestration & cleanup
 
 ---
 
@@ -209,6 +285,10 @@ npm run build
 | Email not sending | Check EMAIL_USER/PASSWORD in .env |
 | Images not uploading | Verify ImageKit credentials |
 | Frontend can't reach backend | Check VITE_API_URL and CORS |
+| Network check showing slow speed | Move closer to WiFi router, close other apps using network |
+| Upload stuck at 99% | Network interrupted - wait & retry or check backend logs |
+| DevTools blocking in production | This is expected security feature - close DevTools to view content |
+| Video upload fails with ECONNRESET | Check internet stability, may need to retry upload |
 
 ---
 

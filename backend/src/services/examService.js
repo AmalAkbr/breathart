@@ -153,6 +153,20 @@ export const addParticipants = async (examId, studentIds, adminId = null) => {
       participants.push(participant);
     }
   }
+  
+  if (participants.length > 0) {
+    const existingParticipantIds = new Set(
+      (exam.participants || []).map((participantId) => participantId.toString())
+    );
+    
+    for (const participant of participants) {
+      if (!existingParticipantIds.has(participant._id.toString())) {
+        exam.participants.push(participant._id);
+      }
+    }
+    
+    await exam.save();
+  }
 
   return participants;
 };

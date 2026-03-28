@@ -59,15 +59,6 @@ const ProfileCard = ({ userDetails, userEmail, createdAt }) => {
             <span className="text-white font-medium">Student</span>
           </div>
         </div>
-
-        {/* Edit Profile Button */}
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          className="w-full mt-8 px-4 py-2.5 bg-gradient-to-r from-accent-cyan/20 to-accent-blue/20 hover:from-accent-cyan/30 hover:to-accent-blue/30 border border-accent-cyan/40 text-accent-cyan rounded-lg font-medium transition-all duration-300"
-        >
-          Edit Profile
-        </motion.button>
       </div>
     </motion.div>
   );

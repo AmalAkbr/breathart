@@ -142,6 +142,14 @@ export const authAPI = {
   },
 
   /**
+   * Get exam notifications for logged-in user (protected)
+   * Returns: { success, data: [] }
+   */
+  getExamNotifications: () => {
+    return apiCall('/auth/exam-notifications');
+  },
+
+  /**
    * Logout user (protected)
    * Returns: { success, message }
    */

@@ -1,16 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import VideoCard from "../../components/VideoCard";
+import SecurityBlankScreen from "../../components/SecurityBlankScreen";
 import SkeletonLoader from "../../components/SkeletonLoader";
 import { getAuthToken, videoAPI } from "../../utils/apiClient";
 import { toast } from "../../utils/toast";
-import { FileVideo } from "lucide-react";
+import { FileVideo, FolderX } from "lucide-react";
 import { motion } from "framer-motion";
+import { useDevtoolsShield } from "../../hooks/useDevtoolsShield";
 const VideoViewer = () => {
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const { isProduction, isDevtoolsOpen } = useDevtoolsShield();
 
   // Check authentication and fetch videos
   useEffect(() => {
@@ -40,6 +43,10 @@ const VideoViewer = () => {
   const handleCardClick = (videoId) => {
     navigate(`/player/${videoId}`);
   };
+
+  if (isProduction && isDevtoolsOpen) {
+    return <SecurityBlankScreen />;
+  }
 
   if (loading) {
     return (
@@ -120,7 +127,9 @@ const VideoViewer = () => {
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="text-6xl mb-4">🎬</div>
+            <div className="text-6xl mb-4">
+              <FolderX size={50} />
+            </div>
             <h2 className="text-2xl font-bold mb-2">No Videos Yet</h2>
             <p className="text-white/60 mb-6">
               Videos will appear here once uploaded

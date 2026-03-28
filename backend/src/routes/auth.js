@@ -7,6 +7,7 @@ import {
   resetPassword,
   resendVerificationEmail,
   getProfile,
+  getExamNotifications,
   logout,
 } from '../controllers/authController.js';
 import {
@@ -79,6 +80,9 @@ router.post(
 
 // GET /api/auth/profile
 router.get('/profile', authenticateToken, getProfile);
+
+// GET /api/auth/exam-notifications
+router.get('/exam-notifications', authenticateToken, getExamNotifications);
 
 // POST /api/auth/logout
 router.post('/logout', authenticateToken, logout);

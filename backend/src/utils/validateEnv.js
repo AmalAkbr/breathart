@@ -45,6 +45,8 @@ const REQUIRED_ENV_VARS = {
   // Cleanup Cron Job Config
   ENABLE_CLEANUP_CRON: { required: false, type: 'string', default: 'true', description: 'Enable cleanup cron job' },
   CLEANUP_CRON_SCHEDULE: { required: false, type: 'string', default: '0 2 * * *', description: 'Cron schedule for cleanup (default: 2 AM daily)' },
+  ENABLE_ORPHAN_VIDEO_CLEANUP_CRON: { required: false, type: 'string', default: 'true', description: 'Enable orphan R2 video cleanup cron' },
+  ORPHAN_VIDEO_CLEANUP_CRON_SCHEDULE: { required: false, type: 'string', default: '0 */12 * * *', description: 'Cron schedule for orphan R2 videos (default: every 12 hours)' },
   TEMP_RETENTION_HOURS: { required: false, type: 'number', default: 24, description: 'Hours to retain temp files' },
   UPLOAD_RETENTION_HOURS: { required: false, type: 'number', default: 72, description: 'Hours to retain uploaded files' }
 };

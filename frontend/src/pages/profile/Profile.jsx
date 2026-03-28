@@ -8,15 +8,15 @@ import { toast } from "../../utils/toast";
 // Import child components
 import ProfileHeader from "./_components/ProfileHeader";
 import ProfileCard from "./_components/ProfileCard";
-import AcademicOverview from "./_components/AcademicOverview";
-import RecentActivity from "./_components/RecentActivity";
-import AchievementsSection from "./_components/AchievementsSection";
+import ExamNotificationsSection from "./_components/ExamNotificationsSection";
 import ReadyToLearnCTA from "./_components/ReadyToLearnCTA";
 
 const Profile = () => {
   const navigate = useNavigate();
   const { user, isLoggedIn, loading, logout } = useUserStore();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [examNotifications, setExamNotifications] = useState([]);
+  const [notificationsLoading, setNotificationsLoading] = useState(false);
 
   // Redirect if not logged in
   useEffect(() => {
@@ -24,6 +24,25 @@ const Profile = () => {
       navigate("/login", { replace: true });
     }
   }, [isLoggedIn, loading, navigate]);
+
+  useEffect(() => {
+    const fetchExamNotifications = async () => {
+      try {
+        setNotificationsLoading(true);
+        const response = await authAPI.getExamNotifications();
+        setExamNotifications(Array.isArray(response?.data) ? response.data : []);
+      } catch (error) {
+        console.error("[PROFILE] Failed to fetch exam notifications:", error.message);
+        setExamNotifications([]);
+      } finally {
+        setNotificationsLoading(false);
+      }
+    };
+
+    if (!loading && isLoggedIn && user) {
+      fetchExamNotifications();
+    }
+  }, [isLoggedIn, loading, user]);
 
   const handleLogout = async () => {
     try {
@@ -109,11 +128,18 @@ const Profile = () => {
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column - Profile Card */}
-          <ProfileCard
-            userDetails={{ fullName: user?.fullName }}
-            userEmail={user?.email}
-            createdAt={user?.createdAt || new Date().toISOString()}
-          />
+          <div className="lg:col-span-1 space-y-6">
+            <ProfileCard
+              userDetails={{ fullName: user?.fullName }}
+              userEmail={user?.email}
+              createdAt={user?.createdAt || new Date().toISOString()}
+            />
+
+            {/* Desktop: CTA under profile card */}
+            <div className="hidden lg:block">
+              <ReadyToLearnCTA className="mt-0" />
+            </div>
+          </div>
 
           {/* Right Column - Content Cards */}
           <motion.div
@@ -122,14 +148,17 @@ const Profile = () => {
             transition={{ delay: 0.3 }}
             className="lg:col-span-2 space-y-6"
           >
-            <AcademicOverview />
-            <RecentActivity />
-            <AchievementsSection />
+            <ExamNotificationsSection
+              notifications={examNotifications}
+              isLoading={notificationsLoading}
+            />
           </motion.div>
         </div>
 
-        {/* Bottom CTA Section */}
-        <ReadyToLearnCTA />
+        {/* Mobile: CTA at very bottom of all content */}
+        <div className="lg:hidden">
+          <ReadyToLearnCTA className="mt-12" />
+        </div>
       </div>
     </div>
   );

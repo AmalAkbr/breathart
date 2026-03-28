@@ -33,7 +33,7 @@ const examSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: ['draft', 'published', 'closed', 'archived'],
-      default: 'draft',
+      default: 'published',
     },
     participants: [
       {

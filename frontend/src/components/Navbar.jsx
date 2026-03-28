@@ -305,13 +305,13 @@ const Navbar = () => {
                   </motion.button>
                 </Link>
               ) : (
-                <Link to="/profile" onMouseEnter={() => setHoveredItem(null)}>
+                <Link to="/profile" onMouseEnter={() => setHoveredItem(null)} >
                   <motion.button
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className={`px-5 md:px-7 py-2.5 rounded-full font-bold text-sm transition-colors border hidden sm:block ${isWhiteNav ? "border-blue-900/30 text-blue-900 hover:bg-blue-900/10" : "border-white/30 text-white hover:bg-white/10"}`}
+                    className={`cursor-pointer px-5 md:px-7 py-2.5 rounded-full font-bold text-sm transition-colors border hidden sm:block ${isWhiteNav ? "border-blue-900/30 text-blue-900 hover:bg-blue-900/10" : "border-white/30 text-white hover:bg-white/10"}`}
                   >
                     Profile
                   </motion.button>
@@ -367,7 +367,7 @@ const Navbar = () => {
                     console.log("[NAVBAR DESKTOP] Logout button clicked");
                     handleLogout();
                   }}
-                  className="p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 transition-all"
+                  className="cursor-pointer p-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 transition-all"
                   title="Logout"
                 >
                   <LogOut size={18} />

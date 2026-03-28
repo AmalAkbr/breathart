@@ -5,13 +5,26 @@
 
 import express from 'express';
 import multer from 'multer';
+import fs from 'fs';
+const fsPromises = fs.promises;
+import path from 'path';
 import { uploadImage, uploadProfileImage, uploadCourseThumbnail } from '../controllers/uploadController.js';
 import { authenticateToken } from '../middleware/auth.js';
 import verifyAdmin from '../middleware/admin.js';
 import * as videoService from '../services/videoService.js';
 import { uploadVideoToCloudflare } from '../utils/cloudflareR2Helper.js';
 import { processImageUpload, cleanupTempFile } from '../helpers/imageConversionHelper.js';
-import { uploadImageToImageKit } from '../utils/imagekitHelper.js';
+import { uploadImageToImageKit, deleteImageFromImageKit, deleteImageFromImageKitByUrl } from '../utils/imagekitHelper.js';
+import { deleteFromR2 } from '../services/uploadService.js';
+import {
+  clearUploadSession,
+  emitUploadCompleted,
+  emitUploadError,
+  emitUploadProgress,
+  emitUploadStage,
+  isUploadCancelled,
+  registerUploadCancelHandler,
+} from '../websocket/uploadSocketManager.js';
 
 const router = express.Router();
 
@@ -33,11 +46,23 @@ const uploadImage_ = multer({
   },
 });
 
-// ===== Multer Configuration - Videos =====
+// Ensure temp upload directory exists for large videos
+const uploadTempDir = path.resolve('temp/uploads');
+if (!fs.existsSync(uploadTempDir)) {
+  fs.mkdirSync(uploadTempDir, { recursive: true });
+}
+
+// ===== Multer Configuration - Videos (disk storage, supports 500MB+) =====
 const uploadVideo_ = multer({
-  storage: multer.memoryStorage(),
+  storage: multer.diskStorage({
+    destination: (_req, _file, cb) => cb(null, uploadTempDir),
+    filename: (_req, file, cb) => {
+      const safeName = file.originalname.replace(/[^a-zA-Z0-9._-]/g, '_');
+      cb(null, `${Date.now()}-${safeName}`);
+    },
+  }),
   limits: {
-    fileSize: 500 * 1024 * 1024, // 500MB max for videos
+    fileSize: 800 * 1024 * 1024, // Allow up to 800MB to comfortably fit 500MB requirement
   },
   fileFilter: (req, file, cb) => {
     const allowedMimes = [
@@ -147,7 +172,14 @@ router.post('/thumbnail', authenticateToken, uploadImage_.single('thumbnail'), a
  * Body: { title, description, category } (title used for video file naming)
  */
 router.post('/video-file', verifyAdmin, uploadVideo_.single('video'), async (req, res) => {
+  let uploadId = '';
+  let unregisterCancelHandler = () => {};
+
   try {
+    // Set extended timeout for large file uploads (5 minutes for socket, 10 minutes for idle)
+    req.setTimeout(600000); // 10 minutes
+    res.setTimeout(600000); // 10 minutes
+    
     if (!req.file) {
       return res.status(400).json({
         success: false,
@@ -156,6 +188,8 @@ router.post('/video-file', verifyAdmin, uploadVideo_.single('video'), async (req
     }
 
     const { title } = req.body;
+    uploadId = typeof req.body?.uploadId === 'string' ? req.body.uploadId.trim() : '';
+
     if (!title) {
       return res.status(400).json({
         success: false,
@@ -163,12 +197,73 @@ router.post('/video-file', verifyAdmin, uploadVideo_.single('video'), async (req
       });
     }
 
-    const { buffer, originalname, size } = req.file;
+    const { path: tempPath, originalname, size, mimetype } = req.file;
+    const fileSizeMB = (size / 1024 / 1024).toFixed(2);
 
-    console.log(`🎬 Uploading video file: ${originalname} (${(size / 1024 / 1024).toFixed(2)}MB)`);
+    if (uploadId) {
+      emitUploadStage(uploadId, 'server_received', {
+        fileName: originalname,
+        totalBytes: size,
+      });
+    }
 
-    // Upload to Cloudflare R2
-    const r2Result = await uploadVideoToCloudflare(buffer, originalname, title);
+    console.log(`🎬 Uploading video file: ${originalname} (${fileSizeMB}MB)`);
+
+    // Warn if file is very large
+    if (size > 400 * 1024 * 1024) {
+      console.warn(`⚠️  Very large file detected (${fileSizeMB}MB). Using multipart upload.`);
+    }
+
+    // Stream upload to Cloudflare R2 (multipart)
+    let activeUploader = null;
+
+    if (uploadId) {
+      unregisterCancelHandler = registerUploadCancelHandler(uploadId, () => {
+        if (activeUploader && typeof activeUploader.abort === 'function') {
+          activeUploader.abort();
+        }
+      });
+
+      if (isUploadCancelled(uploadId)) {
+        const cancelledError = new Error('Upload cancelled before processing started');
+        cancelledError.code = 'UPLOAD_CANCELLED';
+        throw cancelledError;
+      }
+
+      emitUploadStage(uploadId, 'r2_uploading');
+    }
+
+    const r2Result = await uploadVideoToCloudflare({
+      filePath: tempPath,
+      fileName: originalname,
+      videoTitle: title,
+      contentLength: size,
+      mimeType: mimetype,
+      onUploaderReady: (uploader) => {
+        activeUploader = uploader;
+      },
+      onProgress: (progress) => {
+        if (!uploadId) return;
+        emitUploadProgress(uploadId, {
+          phase: 'r2',
+          loaded: progress.loaded,
+          total: progress.total,
+          percent: progress.percent,
+        });
+      },
+      isCancelled: () => (uploadId ? isUploadCancelled(uploadId) : false),
+    });
+
+    if (uploadId) {
+      emitUploadCompleted(uploadId, {
+        videoUrl: r2Result.url,
+      });
+    }
+
+    // Clean up local temp file
+    fsPromises.unlink(tempPath).catch(() => {
+      console.warn('⚠️  Could not remove temp upload file:', tempPath);
+    });
 
     res.status(200).json({
       success: true,
@@ -181,10 +276,139 @@ router.post('/video-file', verifyAdmin, uploadVideo_.single('video'), async (req
     });
   } catch (error) {
     console.error('❌ Video upload error:', error.message);
+
+    if (uploadId && error.code === 'UPLOAD_CANCELLED') {
+      emitUploadStage(uploadId, 'cancelled', {
+        message: 'Upload cancelled by user',
+      });
+      return res.status(499).json({
+        success: false,
+        error: 'Upload cancelled by user',
+        code: 'UPLOAD_CANCELLED',
+      });
+    }
+
+    if (uploadId) {
+      emitUploadError(uploadId, {
+        message: error.message || 'Video upload failed',
+        code: error.code || 'VIDEO_UPLOAD_ERROR',
+      });
+    }
+    
+    // Determine appropriate status code based on error type
+    let statusCode = error.statusCode || 500;
+    if (error.code === 'ECONNRESET' || error.code === 'ETIMEDOUT' || error.code === 'TimeoutError') {
+      statusCode = 504; // Gateway Timeout
+    }
+    
+    res.status(statusCode).json({
+      success: false,
+      error: error.message || 'Video upload failed',
+      code: error.code || 'VIDEO_UPLOAD_ERROR',
+      details: error.details || error.message,
+      retry: statusCode === 504 || statusCode === 503, // Indicate if retry is possible
+    });
+  } finally {
+    unregisterCancelHandler();
+    if (uploadId) {
+      clearUploadSession(uploadId);
+    }
+
+    // Best-effort cleanup of temp file if it still exists
+    if (req?.file?.path) {
+      fsPromises.unlink(req.file.path).catch(() => {});
+    }
+  }
+});
+
+/**
+ * POST /api/upload/cancel-upload
+ * Cleanup already uploaded assets when user cancels upload flow
+ * Body: { thumbnailFileId?, thumbnailUrl?, videoUrl?, videoId? }
+ */
+router.post('/cancel-upload', verifyAdmin, async (req, res) => {
+  const {
+    thumbnailFileId,
+    thumbnailUrl,
+    videoUrl,
+    videoId,
+  } = req.body || {};
+
+  const extractR2KeyFromUrl = (url = '') => {
+    if (!url || typeof url !== 'string') return '';
+    try {
+      const parsed = new URL(url);
+      return parsed.pathname.replace(/^\/+/, '');
+    } catch {
+      return '';
+    }
+  };
+
+  const results = {
+    thumbnailDeleted: false,
+    videoDeleted: false,
+    dbCleaned: false,
+  };
+
+  try {
+    if (thumbnailFileId) {
+      results.thumbnailDeleted = await deleteImageFromImageKit(thumbnailFileId);
+    } else if (thumbnailUrl) {
+      results.thumbnailDeleted = await deleteImageFromImageKitByUrl(thumbnailUrl);
+    }
+
+    if (videoUrl) {
+      const videoKey = extractR2KeyFromUrl(videoUrl);
+      if (videoKey) {
+        results.videoDeleted = await deleteFromR2(videoKey);
+      }
+    }
+
+    if (videoId) {
+      try {
+        await videoService.deleteVideo(videoId);
+        results.dbCleaned = true;
+      } catch (dbError) {
+        console.warn('⚠️  Cancel cleanup DB delete skipped:', dbError.message);
+      }
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Cancel cleanup completed',
+      data: results,
+    });
+  } catch (error) {
+    console.error('❌ Cancel upload cleanup error:', error.message);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to cleanup uploaded assets',
+      details: error.message,
+      data: results,
+    });
+  }
+});
+
+/**
+ * GET /api/upload/check-speed
+ * Network speed check endpoint
+ * Returns server timestamp and latency info for frontend network health verification
+ * No authentication required - used for pre-upload checks without bearer token
+ */
+router.get('/check-speed', (req, res) => {
+  try {
+    res.status(200).json({
+      success: true,
+      timestamp: Date.now(),
+      serverTime: new Date().toISOString(),
+      message: 'Backend connectivity confirmed',
+    });
+  } catch (error) {
+    console.error('❌ Speed check error:', error);
     res.status(500).json({
       success: false,
-      error: 'Video upload failed',
-      details: error.message
+      error: 'Backend speed check failed',
+      details: error.message,
     });
   }
 });

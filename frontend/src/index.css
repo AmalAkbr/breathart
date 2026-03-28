@@ -146,6 +146,14 @@ textarea,
 [role="button"],
 [tabindex] {
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea {
+  transition-property: background-color, border-color, color;
+  transition-duration: 0.2s;
+  cursor: text;
 }
 
 /* ── GPU-accelerate Framer Motion wrappers & any element that animates ──── */

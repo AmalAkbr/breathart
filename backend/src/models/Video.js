@@ -65,7 +65,7 @@ const videoSchema = new mongoose.Schema(
     tags: [String],
     isPublished: {
       type: Boolean,
-      default: false,
+      default: true,
     },
   },
   { timestamps: true }

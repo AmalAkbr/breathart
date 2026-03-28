@@ -1,8 +1,10 @@
 import express from 'express';
+import http from 'http';
 import cors from 'cors';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import mongoose from 'mongoose';
+import { Server as SocketIOServer } from 'socket.io';
 
 // Import config
 import env from './utils/envConfig.js';
@@ -26,8 +28,10 @@ import {
 
 // Import cron job service
 import { initCleanupCron } from './services/cropJobService.js';
+import { initializeUploadSocketServer } from './websocket/uploadSocketServer.js';
 
 const app = express();
+const server = http.createServer(app);
 
 console.log(`
 ╔═══════════════════════════════════════════════════════════╗
@@ -116,6 +120,17 @@ app.use(cors({
   optionsSuccessStatus: 200, // For compatibility with older browsers
 }));
 
+const io = new SocketIOServer(server, {
+  cors: {
+    origin: allowedOrigins,
+    credentials: true,
+    methods: ['GET', 'POST'],
+  },
+  transports: ['websocket', 'polling'],
+});
+
+initializeUploadSocketServer(io);
+
 console.log('✅ CORS configured for origins:', allowedOrigins);
 
 // ==============================================
@@ -180,7 +195,7 @@ app.use(errorHandler);
 // SERVER START
 // ==============================================
 
-const server = app.listen(env.PORT, () => {
+server.listen(env.PORT, () => {
   console.log(`
 ✅ Server Running
 📡 http://localhost:${env.PORT}
@@ -213,6 +228,18 @@ Ready to receive requests! 🚀
   // Log email service status
   console.log('✅ Email service ready (main load)');
 });
+
+// Configure server timeouts for large file uploads
+// Set socket timeout to 10 minutes for large files (150MB+)
+server.setTimeout(600000); // 10 minutes
+
+// Set keepAliveTimeout to prevent premature connection termination
+server.keepAliveTimeout = 65000; // 65 seconds
+
+// Set headersTimeout
+server.headersTimeout = 66000; // 66 seconds (must be > keepAliveTimeout)
+
+console.log('✅ Server timeouts configured for large file uploads');
 
 // Graceful shutdown
 process.on('SIGTERM', async () => {
