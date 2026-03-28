@@ -33,14 +33,6 @@ const REQUIRED_ENV_VARS = {
 };
 
 /**
- * REMOVED (No longer needed):
- * - VITE_SUPABASE_URL
- * - VITE_SUPABASE_ANON_KEY
- * 
- * Database and authentication now handled by MongoDB backend
- */
-
-/**
  * Check if all required environment variables are set
  * @returns {Object} { isValid: boolean, errors: string[], warnings: string[] }
  */
