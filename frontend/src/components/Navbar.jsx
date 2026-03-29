@@ -33,7 +33,7 @@ const Navbar = () => {
   const [hoveredItem, setHoveredItem] = useState(null);
   const location = useLocation();
   const navigate = useNavigate();
-  
+
   // Use Zustand store for auth
   const { user, isLoggedIn, logout } = useUserStore();
   const navLinks = [
@@ -305,7 +305,7 @@ const Navbar = () => {
                   </motion.button>
                 </Link>
               ) : (
-                <Link to="/profile" onMouseEnter={() => setHoveredItem(null)} >
+                <Link to="/profile" onMouseEnter={() => setHoveredItem(null)}>
                   <motion.button
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -345,12 +345,12 @@ const Navbar = () => {
               <div className="flex items-center gap-3">
                 <div
                   className={`h-10 w-10 rounded-full flex items-center justify-center font-bold text-xs uppercase transition-colors ${
-                    isAdmin 
-                      ? isWhiteNav 
-                        ? "bg-amber-500/20 text-amber-600 border border-amber-400/50" 
+                    isAdmin
+                      ? isWhiteNav
+                        ? "bg-amber-500/20 text-amber-600 border border-amber-400/50"
                         : "bg-amber-500/20 text-amber-400 border border-amber-400/50"
-                      : isWhiteNav 
-                        ? "bg-blue-900 text-white" 
+                      : isWhiteNav
+                        ? "bg-blue-900 text-white"
                         : "bg-white/15 text-white border border-white/20"
                   }`}
                 >
@@ -861,7 +861,9 @@ const Navbar = () => {
                           type="button"
                           onClick={(e) => {
                             e.preventDefault();
-                            console.log("[NAVBAR MOBILE] Logout button clicked");
+                            console.log(
+                              "[NAVBAR MOBILE] Logout button clicked",
+                            );
                             handleLogout();
                           }}
                           className="hover:text-accent-cyan transition-colors text-lg font-medium text-left"
@@ -923,7 +925,7 @@ const Navbar = () => {
             transition={{ duration: 0.3 }}
             className={`fixed inset-0 z-[60] lg:hidden backdrop-blur-3xl ${isWhiteNav ? "bg-white/95" : "bg-[#0a0f1a]/95"}`}
           >
-            <div className="h-full w-full overflow-y-auto overscroll-contain pt-24 pb-20 px-6">
+            <div className="h-full w-full overflow-y-scroll overscroll-y-contain pt-24 pb-20 px-6">
               <div className="w-full px-6 pb-20 flex flex-col gap-10">
                 {/* Quick Links Section */}
                 <div>
@@ -941,7 +943,6 @@ const Navbar = () => {
                       { name: "Blogs", path: "/blogs" },
                       { name: "Careers", path: "/careers" },
                       { name: "Brochure", path: "/brochure" },
-                      { name: "Admission", path: "/admission" },
                     ].map((item) => (
                       <Link
                         key={item.name}
@@ -978,7 +979,7 @@ const Navbar = () => {
                     </button>
 
                     {/* Admin Panel Link (Mobile) */}
-                    {isAdmin && (
+                    {isLoggedIn && isAdmin && (
                       <Link
                         to="/admin"
                         onClick={() => setMenuOpen(false)}
@@ -991,11 +992,11 @@ const Navbar = () => {
                     {/* Profile/Admission Link (Mobile) */}
                     {isLoggedIn && !isAdmin && (
                       <Link
-                        to="/"
+                        to="/profile"
                         onClick={() => setMenuOpen(false)}
                         className={`text-xl font-bold py-2 transition-colors flex justify-center items-center group w-full text-center ${isWhiteNav ? "text-blue-900 hover:text-accent-blue" : "text-slate-200 hover:text-accent-cyan"}`}
                       >
-                        Dashboard
+                        Profile
                       </Link>
                     )}
                     {!isLoggedIn && (

@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react'
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: '/',
   plugins: [react()],
   build: {
     target: 'esnext',
@@ -26,5 +27,10 @@ export default defineConfig({
     esbuildOptions: {
       drop: ['console', 'debugger'],
     }
+  },
+  server: {
+    // Allow access from any local network IP for testing on mobile devices
+    host: true,
+    port: 5173,
   }
 })

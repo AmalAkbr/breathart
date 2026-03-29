@@ -174,10 +174,8 @@ app.use(errorHandler);
 // SERVER START
 // ==============================================
 
-server.listen(env.PORT, () => {
-  console.log(`
-✅ Server Running
-📡 http://localhost:${env.PORT}
+server.listen(env.PORT, "0.0.0.0", () => {
+  console.log(`✅ Server Running 📡 http://localhost:${env.PORT}
 🗄️  Database: MongoDB
 🌍 Environment: ${env.NODE_ENV}
 🔐 CORS: ${env.FRONTEND_URL}
