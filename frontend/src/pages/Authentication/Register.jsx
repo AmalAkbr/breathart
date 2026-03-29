@@ -131,7 +131,7 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-black px-4">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-gray-900 via-gray-800 to-black px-4">
       <div className="w-full max-w-md">
         <div className="bg-gray-800/50 backdrop-blur-xl border border-gray-700/50 rounded-2xl shadow-2xl p-8">
           {/* Header */}
@@ -309,7 +309,7 @@ export default function Register() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-3 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 
+              className="w-full py-3 bg-linear-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 
                 disabled:from-gray-600 disabled:to-gray-600 disabled:cursor-not-allowed
                 text-white font-semibold rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
             >

@@ -22,7 +22,6 @@ function useDevtoolsDetection() {
       const sizeOpen = widthDiff > 160 || heightDiff > 160;
       let timingOpen = false;
       const t = performance.now();
-      // eslint-disable-next-line no-console
       console.log("%c", "");
       if (performance.now() - t > 20) timingOpen = true;
       setIsOpen(sizeOpen || timingOpen);
@@ -180,7 +179,7 @@ const ControlBar = memo(function ControlBar({
 
 // ─── Devtools block screen ────────────────────────────────────────────────────
 const DevtoolsBlock = () => (
-  <div className="fixed inset-0 z-[9999] bg-black flex flex-col items-center justify-center select-none">
+  <div className="fixed inset-0 z-9999 bg-black flex flex-col items-center justify-center select-none">
     <div className="text-center px-8 max-w-md">
       <div className="text-6xl mb-6">🔒</div>
       <h1 className="text-2xl font-bold text-white mb-3">Page Protected</h1>
@@ -518,7 +517,7 @@ const VideoPlayer = () => {
 
   if (error)
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#06060a] to-[#0a0a0f] text-white px-6 py-16 flex items-center justify-center">
+      <div className="min-h-screen bg-linear-to-b from-[#06060a] to-[#0a0a0f] text-white px-6 py-16 flex items-center justify-center">
         <div className="max-w-md text-center">
           <div className="text-4xl mb-4">❌</div>
           <h2 className="text-2xl font-bold mb-2">Could Not Load Video</h2>
@@ -600,7 +599,7 @@ const VideoPlayer = () => {
 
             {/* Top bar — always visible at low opacity in fullscreen */}
             <div
-              className="absolute inset-x-0 top-0 bg-gradient-to-b from-black/80 to-transparent px-4 pt-3 pb-8 flex justify-between items-start z-10"
+              className="absolute inset-x-0 top-0 bg-linear-to-b from-black/80 to-transparent px-4 pt-3 pb-8 flex justify-between items-start z-10"
               style={{ opacity: 0.75, pointerEvents: "auto" }}
               onClick={(e) => e.stopPropagation()}
             >
@@ -618,7 +617,7 @@ const VideoPlayer = () => {
 
             {/* Bottom controls — always visible at low opacity in fullscreen */}
             <div
-              className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent text-white z-10"
+              className="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/90 via-black/50 to-transparent text-white z-10"
               style={{ opacity: 0.75, pointerEvents: "auto" }}
               onClick={(e) => e.stopPropagation()}
             >
@@ -629,7 +628,7 @@ const VideoPlayer = () => {
       )}
 
       {/* ── Normal page ─────────────────────────────────────────────────── */}
-      <div className="min-h-screen bg-gradient-to-b from-[#06060a] via-[#0a0a0f] to-[#0a0a0f] text-white flex flex-col items-center">
+      <div className="min-h-screen bg-linear-to-b from-[#06060a] via-[#0a0a0f] to-[#0a0a0f] text-white flex flex-col items-center">
         <div className="w-full py-3 sm:py-4 flex flex-col items-center">
           <div
             className="bg-black rounded-xl overflow-hidden shadow-2xl"
@@ -655,7 +654,7 @@ const VideoPlayer = () => {
 
               {/* Top overlay */}
               <div
-                className="absolute inset-x-0 top-0 bg-gradient-to-b from-black/70 to-transparent px-4 pt-3 pb-8 flex justify-between items-start z-10"
+                className="absolute inset-x-0 top-0 bg-linear-to-b from-black/70 to-transparent px-4 pt-3 pb-8 flex justify-between items-start z-10"
                 style={showControls ? overlayVisible : overlayHidden}
                 onClick={(e) => e.stopPropagation()}
               >
@@ -673,7 +672,7 @@ const VideoPlayer = () => {
 
               {/* Bottom controls */}
               <div
-                className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent text-white z-10"
+                className="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/90 via-black/50 to-transparent text-white z-10"
                 style={showControls ? overlayVisible : overlayHidden}
                 onClick={(e) => e.stopPropagation()}
               >
