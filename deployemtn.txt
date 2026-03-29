@@ -29,3 +29,54 @@ sudo chown -R breathart:breathart /home/breathart/web/breathart
 Log in as breathart, then install Node & npm for that user
 cd /home/breathart/web/breathart/backend → npm ci
 cd ../frontend → npm ci && npm run build
+
+check users : ls/home
+goto user sudo su - username
+
+
+sudo chown -R breathart:breathart ~/web
+Explanation:
+
+sudo → you need root permissions to change ownership of files that belong to root.
+chown → change owner.
+-R → recursively, applies to all files and subfolders inside ~/web.
+breathart:breathart → set user and group to breathart.
+~/web → path to your web directory.
+
+
+
+
+
+
++=====================================
+
+Ah — I see exactly what’s going on. The warnings:
+
+conflicting server name "habeeb.qzz.io" on 0.0.0.0:80, ignored
+conflicting server name "habeeb.qzz.io" on 0.0.0.0:443, ignored
+
+mean that Nginx already has another server block for habeeb.qzz.io (probably in /etc/nginx/sites-enabled/default). So now you have two server blocks claiming the same domain on the same ports. Nginx ignores one of them, which can cause unexpected behavior.
+
+✅ How to fix it
+Check what’s enabled:
+ls -l /etc/nginx/sites-enabled/
+
+You will probably see both default and habeeb.qzz.io linked.
+
+Remove the default one (or any old conflicting blocks):
+sudo rm /etc/nginx/sites-enabled/default
+Make sure only your cleaned config exists:
+sudo nginx -t
+sudo systemctl reload nginx
+
+After this, Nginx should no longer show the conflicting server name warnings, and https://habeeb.qzz.io
+ should properly route to your Node.js app on port 8080.
+
+
+ ===================
+
+
+ sudo npm install -g pm2
+
+
+ 
