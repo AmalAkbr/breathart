@@ -1,6 +1,7 @@
 {
   "name": "breathart-backend",
   "version": "1.0.0",
+  "description": "Breath Art - Complete AI course platform with video player",
   "type": "module",
   "scripts": {
     "start": "node src/index.js",

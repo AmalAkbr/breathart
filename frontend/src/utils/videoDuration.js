@@ -18,7 +18,7 @@ export const getVideoDurationInSecondsFromFile = (file) => {
     video.onloadedmetadata = () => {
       const rawDuration = Number(video.duration);
       const durationSeconds = Number.isFinite(rawDuration) && rawDuration > 0
-        ? Math.round(rawDuration)
+        ? Math.floor(rawDuration)
         : 0;
 
       cleanup();

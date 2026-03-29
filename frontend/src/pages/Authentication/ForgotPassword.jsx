@@ -1,11 +1,10 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import {  Link } from 'react-router-dom';
 import { useUserStore } from '../../store/userStore';
 import { authAPI } from '../../utils/apiClient';
-import { validateForgotPasswordForm, validateToken, validateResetPasswordForm } from '../../utils/validators';
+import { validateForgotPasswordForm, validateResetPasswordForm } from '../../utils/validators';
 
 export default function ForgotPassword() {
-  const navigate = useNavigate();
   const { setError, error } = useUserStore();
 
   const [step, setStep] = useState('email'); // 'email' | 'token' | 'password' | 'success'
@@ -83,6 +82,7 @@ export default function ForgotPassword() {
       }
     } catch (err) {
       setError('Error verifying token. Please try again.');
+      console.log(err)
     } finally {
       setIsSubmitting(false);
     }
@@ -178,6 +178,7 @@ export default function ForgotPassword() {
                   type="email"
                   id="email"
                   value={emailInput}
+                  autoComplete='true'
                   onChange={(e) => {
                     setEmailInput(e.target.value);
                     if (validationErrors.email) {

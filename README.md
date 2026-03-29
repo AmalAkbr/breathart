@@ -87,6 +87,24 @@ breathart/
 - MongoDB (local or Atlas)
 - ImageKit account (for image optimization)
 
+### Dockerized run (prod-style)
+
+```bash
+# 1) Copy backend env vars
+cp backend/.env.example backend/.env
+# Fill PORT=8080 and your real values (Mongo, JWT, R2, ImageKit, email, CORS/FRONTEND_URL)
+
+# 2) Build and start
+docker compose up --build
+
+# App available on http://localhost:8080 (also mapped to host 443 -> container 8080)
+```
+
+Notes:
+- The container serves the built frontend via the Express backend; no separate Vite server.
+- TLS is not terminated in the container; keep `443:8080` mapping for downstream proxies/ingress that terminate HTTPS.
+- Runs as unprivileged user `nodeapp` inside the container.
+
 ### 1. Clone Repository
 ```bash
 git clone <repo-url>
@@ -104,7 +122,7 @@ npm install
 # Create .env file
 # Copy the required variables from section below
 
-# Start backend (runs on port 3001)
+# Start backend (runs on port 8080)
 npm run dev
 ```
 
@@ -117,7 +135,7 @@ cd ../frontend
 npm install
 
 # Create .env.local
-VITE_API_URL=http://localhost:3001/api
+VITE_API_URL=http://localhost:8080/api
 
 # Start development server (runs on port 5173)
 npm run dev
@@ -144,7 +162,7 @@ npm run dev
 
 ### Backend (.env)
 ```
-PORT=3001
+PORT=8080
 NODE_ENV=development
 MONGODB_URI=mongodb://localhost:27017/breathart
 JWT_SECRET=your-secret-key-here
@@ -160,7 +178,7 @@ FRONTEND_URL=http://localhost:5173
 
 ### Frontend (.env.local)
 ```
-VITE_API_URL=http://localhost:3001/api
+VITE_API_URL=http://localhost:8080/api
 ```
 
 ---
@@ -187,7 +205,7 @@ VITE_API_URL=http://localhost:3001/api
 
 ### Backend
 ```bash
-npm run dev          # Start development server (port 3001)
+npm run dev          # Start development server (port 8080)
 npm run start        # Start production server
 ```
 

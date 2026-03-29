@@ -235,6 +235,7 @@ export default function Login() {
                 id="email"
                 name="email"
                 value={formData.email}
+                autoComplete="true"
                 onChange={handleInputChange}
                 placeholder="you@example.com"
                 className={`w-full px-4 py-3 rounded-lg bg-gray-700/50 border transition-colors
@@ -270,6 +271,7 @@ export default function Login() {
                   id="password"
                   name="password"
                   value={formData.password}
+                  autoComplete="current-password"
                   onChange={handleInputChange}
                   placeholder="••••••••"
                   className={`w-full px-4 py-3 pr-10 rounded-lg bg-gray-700/50 border transition-colors
@@ -339,7 +341,7 @@ export default function Login() {
         </div>
 
         {/* Footer Note */}
-        <p className="mt-6 text-center text-gray-500 text-xs">
+        {/* <p className="mt-6 text-center text-gray-500 text-xs">
           💡 Tip: Click the User/Admin button to toggle admin mode before
           logging in
         </p>
@@ -348,7 +350,7 @@ export default function Login() {
           <code className="bg-gray-900/50 px-2 py-1 rounded text-gray-400">
             /login?admin=true
           </code>
-        </p>
+        </p> */}
       </div>
     </div>
   );

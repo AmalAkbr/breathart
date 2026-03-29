@@ -177,6 +177,25 @@
 .form-group textarea { resize: vertical; min-height: 80px; }
 .form-group small { margin: 2px 8px; color: var(--muted); font-size: 12px; }
 
+.duration-parts {
+  display: grid;
+  grid-template-columns: 3fr 1fr 3fr;
+  align-items: center;
+  gap: 2px;
+}
+
+.duration-part {
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  width: 100%;
+}
+
+.duration-sep {
+  color: var(--muted);
+  font-weight: 700;
+  text-align: center;
+}
+
 /* ===== File Upload Zone ===== */
 .file-upload-label {
   display: flex;
@@ -538,133 +557,6 @@
   box-shadow: none;
 }
 
-/* ===== Network Status Display ===== */
-.network-status {
-  grid-column: 1 / -1;
-  padding: 20px;
-  border-radius: 16px;
-  border: 1px solid;
-  display: flex;
-  align-items: flex-start;
-  gap: 16px;
-  margin-bottom: 20px;
-  animation: slideInDown 0.3s ease-out;
-}
-
-@keyframes slideInDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.network-status__content {
-  display: flex;
-  align-items: flex-start;
-  gap: 16px;
-  width: 100%;
-}
-
-.network-status__content svg {
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-
-.network-status__title {
-  font-weight: 600;
-  margin-bottom: 4px;
-  font-size: 15px;
-}
-
-.network-status__subtitle {
-  font-size: 13px;
-  opacity: 0.85;
-}
-
-.network-status__message {
-  font-size: 14px;
-  line-height: 1.5;
-  margin: 8px 0 12px 0;
-  white-space: pre-line;
-}
-
-.network-status__actions {
-  display: flex;
-  gap: 10px;
-  margin-top: 12px;
-}
-
-.network-status--checking {
-  background: rgba(110, 243, 255, 0.08);
-  border-color: rgba(110, 243, 255, 0.25);
-  color: rgba(110, 243, 255, 0.9);
-}
-
-.network-status--checking .spinner {
-  animation: spin 1s linear infinite;
-}
-
-.network-status--excellent {
-  background: rgba(200, 255, 106, 0.12);
-  border-color: rgba(200, 255, 106, 0.35);
-  color: #d9ff8f;
-}
-
-.network-status--warning {
-  background: rgba(251, 191, 36, 0.12);
-  border-color: rgba(251, 191, 36, 0.35);
-  color: #fcd34d;
-}
-
-.network-status--warning .network-status__title {
-  color: #fbbf24;
-}
-
-.network-status--error {
-  background: rgba(239, 68, 68, 0.1);
-  border-color: rgba(239, 68, 68, 0.4);
-  color: #ef9a9a;
-}
-
-.network-status--error .network-status__title {
-  color: #f87171;
-}
-
-.btn--small {
-  padding: 8px 14px;
-  font-size: 13px;
-  min-width: 140px;
-}
-
-.btn--secondary {
-  background: rgba(110, 243, 255, 0.15);
-  color: rgba(110, 243, 255, 0.9);
-  border: 1px solid rgba(110, 243, 255, 0.3);
-  transition: all 0.2s ease;
-}
-
-.btn--secondary:hover:not(:disabled) {
-  background: rgba(110, 243, 255, 0.25);
-  border-color: rgba(110, 243, 255, 0.5);
-}
-
-.btn--tertiary {
-  background: transparent;
-  color: currentColor;
-  border: 1px solid currentColor;
-  opacity: 0.8;
-  transition: all 0.2s ease;
-}
-
-.btn--tertiary:hover:not(:disabled) {
-  opacity: 1;
-  background: rgba(255, 255, 255, 0.08);
-}
-
 /* ===== Full-Screen Upload Overlay ===== */
 .upload-overlay-fullscreen {
   position: fixed;
@@ -815,9 +707,7 @@
   .upload-video-container { padding: 24px; }
   .upload-video__form { grid-template-columns: 1fr; }
   .upload-nav { flex-direction: row; }
-  .network-status__actions { flex-direction: column; }
-  .btn--small { width: 100%; }
-  
+
   .upload-overlay-fullscreen__card {
     padding: 32px 24px;
     max-width: 90vw;

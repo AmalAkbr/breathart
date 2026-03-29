@@ -8,14 +8,11 @@ import {
   Image as ImageIcon,
   Link2,
   Loader,
-  Wifi,
-  WifiOff,
 } from "lucide-react";
 import { io } from "socket.io-client";
 import { getAuthToken } from "../../utils/apiClient";
 import { toast } from "../../utils/toast";
 import { getVideoDurationInSecondsFromFile } from "../../utils/videoDuration";
-import { performNetworkCheck } from "../../utils/networkSpeedCheck";
 import "../../styles/UploadVideo.css";
 
 const UploadVideo = () => {
@@ -24,6 +21,11 @@ const UploadVideo = () => {
     description: "",
     category: "tutorial",
     duration: "",
+  });
+  const [durationParts, setDurationParts] = useState({
+    hours: "",
+    minutes: "",
+    seconds: "",
   });
   const [validationErrors, setValidationErrors] = useState({
     title: "",
@@ -60,17 +62,6 @@ const UploadVideo = () => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
 
-  const [networkCheck, setNetworkCheck] = useState({
-    checking: false,
-    status: null, // 'excellent', 'warning', 'error', null
-    message: '',
-    downloadSpeed: 0,
-    uploadSpeed: 0,
-    latency: 0,
-    verdict: null, // 'excellent', 'acceptable', 'poor', 'error', null
-  });
-  const [networkWarningAcknowledged, setNetworkWarningAcknowledged] = useState(false);
-
   const allowedCategories = ["course", "tutorial", "webinar", "demo", "lecture", "other"];
 
   const activeVideoXhrRef = useRef(null);
@@ -80,6 +71,51 @@ const UploadVideo = () => {
 
   const isBusy = loading || uploading.thumbnail || uploading.video;
   const isVideoUploading = uploading.video;
+
+  const toDurationParts = (totalSeconds) => {
+    const total = Math.max(0, Number(totalSeconds) || 0);
+    const hours = Math.floor(total / 3600);
+    const minutes = Math.floor((total % 3600) / 60);
+    const seconds = Math.floor(total % 60);
+
+    return {
+      hours: hours ? String(hours) : "",
+      minutes: minutes ? String(minutes) : "",
+      seconds: seconds ? String(seconds) : "",
+    };
+  };
+
+  const toTotalSeconds = (parts) => {
+    const hours = Math.max(0, Number(parts.hours) || 0);
+    const minutes = Math.max(0, Number(parts.minutes) || 0);
+    const seconds = Math.max(0, Number(parts.seconds) || 0);
+    return (hours * 3600) + (minutes * 60) + seconds;
+  };
+
+  const handleDurationPartChange = (part, rawValue) => {
+    if (rawValue && !/^\d+$/.test(rawValue)) {
+      return;
+    }
+
+    const maxByPart = part === "hours" ? 999 : 59;
+
+    setDurationParts((prev) => {
+      const next = { ...prev, [part]: rawValue };
+
+      if (next[part] !== "") {
+        const numeric = Math.min(maxByPart, Number(next[part]) || 0);
+        next[part] = String(numeric);
+      }
+
+      const total = toTotalSeconds(next);
+      setFormData((prevForm) => ({
+        ...prevForm,
+        duration: total > 0 ? String(total) : "",
+      }));
+
+      return next;
+    });
+  };
 
   useEffect(() => {
     isMountedRef.current = true;
@@ -385,6 +421,7 @@ const UploadVideo = () => {
                 }
                 return { ...prev, duration: String(durationSeconds) };
               });
+              setDurationParts(toDurationParts(durationSeconds));
             }
           })
           .catch(() => {
@@ -467,13 +504,19 @@ const UploadVideo = () => {
         } else {
           let message = `Upload failed (${xhr.status})`;
           let parsedCode = "";
+          let retryAfterSec = null;
           try {
             const parsed = JSON.parse(xhr.responseText);
-            if (parsed?.error) message = parsed.error;
+            if (parsed?.message) message = parsed.message;
+            else if (parsed?.error) message = parsed.error;
             if (parsed?.code) parsedCode = parsed.code;
+            if (parsed?.retryAfterSec) retryAfterSec = Number(parsed.retryAfterSec);
           } catch (err) {
             console.log(err);
             // ignore
+          }
+          if (xhr.status === 429 && !Number.isNaN(retryAfterSec) && retryAfterSec > 0 && !message.includes('Try again')) {
+            message = `${message} Try again in ${retryAfterSec} seconds.`;
           }
           const uploadError = new Error(message);
           if (parsedCode === "UPLOAD_CANCELLED" || xhr.status === 499) {
@@ -561,93 +604,6 @@ const UploadVideo = () => {
       setIsCancellingUpload(false);
     }
   };
-
-  const performNetworkSpeedCheck = async () => {
-    try {
-      setNetworkCheck((prev) => ({ ...prev, checking: true }));
-      setNetworkWarningAcknowledged(false);
-
-      const token = getAuthToken();
-      if (!token) {
-        setNetworkCheck({
-          checking: false,
-          status: 'error',
-          message: '❌ Not authenticated. Please login first.',
-          downloadSpeed: 0,
-          uploadSpeed: 0,
-          latency: 0,
-          verdict: 'error',
-        });
-        return false;
-      }
-
-      const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-      const result = await performNetworkCheck(backendUrl, token);
-
-      if (isMountedRef.current) {
-        if (result.success && result.verdict === 'excellent') {
-          setNetworkCheck({
-            checking: false,
-            status: 'excellent',
-            message: result.message,
-            downloadSpeed: result.downloadSpeed,
-            uploadSpeed: result.uploadSpeed,
-            latency: result.latency,
-            verdict: result.verdict,
-          });
-          return true;
-        } else if (result.success && result.verdict === 'acceptable') {
-          setNetworkCheck({
-            checking: false,
-            status: 'warning',
-            message: result.message,
-            downloadSpeed: result.downloadSpeed,
-            uploadSpeed: result.uploadSpeed,
-            latency: result.latency,
-            verdict: result.verdict,
-          });
-          
-          toast.warning('Network acceptable but somewhat slow - see details above');
-          return true;
-        } else {
-          setNetworkCheck({
-            checking: false,
-            status: 'warning',
-            message: result.message,
-            downloadSpeed: result.downloadSpeed,
-            uploadSpeed: result.uploadSpeed,
-            latency: result.latency,
-            verdict: result.verdict,
-          });
-          
-          // Show warning toast with option to view details
-          toast.warning('Slow network detected - see details above');
-          return false;
-        }
-      }
-      return result.success;
-    } catch (error) {
-      console.error('Network check failed:', error);
-      if (isMountedRef.current) {
-        setNetworkCheck({
-          checking: false,
-          status: 'error',
-          message: `⚠️ Network check error: ${error.message}`,
-          downloadSpeed: 0,
-          uploadSpeed: 0,
-          latency: 0,
-          verdict: 'error',
-        });
-      }
-      // Fail-safe: allow upload even if check fails completely
-      return true;
-    }
-  };
-
-  // Run an upfront network check when the page loads (triggered when user navigates to Upload Video)
-  useEffect(() => {
-    performNetworkSpeedCheck();
-  }, []);
 
   const uploadThumbnail = async () => {
     if (thumbnailMode === "url") {
@@ -815,16 +771,6 @@ const UploadVideo = () => {
       return;
     }
 
-    // Check network speed before proceeding
-    console.log("🌐 Checking network speed...");
-    const networkOk = await performNetworkSpeedCheck();
-    
-    if (!networkOk && !networkWarningAcknowledged) {
-      console.log("⚠️  Network check showed issues - user should review");
-      toast.warning("Please review network status above. Click 'Proceed Anyway' to continue or 'Change Network' to fix connection.");
-      return;
-    }
-
     let thumbUrl = uploadedUrls.thumbnailUrl || "";
     let thumbFileId = uploadedUrls.thumbnailFileId || "";
     let videoUrl = uploadedUrls.videoUrl || "";
@@ -946,8 +892,16 @@ const UploadVideo = () => {
           throw new Error("You do not have admin privileges to upload videos.");
         }
 
+        if (response.status === 429) {
+          const retryAfter = Number(errorData?.retryAfterSec);
+          const message = retryAfter > 0
+            ? `Upload limit reached. Try again in ${retryAfter} seconds.`
+            : "Upload limit reached. Please wait a bit and try again.";
+          throw new Error(message);
+        }
+
         console.error("🔴 Server error:", errorData);
-        throw new Error(errorData.error || "Failed to create video");
+        throw new Error(errorData.message || errorData.error || "Failed to create video");
       }
 
       const result = await response.json();
@@ -963,6 +917,7 @@ const UploadVideo = () => {
         category: "tutorial",
         duration: "",
       });
+      setDurationParts({ hours: "", minutes: "", seconds: "" });
       setFiles({ thumbnail: null, video: null });
       setUploadedUrls({ thumbnailUrl: "", thumbnailFileId: "", videoUrl: "" });
       setUrlInputs({ thumbnail: "", video: "" });
@@ -1081,20 +1036,42 @@ const UploadVideo = () => {
               )}
             </div>
             <div className="form-group half">
-              <label htmlFor="duration">
-                Duration (seconds) - Optional
+              <label>
+                Duration (H : M : S) - Optional
                 <span className="optional">Leave blank if unknown</span>
               </label>
-              <input
-                type="number"
-                id="duration"
-                name="duration"
-                value={formData.duration}
-                onChange={handleInputChange}
-                placeholder="e.g., 300"
-                disabled={isBusy}
-                min="0"
-              />
+              <div className="duration-parts">
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="HH"
+                  value={durationParts.hours}
+                  onChange={(e) => handleDurationPartChange("hours", e.target.value)}
+                  disabled={isBusy}
+                  className="duration-part"
+                />
+                <span className="duration-sep">:</span>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="MM"
+                  value={durationParts.minutes}
+                  onChange={(e) => handleDurationPartChange("minutes", e.target.value)}
+                  disabled={isBusy}
+                  className="duration-part"
+                />
+                <span className="duration-sep">:</span>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="SS"
+                  value={durationParts.seconds}
+                  onChange={(e) => handleDurationPartChange("seconds", e.target.value)}
+                  disabled={isBusy}
+                  className="duration-part"
+                />
+              </div>
+              <small>Stored as {formData.duration || 0} seconds in database</small>
             </div>
           </div>
         </div>
@@ -1286,92 +1263,6 @@ const UploadVideo = () => {
                 )}
             </div>
           </div>
-
-          {networkCheck.checking && (
-            <div className="network-status network-status--checking">
-              <div className="network-status__content">
-                <Loader size={20} className="spinner" />
-                <div>
-                  <div className="network-status__title">🌐 Checking network speed...</div>
-                  <div className="network-status__subtitle">
-                    Testing download, upload speeds and backend connectivity
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {networkCheck.status === 'excellent' && (
-            <div className="network-status network-status--excellent">
-              <div className="network-status__content">
-                <Wifi size={20} />
-                <div>
-                  <div className="network-status__title">✅ Network Excellent</div>
-                  <div className="network-status__subtitle">
-                    Download: {networkCheck.downloadSpeed.toFixed(2)} Mbps | Upload: {networkCheck.uploadSpeed.toFixed(2)} Mbps | Latency: {networkCheck.latency}ms
-                  </div>
-                  <div className="network-status__message" style={{ marginTop: '8px', fontSize: '13px', opacity: 0.85 }}>
-                    {networkCheck.message}
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {networkCheck.status === 'warning' && (
-            <div className="network-status network-status--warning">
-              <div className="network-status__content">
-                <WifiOff size={20} />
-                <div>
-                  <div className="network-status__title">⚠️  Network Warning</div>
-                  <div className="network-status__subtitle">
-                    Download: {networkCheck.downloadSpeed.toFixed(2)} Mbps | Upload: {networkCheck.uploadSpeed.toFixed(2)} Mbps | Latency: {networkCheck.latency}ms
-                  </div>
-                  <div className="network-status__message">{networkCheck.message}</div>
-                  <div className="network-status__actions">
-                    <button
-                      type="button"
-                      className="btn btn--small btn--secondary"
-                      onClick={() => {
-                        setNetworkCheck({ checking: false, status: null, message: '', downloadSpeed: 0, uploadSpeed: 0, latency: 0, verdict: null });
-                        setNetworkWarningAcknowledged(false);
-                      }}
-                    >
-                      Change Network & Retry
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn--small btn--tertiary"
-                      onClick={() => setNetworkWarningAcknowledged(true)}
-                    >
-                      Proceed Anyway
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {networkCheck.status === 'error' && (
-            <div className="network-status network-status--error">
-              <div className="network-status__content">
-                <AlertCircle size={20} />
-                <div>
-                  <div className="network-status__title">❌ Network Check Failed</div>
-                  <div className="network-status__subtitle">{networkCheck.message}</div>
-                  <div className="network-status__actions">
-                    <button
-                      type="button"
-                      className="btn btn--small btn--secondary"
-                      onClick={() => performNetworkSpeedCheck()}
-                    >
-                      Retry Check
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
 
           <div className="action-card">
             <p className="muted">Ready to publish?</p>

@@ -1,0 +1,17 @@
+
+services:
+  app:
+    build: .
+    container_name: breathart_app
+    env_file:
+      - backend/.env
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      # PORT: ${PORT:-8080}
+      # # In containers, localhost is the container itself.
+      # # Override with a Docker-reachable Mongo host by default.
+      # MONGODB_URI: ${MONGODB_URI_DOCKER:-mongodb://host.docker.internal:27017/breathart}
+    ports:
+      - "8080:8080"
+      # nginx on host handles 443 -> 8080 mapping
+    restart: unless-stopped

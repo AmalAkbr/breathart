@@ -6,13 +6,38 @@
 
 import rateLimit from 'express-rate-limit';
 
+const toRetryAfterSeconds = (req, fallbackSeconds) => {
+  const resetTime = req.rateLimit?.resetTime;
+  if (resetTime instanceof Date) {
+    return Math.max(1, Math.ceil((resetTime.getTime() - Date.now()) / 1000));
+  }
+  const reset = Number(req.rateLimit?.resetTime);
+  if (!Number.isNaN(reset) && reset > 0) {
+    return Math.max(1, Math.ceil(reset));
+  }
+  return fallbackSeconds;
+};
+
+const buildRateLimitHandler = (defaultMessage, fallbackSeconds) => {
+  return (req, res) => {
+    const retryAfterSec = toRetryAfterSeconds(req, fallbackSeconds);
+    res.set('Retry-After', String(retryAfterSec));
+    res.status(429).json({
+      success: false,
+      message: `${defaultMessage} Try again in ${retryAfterSec} seconds.`,
+      retryAfterSec,
+      error: 'RATE_LIMITED'
+    });
+  };
+};
+
 /**
  * General API rate limiter: 100 requests per 15 minutes per IP
  */
 export const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // limit each IP to 100 requests per windowMs
-  message: 'Too many requests from this IP, please try again later.',
+  handler: buildRateLimitHandler('Too many requests from this IP.', 15 * 60),
   standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
   skip: (req) => {
@@ -28,9 +53,9 @@ export const generalLimiter = rateLimit({
  * Prevents brute force password attacks
  */
 export const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // 5 attempts per 15 minutes
-  message: 'Too many login/signup attempts, please try again after 15 minutes.',
+  windowMs: 5 * 60 * 1000, // 5 minutes
+  max: 5, // 5 attempts per 5 minutes
+  handler: buildRateLimitHandler('Too many login/signup attempts.', 5 * 60),
   standardHeaders: true,
   legacyHeaders: false,
   skipSuccessfulRequests: true, // Don't count successful requests
@@ -47,7 +72,7 @@ export const authLimiter = rateLimit({
 export const emailVerificationLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
   max: 3, // 3 attempts per hour
-  message: 'Too many verification attempts. Please try again in 1 hour.',
+  handler: buildRateLimitHandler('Too many verification attempts.', 60 * 60),
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator: (req, res) => {
@@ -62,7 +87,7 @@ export const emailVerificationLimiter = rateLimit({
 export const passwordResetLimiter = rateLimit({
   windowMs: 30 * 60 * 1000, // 30 minutes
   max: 3, // 3 attempts per 30 minutes
-  message: 'Too many password reset attempts. Please try again in 30 minutes.',
+  handler: buildRateLimitHandler('Too many password reset attempts.', 30 * 60),
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator: (req, res) => {
@@ -71,15 +96,15 @@ export const passwordResetLimiter = rateLimit({
 });
 
 /**
- * File upload limiter: 10 uploads per hour
- * Prevents storage abuse
+ * File upload limiter: 20 uploads per 2 minutes
+ * Tuned for admin bulk uploads while still protecting server resources
  */
 export const uploadLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hour
-  max: 10, // 10 uploads per hour
-  message: 'Too many file uploads. Please try again in 1 hour.',
+  windowMs: 2 * 60 * 1000, // 2 minutes
+  max: 20,
+  handler: buildRateLimitHandler('Upload limit reached (20 uploads per 2 minutes).', 2 * 60),
   standardHeaders: true,
-  legacyHeaders: false
+  legacyHeaders: false,
 });
 
 /**
@@ -89,7 +114,7 @@ export const uploadLimiter = rateLimit({
 export const adminLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 1000, // 1000 requests per 15 minutes
-  message: 'Admin API rate limit exceeded.',
+  handler: buildRateLimitHandler('Admin API rate limit exceeded.', 15 * 60),
   standardHeaders: true,
   legacyHeaders: false
 });
@@ -101,7 +126,7 @@ export const adminLimiter = rateLimit({
 export const strictLimiter = rateLimit({
   windowMs: 60 * 1000, // 1 minute
   max: 10, // 10 requests per minute
-  message: 'Too many requests to this endpoint, please try again later.',
+  handler: buildRateLimitHandler('Too many requests to this endpoint.', 60),
   standardHeaders: true,
   legacyHeaders: false
 });

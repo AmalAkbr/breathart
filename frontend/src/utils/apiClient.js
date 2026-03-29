@@ -50,10 +50,24 @@ const apiCall = async (endpoint, options = {}) => {
 
     if (!response.ok) {
       const error = await response.json().catch(() => ({}));
-      const errorMessage = error.message || error.error || `HTTP ${response.status}`;
+      const retryAfterHeader = response.headers.get('retry-after');
+      const rateLimitResetHeader = response.headers.get('ratelimit-reset');
+      const retryAfterSec = Number(error.retryAfterSec)
+        || Number(retryAfterHeader)
+        || Number(rateLimitResetHeader)
+        || null;
+
+      let errorMessage = error.message || error.error || `HTTP ${response.status}`;
+      if (response.status === 429 && !error.message) {
+        errorMessage = retryAfterSec
+          ? `Too many requests. Try again in ${retryAfterSec} seconds.`
+          : 'Too many requests. Please try again later.';
+      }
+
       const err = new Error(errorMessage);
       err.status = response.status;
       err.data = error;
+      err.retryAfterSec = retryAfterSec;
       throw err;
     }
 

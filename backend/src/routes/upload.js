@@ -390,30 +390,6 @@ router.post('/cancel-upload', verifyAdmin, async (req, res) => {
 });
 
 /**
- * GET /api/upload/check-speed
- * Network speed check endpoint
- * Returns server timestamp and latency info for frontend network health verification
- * No authentication required - used for pre-upload checks without bearer token
- */
-router.get('/check-speed', (req, res) => {
-  try {
-    res.status(200).json({
-      success: true,
-      timestamp: Date.now(),
-      serverTime: new Date().toISOString(),
-      message: 'Backend connectivity confirmed',
-    });
-  } catch (error) {
-    console.error('❌ Speed check error:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Backend speed check failed',
-      details: error.message,
-    });
-  }
-});
-
-/**
  * POST /api/upload/video
  * Create video entry with metadata (URL-based, no file upload)
  * Body: { title, description, category, thumbnailUrl, videoUrl, duration }

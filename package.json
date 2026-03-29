@@ -24,14 +24,9 @@
   "devDependencies": {
     "concurrently": "^9.1.0",
     "dotenv-cli": "^7.3.0",
-    "drizzle-kit": "^0.30.6",
     "tsx": "^4.7.0"
   },
   "dependencies": {
-    "drizzle-orm": "^0.45.1",
-    "postgres": "^3.4.8",
-    "prompts": "^2.4.2",
-    "bcryptjs": "^2.4.3",
     "dotenv": "^16.3.1"
   }
 }

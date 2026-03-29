@@ -1,7 +1,5 @@
 import express from 'express';
 import http from 'http';
-import cors from 'cors';
-import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import mongoose from 'mongoose';
 import { Server as SocketIOServer } from 'socket.io';
@@ -14,6 +12,7 @@ const __dirname = path.dirname(__filename);
 
 // Import config
 import env from './utils/envConfig.js';
+import { configureSecurityMiddleware } from './config/security.js';
 
 // Import routes
 import authRoutes from './routes/auth.js';
@@ -25,9 +24,6 @@ import adminRoutes from './routes/admin.js';
 import { errorHandler, notFoundHandler } from './middleware/auth.js';
 import {
   generalLimiter,
-  authLimiter,
-  emailVerificationLimiter,
-  passwordResetLimiter,
   uploadLimiter,
   adminLimiter
 } from './middleware/rateLimit.js';
@@ -51,103 +47,20 @@ console.log(`
 // ==============================================
 
 try {
-  await mongoose.connect(env.MONGODB_URI);
+  await mongoose.connect(env.MONGODB_URI, {
+    // Fail fast when DB is unreachable so container does not appear stuck in startup.
+    serverSelectionTimeoutMS: 10000,
+    connectTimeoutMS: 10000,
+  });
   console.log('✅ MongoDB Connected');
 } catch (error) {
   console.error('❌ MongoDB Connection Failed:', error.message);
   process.exit(1);
 }
 
-// ==============================================
-// SECURITY MIDDLEWARE - HELMET CONFIGURATION
-// ==============================================
+const { allowedOrigins } = configureSecurityMiddleware(app, env);
 
-// Enhanced helmet with strict CSP and security headers
-// CSP allows Google Fonts, YouTube (embed), Google Maps, and the configured frontend origin
-const scriptSrc = [
-  "'self'",
-  "'unsafe-inline'",
-  'https://*.youtube.com',
-  'https://*.youtube-nocookie.com',
-  'https://*.ytimg.com',
-  'https://s.ytimg.com',
-  'https://*.gstatic.com',
-  'https://*.googleapis.com',
-  'https://*.google.com'
-];
-const scriptSrcAttr = ["'self'", "'unsafe-inline'"]; // prevent script-src-attr 'none' errors
-const styleSrc = ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'];
-const fontSrc = ["'self'", 'data:', 'https://fonts.gstatic.com'];
-const connectSrc = [
-  "'self'",
-  env.FRONTEND_URL,
-  'https://*.youtube.com',
-  'https://*.youtube-nocookie.com',
-  'https://*.ytimg.com',
-  'https://s.ytimg.com',
-  'https://*.gstatic.com',
-  'https://*.googleapis.com',
-  'https://*.google.com',
-  'https://maps.google.com'
-].filter(Boolean);
-const frameSrc = [
-  "'self'",
-  'https://*.youtube.com',
-  'https://*.youtube-nocookie.com',
-  'https://*.google.com',
-  'https://*.googleapis.com',
-  'https://maps.google.com',
-  'https://www.google.com/maps',
-  'https://maps.google.com/maps'
-];
-const mediaSrc = [
-  "'self'",
-  'https:',
-  'https://*.googlevideo.com',
-  'https://*.youtube.com'
-];
 
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc, // allow built inline handlers
-      scriptSrcAttr, // allow on* attributes from bundled HTML
-      styleSrc,
-      fontSrc,
-      imgSrc: [
-        "'self'",
-        "data:",
-        "https:",
-        'https://*.ytimg.com',
-        'https://s.ytimg.com',
-        'https://*.gstatic.com',
-        'https://*.google.com'
-      ],
-      connectSrc,
-      frameSrc,
-      mediaSrc,
-      objectSrc: ["'none'"],
-      upgradeInsecureRequests: [],
-    },
-  },
-  // Disable COEP/COOP so third-party iframes (YouTube/Maps) are not blocked
-  crossOriginEmbedderPolicy: false,
-  crossOriginOpenerPolicy: false,
-  crossOriginResourcePolicy: { policy: "cross-origin" },
-  dnsPrefetchControl: true,
-  frameguard: { action: 'deny' },
-  hidePoweredBy: true,
-  hsts: {
-    maxAge: 31536000, // 1 year
-    includeSubDomains: true,
-    preload: true,
-  },
-  ieNoOpen: true,
-  noSniff: true,
-  referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
-  xssFilter: true,
-}));
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
@@ -155,37 +68,6 @@ app.use(cookieParser());
 
 // console.log('✅ Security middleware configured with helmet');
 
-// ==============================================
-// CORS CONFIGURATION (MUST BE BEFORE RATE LIMITING)
-// ==============================================
-// CORS must be applied before rate limiters to allow OPTIONS preflight requests
-
-// Allowed origins driven by env, with dev fallbacks
-const devOrigins = env.NODE_ENV === 'development'
-  ? ['http://localhost:5173', 'http://127.0.0.1:5173']
-  : [];
-
-const allowedOrigins = Array.from(new Set([
-  env.FRONTEND_URL,
-  env.CORS_ORIGIN,
-  ...devOrigins,
-].filter(Boolean)));
-
-app.use(cors({
-  origin: (origin, callback) => {
-    const isAllowed = !origin || allowedOrigins.includes(origin);
-    if (isAllowed) {
-      callback(null, true);
-    } else {
-      console.warn(`❌ CORS blocked origin: ${origin}`);
-      callback(new Error('CORS not allowed'));
-    }
-  },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token'],
-  optionsSuccessStatus: 200, // For compatibility with older browsers
-}));
 
 const io = new SocketIOServer(server, {
   cors: {
@@ -207,36 +89,12 @@ console.log('✅ CORS configured for origins:', allowedOrigins);
 
 const skipRateLimit = env.NODE_ENV === 'development';
 
-// Apply general rate limiter to all requests (but not OPTIONS)
-app.use((req, res, next) => {
+// Apply general rate limiter to API requests only (not static assets)
+app.use('/api', (req, res, next) => {
   if (req.method === 'OPTIONS' || skipRateLimit) {
     return next(); // Skip rate limiting for preflight requests and local dev
   }
   generalLimiter(req, res, next);
-});
-
-// Apply auth limiter to auth endpoints (strict limits on login/register)
-app.use('/api/auth', (req, res, next) => {
-  if (req.method === 'OPTIONS' || skipRateLimit) {
-    return next();
-  }
-  authLimiter(req, res, next);
-});
-
-// Apply email verification limiter to email verification endpoints
-app.use('/api/auth/verify-email', (req, res, next) => {
-  if (req.method === 'OPTIONS' || skipRateLimit) {
-    return next();
-  }
-  emailVerificationLimiter(req, res, next);
-});
-
-// Apply password reset limiter to password reset endpoints
-app.use('/api/auth/reset-password', (req, res, next) => {
-  if (req.method === 'OPTIONS' || skipRateLimit) {
-    return next();
-  }
-  passwordResetLimiter(req, res, next);
 });
 
 // Apply upload limiter to upload endpoints
@@ -256,11 +114,10 @@ app.use('/api/admin', (req, res, next) => {
 });
 
 console.log('✅ Rate limiting configured:');
-console.log('  ✓ Auth limiter: /api/auth');
-console.log('  ✓ Email verification limiter: /api/auth/verify-email');
-console.log('  ✓ Password reset limiter: /api/auth/reset-password');
-console.log('  ✓ Upload limiter: /api/upload');
-console.log('  ✓ Admin limiter: /api/admin');
+// console.log('  ✓ General limiter: /api/*');
+// console.log('  ✓ Auth/email/password limiters: route-level in /api/auth');
+// console.log('  ✓ Upload limiter: /api/upload');
+// console.log('  ✓ Admin limiter: /api/admin');
 
 // ==============================================
 // REQUEST LOGGING

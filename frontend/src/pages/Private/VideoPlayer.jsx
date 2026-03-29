@@ -22,6 +22,27 @@ const VideoPlayer = () => {
   const [speed, setSpeed] = useState(1);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
+  const formatDuration = (seconds) => {
+    const total = Number(seconds);
+    if (!Number.isFinite(total) || total < 0) return '00:00';
+
+    const whole = Math.floor(total);
+    const hrs = Math.floor(whole / 3600);
+    const mins = Math.floor((whole % 3600) / 60);
+    const secs = whole % 60;
+
+    if (hrs > 0) {
+      return `${hrs}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    }
+
+    return `${mins}:${String(secs).padStart(2, '0')}`;
+  };
+
+  const storedDuration = Number(video?.duration || 0);
+  const displayDuration = Number.isFinite(duration) && duration > 0
+    ? duration
+    : (Number.isFinite(storedDuration) ? storedDuration : 0);
+
   const handleLoadedMetadata = () => {
     const videoEl = videoRef.current;
     if (!videoEl) return;
@@ -390,7 +411,7 @@ const VideoPlayer = () => {
 
               <div className="flex items-center gap-2 ml-auto">
                 <span className="text-white/70 tabular-nums">
-                  {new Date(progress * 1000).toISOString().substr(14, 5)} / {duration ? new Date(duration * 1000).toISOString().substr(14, 5) : '00:00'}
+                  {formatDuration(progress)} / {formatDuration(displayDuration)}
                 </span>
                 
                 <select
@@ -524,7 +545,7 @@ const VideoPlayer = () => {
 
                 <div className="flex items-center gap-1.5 ml-auto">
                   <span className="text-white/70 tabular-nums">
-                    {new Date(progress * 1000).toISOString().substr(14, 5)} / {duration ? new Date(duration * 1000).toISOString().substr(14, 5) : '00:00'}
+                    {formatDuration(progress)} / {formatDuration(displayDuration)}
                   </span>
                   
                   <button
@@ -562,9 +583,7 @@ const VideoPlayer = () => {
             <div className="flex flex-wrap gap-4 text-xs sm:text-sm text-white/50 border-t border-white/10 pt-4">
               <div>
                 <span className="text-white/70">Duration:</span>{' '}
-                {video.duration || video.duration === 0
-                  ? `${Math.floor((video.duration || 0) / 60)}:${(Math.floor((video.duration || 0) % 60)).toString().padStart(2, '0')}`
-                  : 'N/A'}
+                {displayDuration > 0 ? formatDuration(displayDuration) : 'N/A'}
               </div>
               <div>
                 <span className="text-white/70">Category:</span> {video.category || 'General'}
