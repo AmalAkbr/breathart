@@ -1,5 +1,7 @@
 import express from 'express';
+import https from 'https';  // Use https, not http
 import http from 'http';
+import fs from 'fs';        // <-- THIS WAS MISSING
 import cookieParser from 'cookie-parser';
 import mongoose from 'mongoose';
 import { Server as SocketIOServer } from 'socket.io';
@@ -13,6 +15,7 @@ const __dirname = path.dirname(__filename);
 // Import config
 import env from './utils/envConfig.js';
 import { configureSecurityMiddleware } from './config/security.js';
+// Load SSL certs
 
 // Import routes
 import authRoutes from './routes/auth.js';
@@ -33,8 +36,21 @@ import { initCleanupCron } from './services/cropJobService.js';
 import { initializeUploadSocketServer } from './websocket/uploadSocketServer.js';
 
 const app = express();
-const server = http.createServer(app);
+let server;
 
+if (env.NODE_ENV === 'production') {
+  // Use HTTPS in production
+  const sslOptions = {
+    key: fs.readFileSync(path.join(__dirname, 'ssl', 'key.pem')),
+    cert: fs.readFileSync(path.join(__dirname, 'ssl', 'cert.pem')),
+  };
+  server = https.createServer(sslOptions, app);
+  console.log('🚀 Running in PRODUCTION with HTTPS');
+} else {
+  // Use HTTP in development
+  server = http.createServer(app);
+  console.log('🚀 Running in DEVELOPMENT with HTTP');
+}
 console.log(`
 ╔═══════════════════════════════════════════════════════════╗
 ║  🚀 Breath Art Institute Backend - MongoDB                ║
@@ -114,10 +130,6 @@ app.use('/api/admin', (req, res, next) => {
 });
 
 console.log('✅ Rate limiting configured:');
-// console.log('  ✓ General limiter: /api/*');
-// console.log('  ✓ Auth/email/password limiters: route-level in /api/auth');
-// console.log('  ✓ Upload limiter: /api/upload');
-// console.log('  ✓ Admin limiter: /api/admin');
 
 // ==============================================
 // REQUEST LOGGING
@@ -175,7 +187,8 @@ app.use(errorHandler);
 // ==============================================
 
 server.listen(env.PORT, "0.0.0.0", () => {
-  console.log(`✅ Server Running 📡 http://localhost:${env.PORT}
+  const protocol = env.NODE_ENV === 'production' ? 'https' : 'http';
+  console.log(`✅ Server running at ${protocol}://localhost:${env.PORT}
 🗄️  Database: MongoDB
 🌍 Environment: ${env.NODE_ENV}
 🔐 CORS: ${env.FRONTEND_URL}

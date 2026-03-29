@@ -1,0 +1,31 @@
+2️⃣ Create a dedicated user (optional but recommended)
+
+It’s best practice not to run Node as root. You can create a breathart user:
+
+sudo adduser breathart
+sudo usermod -aG sudo breathart
+
+Move your project folder to the new user home (optional):
+
+
+sudo chown -R breathart:breathart /home/muhammadhabeebrahmam/web/breathart
+mv /home/muhammadhabeebrahmam/web/breathart /home/breathart/breathart
+
+
+Switch to the new user:
+su - breathart
+cd ~/breathart
+
+Running Node as a normal user prevents accidental system-wide damage.
+
+
+
+Option 2 — Move project to the user who will run the app
+Create a dedicated breathart user if you want
+Move the project files there:
+sudo mkdir -p /home/breathart/web
+sudo cp -r /home/muhammadhabeebrahmam/web/breathart /home/breathart/web/
+sudo chown -R breathart:breathart /home/breathart/web/breathart
+Log in as breathart, then install Node & npm for that user
+cd /home/breathart/web/breathart/backend → npm ci
+cd ../frontend → npm ci && npm run build
