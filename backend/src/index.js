@@ -37,20 +37,24 @@ import { initializeUploadSocketServer } from './websocket/uploadSocketServer.js'
 
 const app = express();
 let server;
+// this only need if you are testing locally wiht your ip network with self-signed certs, in production the server will be behind a reverse proxy that handles SSL termination
+// if (env.NODE_ENV === 'production') {
+//   // Use HTTPS in production
+//   const sslOptions = {
+//     key: fs.readFileSync(path.join(__dirname, 'ssl', 'key.pem')),
+//     cert: fs.readFileSync(path.join(__dirname, 'ssl', 'cert.pem')),
+//   };
+//   server = https.createServer(sslOptions, app);
+//   console.log('🚀 Running in PRODUCTION with HTTPS');
+// } else {
+//   // Use HTTP in development
+//   server = http.createServer(app);
+//   console.log('🚀 Running in DEVELOPMENT with HTTP');
+// }
+// else use this in main production
 
-if (env.NODE_ENV === 'production') {
-  // Use HTTPS in production
-  const sslOptions = {
-    key: fs.readFileSync(path.join(__dirname, 'ssl', 'key.pem')),
-    cert: fs.readFileSync(path.join(__dirname, 'ssl', 'cert.pem')),
-  };
-  server = https.createServer(sslOptions, app);
-  console.log('🚀 Running in PRODUCTION with HTTPS');
-} else {
-  // Use HTTP in development
-  server = http.createServer(app);
-  console.log('🚀 Running in DEVELOPMENT with HTTP');
-}
+server = http.createServer(app);
+
 console.log(`
 ╔═══════════════════════════════════════════════════════════╗
 ║  🚀 Breath Art Institute Backend - MongoDB                ║
@@ -188,7 +192,8 @@ app.use(errorHandler);
 
 server.listen(env.PORT, "0.0.0.0", () => {
   const protocol = env.NODE_ENV === 'production' ? 'https' : 'http';
-  console.log(`✅ Server running at ${protocol}://localhost:${env.PORT}
+  // console.log(`✅ Server running at ${protocol}://localhost:${env.PORT}
+  console.log(`🚀 Server running on port ${env.PORT} 
 🗄️  Database: MongoDB
 🌍 Environment: ${env.NODE_ENV}
 🔐 CORS: ${env.FRONTEND_URL}

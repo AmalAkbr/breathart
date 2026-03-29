@@ -79,4 +79,10 @@ After this, Nginx should no longer show the conflicting server name warnings, an
  sudo npm install -g pm2
 
 
- 
+ pm2 start npm --name "breathart" -- run prod:backend
+
+ Explanation:
+
+npm → tells PM2 to run npm scripts.
+--name "breathart" → gives the process a friendly name for PM2.
+-- run prod:backend → runs your prod:backend script.
