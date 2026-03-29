@@ -1,17 +1,16 @@
-
 services:
   app:
-    build: .
-    container_name: breathart_app
+    build:
+      context: .
+      args:
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:8080/api}
+        VITE_WEB3FORMS_KEY: ${VITE_WEB3FORMS_KEY:-4061c748-3472-46d4-b2db-b814c914677a}
+        VITE_NODE_ENV: ${VITE_NODE_ENV:-production}
+    container_name: brt_app
     env_file:
       - backend/.env
     environment:
       NODE_ENV: ${NODE_ENV:-production}
-      # PORT: ${PORT:-8080}
-      # # In containers, localhost is the container itself.
-      # # Override with a Docker-reachable Mongo host by default.
-      # MONGODB_URI: ${MONGODB_URI_DOCKER:-mongodb://host.docker.internal:27017/breathart}
     ports:
       - "8080:8080"
-      # nginx on host handles 443 -> 8080 mapping
     restart: unless-stopped

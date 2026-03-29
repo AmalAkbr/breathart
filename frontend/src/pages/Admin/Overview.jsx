@@ -1,7 +1,7 @@
 // frontend/src/pages/Admin/Overview.jsx
 import React, { useEffect, useState } from 'react';
 import { Users, Play, CheckCircle2, Activity, Sparkles, Clock3, Shield } from 'lucide-react';
-import { getAuthToken } from '../../utils/apiClient';
+import { API_URL, getAuthToken } from '../../utils/apiClient';
 import { toast } from '../../utils/toast';
 import '../../styles/AdminOverview.css';
 
@@ -27,7 +27,7 @@ const Overview = () => {
       const token = getAuthToken();
       if (!token) throw new Error('Session expired');
 
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/admin/overview`, {
+      const res = await fetch(`${API_URL}/admin/overview`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

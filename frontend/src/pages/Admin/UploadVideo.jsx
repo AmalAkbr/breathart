@@ -10,7 +10,7 @@ import {
   Loader,
 } from "lucide-react";
 import { io } from "socket.io-client";
-import { getAuthToken } from "../../utils/apiClient";
+import { API_URL,getAuthToken } from "../../utils/apiClient";
 import { toast } from "../../utils/toast";
 import { getVideoDurationInSecondsFromFile } from "../../utils/videoDuration";
 import "../../styles/UploadVideo.css";
@@ -154,8 +154,7 @@ const UploadVideo = () => {
   };
 
   const getSocketServerUrl = () => {
-    const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
-    return apiUrl.replace(/\/api\/?$/, "");
+    return API_URL.replace(/\/api\/?$/, "");
   };
 
   const createUploadId = () => {
@@ -554,7 +553,7 @@ const UploadVideo = () => {
       return;
     }
 
-    await fetch(`${import.meta.env.VITE_API_URL}/upload/cancel-upload`, {
+    await fetch(`${API_URL}/upload/cancel-upload`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -632,7 +631,7 @@ const UploadVideo = () => {
       formDataObj.append("thumbnail", files.thumbnail);
 
       const data = await uploadWithProgress(
-        `${import.meta.env.VITE_API_URL}/upload/thumbnail`,
+        `${API_URL}/upload/thumbnail`,
         formDataObj,
         token,
         ({ percent }) =>
@@ -697,7 +696,7 @@ const UploadVideo = () => {
       formDataObj.append("uploadId", uploadId);
 
       const data = await uploadWithProgress(
-        `${import.meta.env.VITE_API_URL}/upload/video-file`,
+        `${API_URL}/upload/video-file`,
         formDataObj,
         token,
         ({ percent, loaded, total }) => {
@@ -853,7 +852,7 @@ const UploadVideo = () => {
       // });
 
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/upload/video`,
+        `${API_URL}/upload/video`,
         {
           method: "POST",
           headers: {

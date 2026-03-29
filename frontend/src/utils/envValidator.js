@@ -9,9 +9,10 @@ const REQUIRED_ENV_VARS = {
   VITE_API_URL: {
     label: 'Backend API URL',
     required: true,
-    description: 'Backend API endpoint (e.g., http://localhost:3001/api)',
+    description: 'Backend API endpoint (e.g., http://localhost:8080/api). In production, same-origin /api is used if omitted.',
+    allowMissingInProd: true,
     validate: (value) => {
-      if (!value) return false;
+      if (!value) return import.meta.env.PROD;
       try {
         // Check if it's a valid URL
         new URL(value);
@@ -21,7 +22,7 @@ const REQUIRED_ENV_VARS = {
         return false;
       }
     },
-    errorMessage: 'Must be a valid URL with /api path (e.g., http://localhost:3001/api)'
+    errorMessage: 'Must be a valid URL with /api path (e.g., http://localhost:8080/api)'
   },
 
   // Web3Forms for contact forms (optional)
@@ -29,6 +30,11 @@ const REQUIRED_ENV_VARS = {
     label: 'Web3Forms Key',
     required: false,
     description: 'Web3Forms key for contact form submissions',
+  },
+  VITE_NODE_ENV: {
+    label: 'Node Environment',
+    required: true,
+    description: 'Node environment (e.g., development, production)',
   },
 };
 
@@ -44,6 +50,10 @@ export const validateEnvironmentVariables = () => {
     const value = import.meta.env[varName];
 
     if (!value || value.startsWith('your_')) {
+      if (config.allowMissingInProd && import.meta.env.PROD) {
+        return;
+      }
+
       const message = config.errorMessage 
         ? `${config.label}: ${config.errorMessage}`
         : `Missing or invalid ${config.label}: ${config.description}`;

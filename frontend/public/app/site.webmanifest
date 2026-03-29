@@ -1,23 +1,31 @@
 {
-  "name": "Breath Art Institute",
+  "name": "Breath Art Institute — Creative & Digital Programs",
   "short_name": "BreathArt",
+  "lang": "en",
+  "dir": "ltr",
   "id": "/",
-  "start_url": "/",
+  "start_url": "/?source=pwa",
   "scope": "/",
-  "description": "Breath Art Institute web app",
+  "description": "Breath Art Institute: digital marketing, design, and career training with verified mentors and placement support.",
+  "categories": ["education", "productivity", "lifestyle", "business", "portfolio"],
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait-primary",
+  "background_color": "#0d1b2e",
+  "theme_color": "#0d1b2e",
   "icons": [
     {
       "src": "/app/android-chrome-192x192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "/app/android-chrome-512x512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ],
-  "background_color": "#0d1b2e",
-  "theme_color": "#0d1b2e",
-  "display": "standalone"
+  "prefer_related_applications": false
 }

@@ -7,13 +7,13 @@ import { getAuthToken, videoAPI } from "../../utils/apiClient";
 import { toast } from "../../utils/toast";
 import { FileVideo, FolderX } from "lucide-react";
 import { motion } from "framer-motion";
-import { useDevtoolsShield } from "../../hooks/useDevtoolsShield";
+// import { useDevtoolsShield } from "../../hooks/useDevtoolsShield";
 const VideoViewer = () => {
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-  const { isProduction, isDevtoolsOpen } = useDevtoolsShield();
+  // const { isProduction, isDevtoolsOpen } = useDevtoolsShield();
 
   // Check authentication and fetch videos
   useEffect(() => {
@@ -44,9 +44,10 @@ const VideoViewer = () => {
     navigate(`/player/${videoId}`);
   };
 
-  if (isProduction && isDevtoolsOpen) {
-    return <SecurityBlankScreen />;
-  }
+  // if (isProduction && isDevtoolsOpen) {
+  //   // <SecurityBlankScreen />;
+  //   return;
+  // }
 
   if (loading) {
     return (
@@ -88,7 +89,7 @@ const VideoViewer = () => {
   return (
     <div className="min-h-screen bg-linear-to-b from-[#06060a] to-[#0a0a0f] text-white px-6 py-16">
       <div className="max-w-7xl mx-auto relative">
-        <nav className="" >
+        <nav className="">
           <Link to="/">
             <motion.button
               type="button"

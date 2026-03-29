@@ -218,20 +218,76 @@ npm run preview      # Preview production build
 
 ---
 
-## 🚀 Deployment
+## 🚀 Production Deployment (Docker)
 
-### Backend (VPS/Heroku)
+### 1. Prepare Environment Files
+
+- Create `backend/.env` with all backend secrets (see below for required variables)
+- Create `frontend/.env.local` with frontend build-time variables (must include `VITE_API_URL`)
+
+### 2. Clean Up Old Containers & Images (Optional, for guaranteed fresh build)
+
 ```bash
-npm install
-npm start
-# Configure production .env variables
+docker compose down
+docker builder prune -af
+docker image prune -af
+docker image rm -f breathart-app  # Remove old app image if exists
 ```
 
-### Frontend (Vercel/Netlify)
+### 3. Build & Start Containers
+
 ```bash
-npm run build
-# Deploy dist/ folder
-# Set VITE_API_URL to production API
+# Build all images with no cache (ensures env vars are injected)
+docker compose build --no-cache
+
+# Start containers in detached mode
+docker compose up -d
+
+# (Optional) View logs
+docker compose logs -f
+```
+
+### 4. Container Access & Management
+
+```bash
+# Open a shell in the running app container (sh or bash)
+docker compose exec app sh
+# or, if bash is available:
+docker compose exec app bash
+
+# Restart app container
+docker compose restart app
+
+# Stop all containers
+docker compose down
+```
+
+### 5. Troubleshooting & Maintenance
+
+```bash
+# Remove all stopped containers, unused networks, images, and cache
+docker system prune -af
+
+# Check running containers
+docker compose ps
+
+# Remove a specific image
+docker image rm -f breathart-app
+
+# View last 50 log lines
+docker compose logs -n 50 app
+
+# Execute a command in the app container
+docker exec brt_app npm run migrate
+
+# SSH into container (interactive)
+docker exec -it brt_app /bin/bash
+
+# Test backend health
+curl http://localhost:8080/api/health
+
+# Test frontend served
+curl http://localhost:8080/
 ```
 
 ---

@@ -10,7 +10,7 @@ import ManageExams from "./exams/ManageExams";
 import ManageUsers from "./ManageUsers";
 import "../../styles/AdminDashboard.css";
 import { useUserStore } from "../../store/userStore";
-import { getAuthToken } from "../../utils/apiClient";
+import { API_URL, getAuthToken } from "../../utils/apiClient";
 import { toast } from "../../utils/toast";
 
 const AdminDashboard = () => {
@@ -46,7 +46,7 @@ const AdminDashboard = () => {
         // Enable admin flag on backend if needed
         try {
           const enableResponse = await fetch(
-            `${import.meta.env.VITE_API_URL}/admin/enable-admin`,
+            `${API_URL}/admin/enable-admin`,
             {
               method: "POST",
               headers: {

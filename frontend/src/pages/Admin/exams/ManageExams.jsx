@@ -1,7 +1,7 @@
 // frontend/src/pages/Admin/exams/ManageExams.jsx
 import React, { useState, useEffect } from "react";
 import { Trash2, Loader, Link as LinkIcon } from "lucide-react";
-import { getAuthToken } from "../../../utils/apiClient";
+import { API_URL, getAuthToken } from "../../../utils/apiClient";
 import "../../../styles/ManageExams.css";
 
 const ManageExams = () => {
@@ -31,7 +31,7 @@ const ManageExams = () => {
       try {
         setLoading(true);
         const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/admin/exams`,
+          `${API_URL}/admin/exams`,
           {
             headers: getAuthHeaders(),
           },
@@ -57,7 +57,7 @@ const ManageExams = () => {
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/admin/exams/${examId}`,
+        `${API_URL}/admin/exams/${examId}`,
         {
           method: "DELETE",
           headers: getAuthHeaders(),
@@ -77,7 +77,7 @@ const ManageExams = () => {
   const handleViewDetails = async (exam) => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/admin/exams/${exam.id}`,
+        `${API_URL}/admin/exams/${exam.id}`,
         {
           headers: getAuthHeaders(),
         },

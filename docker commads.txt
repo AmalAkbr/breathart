@@ -1,0 +1,104 @@
+docker compose down
+docker builder prune -af
+docker image prune -af
+docker compose build --no-cache
+docker compose up
+docker image prune -af
+docker compose exec app sh
+docker compose exec app bash
+docker image rm -f brt-app
+
+# Docker Production Deployment Commands
+
+## 1. Clean Up Old Containers & Images
+
+# Stop and remove all running containers
+docker compose down
+
+# Remove all unused build cache (optional, for guaranteed fresh build)
+docker builder prune -af
+
+# Remove all unused images (optional, for guaranteed fresh build)
+docker image prune -af
+
+# (Optional) Remove specific old app image
+docker image rm -f breathart-app
+
+---
+
+## 2. Set Up Environment Variables
+
+# Create and edit environment files:
+#   - backend/.env         (backend secrets)
+#   - frontend/.env.local  (frontend build-time vars)
+
+# Example:
+# nano backend/.env
+# nano frontend/.env.local
+
+---
+
+## 3. Build & Start Containers
+
+# Build all images with no cache (ensures env vars are injected)
+docker compose build --no-cache
+
+# Start containers in detached mode
+docker compose up -d
+
+# (Optional) View logs
+docker compose logs -f
+
+---
+
+## 4. Container Access & Management
+
+# Open a shell in the running app container (sh or bash)
+docker compose exec app sh
+# or, if bash is available:
+docker compose exec app bash
+
+# Restart app container
+docker compose restart app
+
+# Stop all containers
+docker compose down
+
+---
+
+## 5. Troubleshooting & Maintenance
+
+# Remove all stopped containers, unused networks, images, and cache
+docker system prune -af
+
+# Check running containers
+docker compose ps
+
+# Remove a specific image
+docker image rm -f breathart-app
+
+# View last 50 log lines
+docker compose logs -n 50 app
+
+# Execute a command in the app container
+docker exec brt_app npm run migrate
+
+# SSH into container (interactive)
+docker exec -it brt_app /bin/bash
+
+# Test backend health
+curl http://localhost:8080/api/health
+
+# Test frontend served
+curl http://localhost:8080/
+
+---
+
+## 6. Quick Reference
+
+# Build & start (one-liner)
+docker compose up -d --build app
+
+# Remove everything (careful!)
+docker compose down -v
+docker image rm breathart-app

@@ -1,7 +1,7 @@
 // frontend/src/pages/Admin/exams/CreateExam.jsx
 import React, { useState, useEffect, useMemo } from "react";
 import { Users, AlertCircle, CheckCircle, Search } from "lucide-react";
-import { getAuthToken } from "../../../utils/apiClient";
+import { API_URL, getAuthToken } from "../../../utils/apiClient";
 import { toast } from "../../../utils/toast";
 import "../../../styles/CreateExam.css";
 
@@ -42,7 +42,7 @@ const CreateExam = () => {
       try {
         setLoading(true);
         const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/admin/students`,
+          `${API_URL}/admin/students`,
           {
             headers: getAuthHeaders(),
           },
@@ -127,7 +127,7 @@ const CreateExam = () => {
 
     try {
       const createResponse = await fetch(
-        `${import.meta.env.VITE_API_URL}/admin/exams`,
+        `${API_URL}/admin/exams`,
         {
           method: "POST",
           headers: getAuthHeaders(true),
@@ -158,7 +158,7 @@ const CreateExam = () => {
       const studentIds = Array.from(selectedStudents);
 
       const addParticipantsResponse = await fetch(
-        `${import.meta.env.VITE_API_URL}/admin/exams/${examId}/add-participants`,
+        `${API_URL}/admin/exams/${examId}/add-participants`,
         {
           method: "POST",
           headers: getAuthHeaders(true),
@@ -176,7 +176,7 @@ const CreateExam = () => {
       }
 
       const sendResponse = await fetch(
-        `${import.meta.env.VITE_API_URL}/admin/exams/${examId}/send-invitations`,
+        `${API_URL}/admin/exams/${examId}/send-invitations`,
         {
           method: "POST",
           headers: getAuthHeaders(true),

@@ -11,7 +11,7 @@ import {
   Layers,
   X,
 } from "lucide-react";
-import { getAuthToken } from "../../utils/apiClient";
+import { API_URL, getAuthToken } from "../../utils/apiClient";
 import { toast } from "../../utils/toast";
 import { getVideoDurationInSecondsFromFile } from "../../utils/videoDuration";
 import { io } from "socket.io-client";
@@ -112,8 +112,7 @@ const ManageVideos = () => {
   };
 
   const getSocketServerUrl = () => {
-    const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3001/api";
-    return apiUrl.replace(/\/api\/?$/, "");
+    return API_URL.replace(/\/api\/?$/, "");
   };
 
   const createUploadId = () => {
@@ -242,7 +241,7 @@ const ManageVideos = () => {
       setLoading(true);
       const token = getAuthToken();
 
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/videos`, {
+      const response = await fetch(`${API_URL}/videos`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -270,7 +269,7 @@ const ManageVideos = () => {
       const token = getAuthToken();
 
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/videos/${videoId}`,
+        `${API_URL}/videos/${videoId}`,
         {
           method: "DELETE",
           headers: {
@@ -397,7 +396,7 @@ const ManageVideos = () => {
       };
 
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/videos/${editForm.id}`,
+        `${API_URL}/videos/${editForm.id}`,
         {
           method: "PUT",
           headers: {
@@ -440,7 +439,7 @@ const ManageVideos = () => {
       const fd = new FormData();
       fd.append("thumbnail", file);
       const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/upload/thumbnail`,
+        `${API_URL}/upload/thumbnail`,
         {
           method: "POST",
           headers: { Authorization: `Bearer ${token}` },
@@ -500,7 +499,7 @@ const ManageVideos = () => {
         : 0;
 
       const data = await uploadWithProgress(
-        `${import.meta.env.VITE_API_URL}/upload/video-file`,
+        `${API_URL}/upload/video-file`,
         fd,
         token,
         ({ percent, loaded, total }) => {

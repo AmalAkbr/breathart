@@ -4,7 +4,21 @@
  * Handles authentication, error handling, and endpoint management
  */
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+const resolveApiUrl = () => {
+  const configuredApiUrl = (import.meta.env.VITE_API_URL || '').trim();
+  
+  if (!configuredApiUrl) {
+    throw new Error(
+      '❌ VITE_API_URL environment variable is not set. ' +
+      'Set it in frontend/.env.local before building.\n' +
+      'Example: VITE_API_URL=http://localhost:8080/api'
+    );
+  }
+
+  return configuredApiUrl.replace(/\/$/, '');
+};
+
+export const API_URL = resolveApiUrl();
 
 let authToken = null;
 
@@ -298,6 +312,7 @@ export const healthCheck = () => {
 };
 
 export default {
+  API_URL,
   authAPI,
   videoAPI,
   uploadAPI,

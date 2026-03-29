@@ -1,7 +1,7 @@
 // frontend/src/pages/Admin/ManageUsers.jsx
 import React, { useState, useEffect } from 'react';
 import { Trash2, Edit2, Search, Loader, Check, X } from 'lucide-react';
-import { getAuthToken } from '../../utils/apiClient';
+import { API_URL, getAuthToken } from '../../utils/apiClient';
 import { toast } from '../../utils/toast';
 import '../../styles/ManageUsers.css';
 
@@ -62,7 +62,7 @@ const ManageUsers = () => {
     try {
       const token = getAuthToken();
 
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/admin/users/${userId}`, {
+      const response = await fetch(`${API_URL}/admin/users/${userId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -94,7 +94,7 @@ const ManageUsers = () => {
     try {
       const token = getAuthToken();
 
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/admin/users/${userId}`, {
+      const response = await fetch(`${API_URL}/admin/users/${userId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,

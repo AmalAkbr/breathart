@@ -66,7 +66,7 @@ export default function ForgotPassword() {
     try {
       setError(null);
       // Verify token with backend
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/auth/verify-reset-token`, {
+      const response = await fetch(`${API_URL}/auth/verify-reset-token`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token: tokenInput }),

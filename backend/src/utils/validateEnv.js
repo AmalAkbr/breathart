@@ -8,7 +8,7 @@
  */
 const REQUIRED_ENV_VARS = {
   // Server Config
-  PORT: { required: false, type: 'number', default: 3001, description: 'Server port' },
+  PORT: { required: false, type: 'number', default: 8080, description: 'Server port' },
   NODE_ENV: { required: false, type: 'string', default: 'development', description: 'Node environment' },
   CORS_ORIGIN: { required: false, type: 'string', default: 'http://localhost:5173', description: 'CORS origin (frontend URL)' },
   FRONTEND_URL: { required: false, type: 'string', default: 'http://localhost:5173', description: 'Frontend URL for email links' },

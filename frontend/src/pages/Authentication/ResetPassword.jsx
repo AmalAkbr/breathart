@@ -110,8 +110,7 @@ const ResetPassword = () => {
 
       console.log("[RESET PASSWORD] Submitting new password");
 
-      const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
-      const response = await fetch(`${baseUrl}/auth/reset-password`, {
+      const response = await fetch(`${API_URL}/auth/reset-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
