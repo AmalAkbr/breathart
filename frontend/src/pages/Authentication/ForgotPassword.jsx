@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {  Link } from 'react-router-dom';
 import { useUserStore } from '../../store/userStore';
-import { authAPI } from '../../utils/apiClient';
+import { authAPI,API_URL } from '../../utils/apiClient';
 import { validateForgotPasswordForm, validateResetPasswordForm } from '../../utils/validators';
 
 export default function ForgotPassword() {

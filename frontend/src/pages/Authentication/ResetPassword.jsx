@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Eye, EyeOff, Lock, CheckCircle, Loader } from "lucide-react";
-
+import {API_URL} from "../../utils/apiClient";
 const ResetPassword = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
