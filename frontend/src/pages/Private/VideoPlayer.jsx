@@ -251,7 +251,7 @@ const VideoPlayer = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [volume, setVolume] = useState(0.8);
+  const [volume, setVolume] = useState(1);
   const [speed, setSpeed] = useState(1);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
@@ -266,6 +266,9 @@ const VideoPlayer = () => {
   // ─── Security: pause on devtools open ──────────────────────────────────
   useEffect(() => {
     if (devtoolsOpen) videoRef.current?.pause();
+    return () => {
+      // No need to resume on close — user can click play if they want
+    };
   }, [devtoolsOpen]);
 
   // ─── Security: block right-click ───────────────────────────────────────
@@ -350,7 +353,7 @@ const VideoPlayer = () => {
       el.load();
     }
 
-    el.volume = 1.0;
+    el.volume = volume;
     el.playbackRate = 1;
     el.playsInline = true;
     el.disablePictureInPicture = true;
@@ -571,7 +574,7 @@ const VideoPlayer = () => {
       {/* Single video element — moved via appendChild, never remounted */}
       <video
         ref={videoRef}
-        playsInline
+        playsInline={devtoolsOpen ? false : true}
         disablePictureInPicture
         controlsList="nodownload noplaybackrate noremoteplayback"
         style={{ display: "none" }}
@@ -618,7 +621,7 @@ const VideoPlayer = () => {
             {/* Bottom controls — always visible at low opacity in fullscreen */}
             <div
               className="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/90 via-black/50 to-transparent text-white z-10"
-              style={{ opacity: 0.75, pointerEvents: "auto" }}
+              style={{ opacity: 1, pointerEvents: "auto" }}
               onClick={(e) => e.stopPropagation()}
             >
               <ControlBar {...controlProps} />
