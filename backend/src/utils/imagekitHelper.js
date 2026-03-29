@@ -54,7 +54,7 @@ try {
   const prototypeChain = Object.getPrototypeOf(imageKit);
   const prototypeMethods = Object.getOwnPropertyNames(prototypeChain).filter(m => typeof prototypeChain[m] === 'function');
   // console.log(`📋 ImageKit prototype methods (${prototypeMethods.length}):`, prototypeMethods.join(', '));
-  console.log(`⚙️  Direct properties (first 15):`, Object.keys(imageKit).slice(0, 15).join(', '));
+  // console.log(`⚙️  Direct properties (first 15):`, Object.keys(imageKit).slice(0, 15).join(', '));
 } catch (error) {
   console.error('❌ Failed to initialize ImageKit:', error.message);
   imageKit = null;

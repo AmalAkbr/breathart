@@ -106,20 +106,69 @@ export const initCleanupCron = () => {
  */
 const getNextRunTime = (cronExpression) => {
   try {
-    // Simple parsing for "0 2 * * *" format
-    const parts = cronExpression.split(' ');
-    if (parts.length === 5 && parts[1] !== '*') {
-      const hour = parseInt(parts[1], 10);
-      const now = new Date();
-      const next = new Date();
-      next.setHours(hour, 0, 0, 0);
+    const parts = cronExpression.trim().split(/\s+/);
+    if (parts.length !== 5) {
+      return 'Next run time varies by expression';
+    }
 
-      if (next <= now) {
-        next.setDate(next.getDate() + 1);
+    const [minuteExpr, hourExpr, dayExpr, monthExpr, weekDayExpr] = parts;
+
+    // This helper intentionally handles common schedules used here:
+    // - fixed numbers (e.g. 0, 2)
+    // - wildcard (*)
+    // - step values (e.g. */12)
+    // For complex cron syntax, fall back to informative message.
+    const parseField = (expr, maxValue) => {
+      if (expr === '*') {
+        return { type: 'any' };
       }
 
-      return next.toISOString();
+      if (/^\d+$/.test(expr)) {
+        const value = Number(expr);
+        if (value < 0 || value > maxValue) return null;
+        return { type: 'fixed', value };
+      }
+
+      const stepMatch = expr.match(/^\*\/(\d+)$/);
+      if (stepMatch) {
+        const step = Number(stepMatch[1]);
+        if (!step || step < 1 || step > maxValue + 1) return null;
+        return { type: 'step', step };
+      }
+
+      return null;
+    };
+
+    const minuteRule = parseField(minuteExpr, 59);
+    const hourRule = parseField(hourExpr, 23);
+
+    // Keep day/month/week-day parsing strict and simple for now.
+    if (!minuteRule || !hourRule || dayExpr !== '*' || monthExpr !== '*' || weekDayExpr !== '*') {
+      return 'Next run time varies by expression';
     }
+
+    const matchesRule = (value, rule) => {
+      if (rule.type === 'any') return true;
+      if (rule.type === 'fixed') return value === rule.value;
+      if (rule.type === 'step') return value % rule.step === 0;
+      return false;
+    };
+
+    const now = new Date();
+    const candidate = new Date(now.getTime() + 60 * 1000);
+    candidate.setSeconds(0, 0);
+
+    // Search up to 14 days ahead, minute by minute.
+    for (let i = 0; i < 14 * 24 * 60; i += 1) {
+      if (
+        matchesRule(candidate.getMinutes(), minuteRule)
+        && matchesRule(candidate.getHours(), hourRule)
+      ) {
+        return candidate.toLocaleString();
+      }
+      candidate.setMinutes(candidate.getMinutes() + 1);
+    }
+
     return 'Next run time varies by expression';
   } catch {
     return 'Unable to calculate next run time';

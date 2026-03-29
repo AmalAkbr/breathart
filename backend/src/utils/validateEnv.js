@@ -60,6 +60,32 @@ export const validateEnv = () => {
   const errors = [];
   const validatedEnv = {};
 
+  const isValidUrl = (value) => {
+    try {
+      new URL(value);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  const validateUrlList = (rawValue, envKey) => {
+    const parts = String(rawValue)
+      .split(',')
+      .map((part) => part.trim())
+      .filter(Boolean);
+
+    if (parts.length === 0) {
+      errors.push(`❌ ${envKey} must contain at least one valid URL`);
+      return;
+    }
+
+    const invalid = parts.filter((part) => !isValidUrl(part));
+    if (invalid.length > 0) {
+      errors.push(`❌ ${envKey} has invalid URL(s): ${invalid.join(', ')}`);
+    }
+  };
+
   Object.entries(REQUIRED_ENV_VARS).forEach(([key, config]) => {
     const value = process.env[key];
 
@@ -97,29 +123,19 @@ export const validateEnv = () => {
     errors.push('❌ PORT must be between 1 and 65535');
   }
 
-  // Validate CORS_ORIGIN is a valid URL
+  // Validate CORS_ORIGIN (supports comma-separated URLs)
   if (validatedEnv.CORS_ORIGIN) {
-    try {
-      new URL(validatedEnv.CORS_ORIGIN);
-    } catch {
-      errors.push(`❌ CORS_ORIGIN must be a valid URL: "${validatedEnv.CORS_ORIGIN}"`);
-    }
+    validateUrlList(validatedEnv.CORS_ORIGIN, 'CORS_ORIGIN');
   }
 
-  // Validate FRONTEND_URL is a valid URL
+  // Validate FRONTEND_URL (supports comma-separated URLs)
   if (validatedEnv.FRONTEND_URL) {
-    try {
-      new URL(validatedEnv.FRONTEND_URL);
-    } catch {
-      errors.push(`❌ FRONTEND_URL must be a valid URL: "${validatedEnv.FRONTEND_URL}"`);
-    }
+    validateUrlList(validatedEnv.FRONTEND_URL, 'FRONTEND_URL');
   }
 
   // Validate BACKEND_API_URL if provided
   if (validatedEnv.BACKEND_API_URL) {
-    try {
-      new URL(validatedEnv.BACKEND_API_URL);
-    } catch {
+    if (!isValidUrl(validatedEnv.BACKEND_API_URL)) {
       errors.push(`❌ BACKEND_API_URL must be a valid URL: "${validatedEnv.BACKEND_API_URL}"`);
     }
   }
