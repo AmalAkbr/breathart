@@ -12,7 +12,8 @@
     "build:frontend": "cd frontend && npm run build",
     "preview": "cd frontend && npm run preview",
     "lint": "cd frontend && npm run lint",
-    "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install"
+    "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install",
+    "install:all:prod": "npm ci && cd frontend && npm ci && cd ../backend && npm ci"
   },
   "keywords": [
     "react",
