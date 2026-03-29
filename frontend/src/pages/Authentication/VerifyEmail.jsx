@@ -1,132 +1,148 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
-import { useUserStore } from '../../store/userStore';
-import { authAPI, getAuthToken } from '../../utils/apiClient';
-import { validateToken } from '../../utils/validators';
-import { toast } from '../../utils/toast';
+import { useState, useEffect, useCallback } from "react";
+import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
+import { useUserStore } from "../../store/userStore";
+import { authAPI, getAuthToken } from "../../utils/apiClient";
+import { validateToken } from "../../utils/validators";
+import { toast } from "../../utils/toast";
 
 export default function VerifyEmail() {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const { user, setUser, setError, clearError, error } = useUserStore();
-  const [verificationToken, setVerificationToken] = useState('');
+  const [verificationToken, setVerificationToken] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [validationError, setValidationError] = useState('');
+  const [validationError, setValidationError] = useState("");
   const [isResendingEmail, setIsResendingEmail] = useState(false);
-  const [resendMessage, setResendMessage] = useState('');
+  const [resendMessage, setResendMessage] = useState("");
   const [autoVerifyAttempted, setAutoVerifyAttempted] = useState(false);
 
   // Resolve email from multiple sources for reliable autofill
-  const urlEmail = searchParams.get('email');
-  const stateEmail = location.state?.email || '';
-  const pendingEmail = sessionStorage.getItem('pendingVerifyEmail') || '';
-  const storeEmail = user?.email || '';
-  const userEmail = urlEmail || stateEmail || pendingEmail || storeEmail || '';
-  const urlToken = searchParams.get('token');
-
+  const urlEmail = searchParams.get("email");
+  const stateEmail = location.state?.email || "";
+  const pendingEmail = sessionStorage.getItem("pendingVerifyEmail") || "";
+  const storeEmail = user?.email || "";
+  const userEmail = urlEmail || stateEmail || pendingEmail || storeEmail || "";
+  const urlToken = searchParams.get("token");
   // Persist resolved email for refresh/revisit autofill
   useEffect(() => {
     if (userEmail) {
-      sessionStorage.setItem('pendingVerifyEmail', userEmail);
+      sessionStorage.setItem("pendingVerifyEmail", userEmail);
     }
   }, [userEmail]);
 
   // Redirect only when we have neither auth nor recoverable verify context
   useEffect(() => {
+    console.log("[VERIFY EMAIL] Checking verification context...");
     if (!getAuthToken() && !userEmail && !urlToken) {
-      navigate('/login');
+      navigate("/login");
     }
   }, [userEmail, urlToken, navigate]);
 
   // ===== DEFINE ALL HANDLERS FIRST (before effects that use them) =====
-  
-  const handleAutoVerify = useCallback(async (tokenToVerify) => {
-    console.log('[VERIFY EMAIL] Auto-verifying with token:', tokenToVerify.substring(0, 20) + '...');
-    console.log('[VERIFY EMAIL] Email:', userEmail);
-    
-    setIsSubmitting(true);
-    setError(null);
 
-    try {
-      const response = await authAPI.verifyEmail(userEmail, tokenToVerify);
+  const handleAutoVerify = useCallback(
+    async (tokenToVerify) => {
+      console.log(
+        "[VERIFY EMAIL] Auto-verifying with token:",
+        tokenToVerify.substring(0, 20) + "...",
+      );
+      console.log("[VERIFY EMAIL] Email:", userEmail);
 
-      if (response.success) {
-        console.log('[VERIFY EMAIL] ✅ Verification successful!');
-        sessionStorage.removeItem('pendingVerifyEmail');
-        
-        // Email verified! Update user in store
-        if (response.data?.user) {
-          setUser(response.data.user);
-          console.log('[VERIFY EMAIL] User state updated:', response.data.user.email);
+      setIsSubmitting(true);
+      setError(null);
+      
+      try {
+        const response = await authAPI.verifyEmail(userEmail, tokenToVerify);
+        console.log(urlToken);
+
+        if (response.success) {
+          console.log("[VERIFY EMAIL] ✅ Verification successful!");
+          sessionStorage.removeItem("pendingVerifyEmail");
+
+          // Email verified! Update user in store
+          if (response.data?.user) {
+            setUser(response.data.user);
+            console.log(
+              "[VERIFY EMAIL] User state updated:",
+              response.data.user.email,
+            );
+          }
+
+          // Show success toast
+          toast.success("✓ Email verified successfully!");
+
+          console.log("[VERIFY EMAIL] Redirecting to home...");
+          // Redirect to home after brief delay
+          setTimeout(() => {
+            navigate('/', { replace: true });
+          }, 1500);
+        } else {
+          const errorMsg = response.message || "Failed to verify email";
+          console.error("[VERIFY EMAIL] ❌ Verification failed:", errorMsg);
+          setError(errorMsg);
+          toast.error(errorMsg);
         }
-        
-        // Show success toast
-        toast.success('✓ Email verified successfully!');
-
-        // Redirect to home after brief delay
-        setTimeout(() => {
-          console.log('[VERIFY EMAIL] Redirecting to home...');
-          navigate('/', { replace: true });
-        }, 1500);
-      } else {
-        const errorMsg = response.message || 'Failed to verify email';
-        console.error('[VERIFY EMAIL] ❌ Verification failed:', errorMsg);
-        setError(errorMsg);
-        toast.error(errorMsg);
+      } catch (err) {
+        const errorMessage =
+          err.data?.message || err.message || "Failed to verify email";
+        console.error("[VERIFY EMAIL] ❌ Error:", errorMessage, err);
+        setError(errorMessage);
+        toast.error(errorMessage);
+      } finally {
+        setIsSubmitting(false);
       }
-    } catch (err) {
-      const errorMessage = err.data?.message || err.message || 'Failed to verify email';
-      console.error('[VERIFY EMAIL] ❌ Error:', errorMessage, err);
-      setError(errorMessage);
-      toast.error(errorMessage);
-    } finally {
-      setIsSubmitting(false);
-    }
-  }, [userEmail, setUser, setError, navigate]);
+    },
+    [userEmail, setUser, setError, navigate],
+  );
 
-  const handleSubmit = useCallback(async (e) => {
-    e.preventDefault();
-    setValidationError('');
-    setIsSubmitting(true);
+  const handleSubmit = useCallback(
+    async (e) => {
+      e.preventDefault();
+      setValidationError("");
+      setIsSubmitting(true);
 
-    const validation = validateToken(verificationToken);
-    if (!validation.isValid) {
-      setValidationError(validation.error);
-      setIsSubmitting(false);
-      return;
-    }
+      const validation = validateToken(verificationToken);
+      if (!validation.isValid) {
+        setValidationError(validation.error);
+        setIsSubmitting(false);
+        return;
+      }
 
-    await handleAutoVerify(verificationToken);
-  }, [verificationToken, handleAutoVerify]);
+      await handleAutoVerify(verificationToken);
+    },
+    [verificationToken, handleAutoVerify],
+  );
 
   const handleResendEmail = useCallback(async () => {
     if (!userEmail) {
-      toast.error('Email address not found');
+      toast.error("Email address not found");
       return;
     }
 
-    console.log('[VERIFY EMAIL] Resending verification to:', userEmail);
+    console.log("[VERIFY EMAIL] Resending verification to:", userEmail);
     setIsResendingEmail(true);
-    setResendMessage('');
+    setResendMessage("");
     setError(null);
 
     try {
       const response = await authAPI.resendVerification(userEmail);
 
       if (response.success) {
-        console.log('[VERIFY EMAIL] ✅ Verification email resent');
-        setResendMessage('✓ Verification email sent! Check your inbox.');
-        toast.success('Verification email sent!');
+        console.log("[VERIFY EMAIL] ✅ Verification email resent");
+        setResendMessage("✓ Verification email sent! Check your inbox.");
+        toast.success("Verification email sent!");
       } else {
-        const errorMsg = response.message || 'Failed to resend verification email';
-        console.error('[VERIFY EMAIL] ❌ Resend failed:', errorMsg);
+        const errorMsg =
+          response.message || "Failed to resend verification email";
+        console.error("[VERIFY EMAIL] ❌ Resend failed:", errorMsg);
         setError(errorMsg);
         toast.error(errorMsg);
       }
     } catch (err) {
-      const errorMessage = err.data?.message || err.message || 'Failed to resend email';
-      console.error('[VERIFY EMAIL] ❌ Resend error:', errorMessage);
+      const errorMessage =
+        err.data?.message || err.message || "Failed to resend email";
+      console.error("[VERIFY EMAIL] ❌ Resend error:", errorMessage);
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -136,12 +152,12 @@ export default function VerifyEmail() {
 
   const handleLogout = useCallback(async () => {
     try {
-      sessionStorage.removeItem('pendingVerifyEmail');
+      sessionStorage.removeItem("pendingVerifyEmail");
       await authAPI.logout();
-      navigate('/login');
+      navigate("/login");
     } catch (err) {
-      console.error('Logout error:', err);
-      navigate('/login');
+      console.error("Logout error:", err);
+      navigate("/login");
     }
   }, [navigate]);
 
@@ -161,7 +177,7 @@ export default function VerifyEmail() {
   useEffect(() => {
     if (validationError) {
       const timer = setTimeout(() => {
-        setValidationError('');
+        setValidationError("");
       }, 5000);
       return () => clearTimeout(timer);
     }
@@ -171,7 +187,7 @@ export default function VerifyEmail() {
   useEffect(() => {
     if (resendMessage) {
       const timer = setTimeout(() => {
-        setResendMessage('');
+        setResendMessage("");
       }, 5000);
       return () => clearTimeout(timer);
     }
@@ -180,27 +196,42 @@ export default function VerifyEmail() {
   // Auto-verify if token is in URL (from email link)
   useEffect(() => {
     if (!urlToken || autoVerifyAttempted) return;
-    
-    console.log('[VERIFY EMAIL COMPONENT] Token found - urlToken:', urlToken.substring(0, 20) + '...');
-    console.log('[VERIFY EMAIL] Starting auto-verify...');
-    
+
+    console.log(
+      "[VERIFY EMAIL COMPONENT] Token found - urlToken:",
+      urlToken.substring(0, 20) + "...",
+    );
+    console.log("[VERIFY EMAIL] Starting auto-verify...");
+
     setAutoVerifyAttempted(true);
     handleAutoVerify(urlToken);
   }, [urlToken, autoVerifyAttempted, handleAutoVerify]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-gray-900 via-gray-800 to-black px-4">
-        <div className="w-full max-w-md">
-          <div className="bg-gray-800/50 backdrop-blur-xl border border-gray-700/50 rounded-2xl shadow-2xl p-8">
+      <div className="w-full max-w-md">
+        <div className="bg-gray-800/50 backdrop-blur-xl border border-gray-700/50 rounded-2xl shadow-2xl p-8">
           {/* Header */}
           <div className="mb-8 text-center">
             <div className="mb-4 inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-500/20 border border-blue-500/50">
-              <svg className="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              <svg
+                className="w-8 h-8 text-blue-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                />
               </svg>
             </div>
             <h1 className="text-3xl font-bold text-white mb-2">Verify Email</h1>
-            <p className="text-gray-400">Almost there! Verify your email to complete registration</p>
+            <p className="text-gray-400">
+              Almost there! Verify your email to complete registration
+            </p>
           </div>
 
           {/* Global Error */}
@@ -221,13 +252,18 @@ export default function VerifyEmail() {
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Email Display */}
             <div className="p-4 rounded-lg bg-gray-700/30 border border-gray-600">
-              <p className="text-sm text-gray-400 mb-1">Verification code sent to:</p>
+              <p className="text-sm text-gray-400 mb-1">
+                Verification code sent to:
+              </p>
               <p className="text-white font-semibold truncate">{userEmail}</p>
             </div>
 
             {/* Verification Token Field */}
             <div>
-              <label htmlFor="token" className="block text-sm font-medium text-gray-300 mb-2">
+              <label
+                htmlFor="token"
+                className="block text-sm font-medium text-gray-300 mb-2"
+              >
                 Verification Code
               </label>
               <input
@@ -237,15 +273,15 @@ export default function VerifyEmail() {
                 onChange={(e) => {
                   setVerificationToken(e.target.value);
                   if (validationError) {
-                    setValidationError('');
+                    setValidationError("");
                   }
                 }}
                 placeholder="Enter code from email"
                 className={`w-full px-4 py-3 rounded-lg bg-gray-700/50 border transition-colors
                   ${
                     validationError
-                      ? 'border-red-500 focus:border-red-400'
-                      : 'border-gray-600 focus:border-blue-400'
+                      ? "border-red-500 focus:border-red-400"
+                      : "border-gray-600 focus:border-blue-400"
                   }
                   text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20`}
                 disabled={isSubmitting}
@@ -263,7 +299,7 @@ export default function VerifyEmail() {
                 disabled:from-gray-600 disabled:to-gray-600 disabled:cursor-not-allowed
                 text-white font-semibold rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
             >
-              {isSubmitting ? 'Verifying...' : 'Verify Email'}
+              {isSubmitting ? "Verifying..." : "Verify Email"}
             </button>
           </form>
 
@@ -287,7 +323,7 @@ export default function VerifyEmail() {
                 disabled:border-gray-700 disabled:text-gray-500 disabled:cursor-not-allowed
                 font-semibold rounded-lg transition-all duration-200"
             >
-              {isResendingEmail ? 'Sending...' : 'Resend Code'}
+              {isResendingEmail ? "Sending..." : "Resend Code"}
             </button>
           </div>
 

@@ -30,7 +30,6 @@ console.error = function(...args) {
 };
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
+  // <StrictMode>
     <App />
-  </StrictMode>,
 )

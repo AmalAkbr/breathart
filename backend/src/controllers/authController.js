@@ -550,8 +550,7 @@ export const resendVerificationEmail = async (req, res) => {
     console.log('[RESEND VERIFICATION] Token generated for:', email);
 
     // Generate verification link
-    const verificationLink = `${env.FRONTEND_URL}/auth/verify-email?token=${verificationToken}`;
-
+    const verificationLink = `${env.FRONTEND_URL}/verify-email?token=${verificationToken}`;
     // Send verification email
     try {
       await sendVerificationEmail(user.email, user.fullName, verificationLink);
