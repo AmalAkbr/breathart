@@ -86,3 +86,98 @@ After this, Nginx should no longer show the conflicting server name warnings, an
 npm → tells PM2 to run npm scripts.
 --name "breathart" → gives the process a friendly name for PM2.
 -- run prod:backend → runs your prod:backend script.
+======================================================
+
+3️⃣ Check that it’s running
+pm2 list
+pm2 logs breathart
+pm2 list shows all PM2 processes.
+pm2 logs breathart streams logs from your app.
+4️⃣ Make it auto-start on reboot
+pm2 save
+pm2 startup
+pm2 save remembers your processes.
+pm2 startup generates a system service so Node restarts if the VPS reboots.
+
+✅ Result:
+
+Node app runs on port 8080 via npm run prod:backend.
+PM2 keeps it alive and restarts on crash or reboot.
+Nginx will forward HTTPS traffic to your Node app automatically.
+
+
+=======================================
+
+Nginx will still handle HTTPS properly.
+Restart your app with PM2:
+pm2 restart breathart
+Or stop & start if needed:
+pm2 stop breathart
+pm2 delete breathart
+pm2 start npm --name "breathart" -- run prod:backend
+⚡ Result
+
+==============================================================
+
+1️⃣ List running PM2 processes
+pm2 list
+
+Output looks like:
+
+┌───────┬───────────┬──────┬───────┬──────────┐
+│ id    │ name      │ mode │ pid   │ status   │
+├───────┼───────────┼──────┼───────┼──────────┤
+│ 0     │ breathart │ fork │ 12345 │ online   │
+└───────┴───────────┴──────┴───────┴──────────┘
+
+Take note of either the id or the name of the process.
+
+2️⃣ Stop a running process
+By name:
+pm2 stop breathart
+Or by id (e.g., 0):
+pm2 stop 0
+
+This stops the process but keeps it in PM2’s list (you can restart it later).
+
+3️⃣ Delete a process completely
+By name:
+pm2 delete breathart
+Or by id:
+pm2 delete 0
+
+This removes it from PM2, freeing it from auto-start.
+
+4️⃣ Optional: Stop all PM2 processes
+pm2 stop all
+
+Or delete all:
+
+pm2 delete all
+5️⃣ Clean saved startup list (if auto-start is set)
+pm2 save
+After deleting or stopping processes, run pm2 save to update the auto-start list.
+
+💡 Summary:
+
+stop → stops process but keeps it in PM2 list.
+delete → completely removes it.
+Always check with pm2 list to confirm.
+
+===============================
+
+
+
+
+
+Useful PM2 commands:
+Stop a process:
+pm2 stop breathart   # by name
+pm2 stop 0           # by PM2 id
+Delete a process (remove completely from PM2 list):
+pm2 delete breathart
+pm2 delete 0
+Restart a process:
+pm2 restart breathart
+Show detailed info:
+pm2 show breathart
