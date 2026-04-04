@@ -29,7 +29,7 @@ const META_BY_ROUTE = [
     image: `${SITE_URL}/app/og-courses.png?v=1`,
     imageAlt: "Courses page preview",
   },
-  {
+{
     match: (pathname) => pathname.startsWith("/blogs"),
     title: "Blogs | Digital Marketing Tips and Insights from BICT",
     description:
@@ -74,7 +74,7 @@ const setCanonical = (href) => {
 const RouteMeta = () => {
   const { pathname } = useLocation();
 
-  useEffect(() => {
+useEffect(() => {
     const selected =
       META_BY_ROUTE.find((entry) => entry.match(pathname)) || DEFAULT_META;
     const normalizedPath = pathname === "/" ? "/" : pathname.replace(/\/+$/, "");

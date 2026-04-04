@@ -210,7 +210,7 @@ const Navbar = () => {
                   {/* <span
                     className={`text-[9px] md:text-xs tracking-widest hidden sm:block transition-colors duration-300 ${isWhiteNav ? "text-blue-800" : "text-slate-300"}`}
                   > */}
-                  <span className="text-sm md:text-md font-heading font-bold text-gradient leading-tight">
+                <span className="text-sm md:text-md font-heading font-bold text-gradient leading-tight">
                     {/* LEARN | CREATE | GROW */}
                     Of Creative Technology
                   </span>
