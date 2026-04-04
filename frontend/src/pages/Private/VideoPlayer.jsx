@@ -440,6 +440,22 @@ const VideoPlayer = () => {
     if (el) el.playbackRate = val;
   }, []);
 
+  const handleClosePlayer = useCallback(() => {
+    const el = videoRef.current;
+    if (el) {
+      el.pause();
+      el.removeAttribute("src");
+      el.load();
+    }
+
+    document.documentElement.style.overflow = "";
+    if (document.fullscreenElement) {
+      document.exitFullscreen?.().catch(() => {});
+    }
+
+    window.location.assign("/videos");
+  }, []);
+
   const toggleFullscreen = useCallback(() => {
     setIsFullscreen((prev) => {
       const next = !prev;
@@ -507,6 +523,24 @@ const VideoPlayer = () => {
     return () => document.removeEventListener("fullscreenchange", onFSChange);
   }, []);
 
+  // Ensure no fullscreen/overflow/video state leaks when leaving this page.
+  useEffect(
+    () => () => {
+      const el = videoRef.current;
+      if (el) {
+        el.pause();
+        el.removeAttribute("src");
+        el.load();
+      }
+
+      document.documentElement.style.overflow = "";
+      if (document.fullscreenElement) {
+        document.exitFullscreen?.().catch(() => {});
+      }
+    },
+    [],
+  );
+
   // ─── Loading / Error / Not found ───────────────────────────────────────
   if (loading)
     return (
@@ -526,7 +560,7 @@ const VideoPlayer = () => {
           <h2 className="text-2xl font-bold mb-2">Could Not Load Video</h2>
           <p className="text-white/60 mb-6">{error}</p>
           <button
-            onClick={() => navigate("/videos")}
+            onClick={handleClosePlayer}
             className="px-6 py-2 bg-white text-black rounded-lg font-semibold hover:bg-white/90 transition"
           >
             Back to Library
@@ -665,7 +699,7 @@ const VideoPlayer = () => {
                   {video.title}
                 </h1>
                 <button
-                  onClick={() => navigate("/videos", { replace: true })}
+                  onClick={handleClosePlayer}
                   className="p-2 rounded-lg bg-white/10 hover:bg-white/25 transition-colors text-white shrink-0"
                   title="Back to library"
                 >

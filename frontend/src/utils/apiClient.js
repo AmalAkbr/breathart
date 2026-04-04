@@ -193,8 +193,12 @@ export const videoAPI = {
   /**
    * Get all videos
    */
-  getAll: () => {
-    return apiCall('/videos');
+  getAll: ({ noCache = false } = {}) => {
+    if (!noCache) return apiCall('/videos');
+
+    return apiCall(`/videos?t=${Date.now()}`, {
+      cache: 'no-store'
+    });
   },
 
   /**

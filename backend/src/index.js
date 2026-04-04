@@ -37,6 +37,12 @@ import { initializeUploadSocketServer } from './websocket/uploadSocketServer.js'
 
 const app = express();
 let server;
+
+// Required when running behind reverse proxies (Nginx/Cloudflare) so req.ip
+// and express-rate-limit use X-Forwarded-For correctly.
+if (env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
 // this only need if you are testing locally wiht your ip network with self-signed certs, in production the server will be behind a reverse proxy that handles SSL termination
 // if (env.NODE_ENV === 'production') {
 //   // Use HTTPS in production

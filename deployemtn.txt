@@ -114,6 +114,7 @@ pm2 restart breathart
 Or stop & start if needed:
 pm2 stop breathart
 pm2 delete breathart
+============================
 pm2 start npm --name "breathart" -- run prod:backend
 ⚡ Result
 
@@ -181,3 +182,5 @@ Restart a process:
 pm2 restart breathart
 Show detailed info:
 pm2 show breathart
+
+

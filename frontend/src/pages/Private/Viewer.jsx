@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useCallback, useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import VideoCard from "../../components/VideoCard";
-import SecurityBlankScreen from "../../components/SecurityBlankScreen";
 import SkeletonLoader from "../../components/SkeletonLoader";
 import { getAuthToken, videoAPI } from "../../utils/apiClient";
 import { toast } from "../../utils/toast";
@@ -13,32 +12,42 @@ const VideoViewer = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const location = useLocation();
   // const { isProduction, isDevtoolsOpen } = useDevtoolsShield();
 
   // Check authentication and fetch videos
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const token = getAuthToken();
-        if (!token) {
-          navigate("/auth", { replace: true });
-          return;
-        }
+  const loadVideos = useCallback(async () => {
+    setLoading(true);
+    setError(null);
 
-        const res = await videoAPI.getAll();
-        const list = res.data || res.videos || [];
-        setVideos(list);
-      } catch (err) {
-        console.error("Error fetching videos:", err);
-        setError(err.message || "Failed to load videos");
-        toast.error(err.message || "Failed to load videos");
-      } finally {
-        setLoading(false);
+    try {
+      const token = getAuthToken();
+      if (!token) {
+        navigate("/auth", { replace: true });
+        return;
       }
-    };
 
-    load();
+      // Cache-bust list request so returning from player always gets fresh data.
+      const res = await videoAPI.getAll({ noCache: true });
+      const list = Array.isArray(res?.data)
+        ? res.data
+        : Array.isArray(res?.videos)
+          ? res.videos
+          : [];
+
+      setVideos(list);
+    } catch (err) {
+      console.error("Error fetching videos:", err);
+      setError(err.message || "Failed to load videos");
+      toast.error(err.message || "Failed to load videos");
+    } finally {
+      setLoading(false);
+    }
   }, [navigate]);
+
+  useEffect(() => {
+    loadVideos();
+  }, [loadVideos, location.key]);
 
   const handleCardClick = (videoId) => {
     navigate(`/player/${videoId}`);
