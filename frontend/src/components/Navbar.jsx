@@ -207,10 +207,12 @@ const Navbar = () => {
                   <span className="text-base md:text-xl font-heading font-bold text-gradient leading-tight">
                     BreathArt Institute
                   </span>
-                  <span
+                  {/* <span
                     className={`text-[9px] md:text-xs tracking-widest hidden sm:block transition-colors duration-300 ${isWhiteNav ? "text-blue-800" : "text-slate-300"}`}
-                  >
-                    LEARN | CREATE | GROW
+                  > */}
+                  <span className="text-sm md:text-md font-heading font-bold text-gradient leading-tight">
+                    {/* LEARN | CREATE | GROW */}
+                    Of Creative Technology
                   </span>
                 </div>
               </motion.div>
@@ -324,7 +326,8 @@ const Navbar = () => {
                   animate={{ opacity: 1, x: 0 }}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className={`px-5 md:px-7 py-2.5 rounded-full font-bold text-sm transition-colors border hidden sm:block ${isWhiteNav ? "border-blue-900/30 text-blue-900 hover:bg-blue-900/10" : "border-white/30 text-white hover:bg-white/10"}`}
+                  // className={`px-5 md:px-7 py-2.5 rounded-full font-bold text-sm transition-colors border hidden sm:block ${isWhiteNav ? "border-blue-900/30 text-blue-900 hover:bg-blue-900/10" : "border-white/30 text-white hover:bg-white/10"}`}
+                  className="bg-linear-to-r  from-accent-cyan to-accent-blue text-white px-5 md:px-7 py-2.5 rounded-full font-bold shadow-lg shadow-accent-blue/20 text-sm hover:shadow-accent-cyan/40 transition-shadow cursor-pointer"
                 >
                   Admission
                 </motion.button>
@@ -374,17 +377,27 @@ const Navbar = () => {
                 </motion.button>
               </div>
             ) : (
-              <Link to="/login">
-                <motion.button
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="bg-linear-to-r  from-accent-cyan to-accent-blue text-white px-5 md:px-7 py-2.5 rounded-full font-bold shadow-lg shadow-accent-blue/20 text-sm hover:shadow-accent-cyan/40 transition-shadow cursor-pointer"
-                >
-                  {" Get Started"}
-                </motion.button>
-              </Link>
+              // <Link to="/login">
+              //   <motion.button
+              //     initial={{ opacity: 0, x: 20 }}
+              //     animate={{ opacity: 1, x: 0 }}
+              //     whileHover={{ scale: 1.05 }}
+              //     whileTap={{ scale: 0.95 }}
+              //     className="bg-linear-to-r  from-accent-cyan to-accent-blue text-white px-5 md:px-7 py-2.5 rounded-full font-bold shadow-lg shadow-accent-blue/20 text-sm hover:shadow-accent-cyan/40 transition-shadow cursor-pointer"
+              //   >
+              //     {" Get Started"}
+              //   </motion.button>
+              // </Link>
+              <motion.button
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={openContact}
+                className={`px-5 w-auto md:px-7 py-2.5 rounded-full font-bold text-sm transition-colors border hidden sm:block ${isWhiteNav ? "border-blue-900/30 text-blue-900 hover:bg-blue-900/10" : "border-white/30 text-white hover:bg-white/10"}`}
+              >
+                Contact Us
+              </motion.button>
             )}
 
             {/* Menu Buttons Container */}

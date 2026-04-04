@@ -11,6 +11,7 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import WhatsAppButton from "./components/WhatsAppButton";
 import ScrollToTopButton from "./components/ScrollToTopButton";
+import RouteMeta from "./components/RouteMeta";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
 import PublicRoute from "./components/PublicRoute";
@@ -218,6 +219,7 @@ function App() {
 
   return (
     <Router>
+      <RouteMeta />
       <ScrollToTop />
       <div className="min-h-screen text-white font-sans selection:bg-accent-cyan/30 overflow-x-hidden w-full max-w-[100vw]">
         <Routes>

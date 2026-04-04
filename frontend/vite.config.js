@@ -30,7 +30,8 @@ export default defineConfig({
   },
   server: {
     // Allow access from any local network IP for testing on mobile devices
-    host: '172.30.83.187',
+    // host: '172.30.83.187',
+    host:true,
     port: 5173,
   }
 })
