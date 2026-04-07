@@ -1,14 +1,18 @@
-# MongoDB Backup to Google Drive Setup Guide
+# MongoDB Backup Setup Guide (Mega or Google Drive)
 
 ## Overview
-Automated daily backups of your MongoDB database exported as JSON and uploaded to Google Drive using `rclone`.
+Automated daily backups of your MongoDB database exported as JSON and uploaded to cloud storage using `rclone`.
+
+Choose your storage:
+- **Mega** ⭐ Easier (no browser auth, works on Windows)
+- **Google Drive** Better for production on VPS
 
 ## Prerequisites
-- VPS with access to MongoDB
+- MongoDB access (local or VPS)
 - `mongoexport` installed (comes with MongoDB tools)
 - `gzip` installed (standard on Linux)
 - `rclone` installed
-- Google Drive account
+- Either: Mega account OR Google Drive account
 
 ---
 
@@ -38,41 +42,62 @@ sudo cp mongodb-database-tools-ubuntu2004-x86_64-100.9.4/bin/* /usr/local/bin/
 
 ---
 
-## 🔐 Step 2: Configure Google Drive Access
+## 🔐 Step 2: Configure Cloud Storage
 
-### Start rclone configuration
+### Option A: Mega (Easier - No Browser Needed!)
+
 ```bash
 rclone config
 ```
 
-### Follow the prompts:
+Follow prompts:
+```
+n/s/q> n                    # Create NEW remote
+name> mega                  # Name it "mega"
+Type of storage> mega       # Choose Mega storage
+Username> your-email@gmail.com  # Your Mega account email
+Password> your-password     # Your Mega password
+Edit advanced config?> n
+```
+
+✅ Done! No browser needed.
+
+Verify:
+```bash
+rclone listremotes        # Should show: mega
+rclone ls mega:/          # List Mega contents
+```
+
+---
+
+### Option B: Google Drive (Better for Production)
+
+```bash
+rclone config
+```
+
+Follow prompts:
 ```
 n/s/q> n                          # Create NEW remote
 name> gdrive                       # Name it "gdrive"
-Type of storage> 17               # Choose "Google Drive" (option #)
+Type of storage> 17               # Choose "Google Drive"
 ID of Google Drive to use> <leave blank>
-Service Account Credentials JSON file path> <leave blank>
+Service Account Credentials?> <leave blank>
 scope> drive                       # Full access to Drive
-root_folder_id> <leave blank>
-config_refresh_token> <leave blank>
 Edit advanced config?> n
-Use web browser to authorize rclone? y
+Use web browser to authorize? y    # YES - open browser
 ```
 
-### Browser authentication
-When prompted, you'll see:
-```
-If your browser doesn't open automatically go to the following link: https://...
-Log in with your Google Account
-Grant rclone access to Google Drive
-```
+Browser authentication:
+1. Click the link that appears
+2. Log in with your Google Account
+3. Grant rclone access to Google Drive
+4. You'll get a token — rclone saves it automatically
 
-✅ You'll get a token — rclone saves it automatically
-
-### Verify configuration
+Verify:
 ```bash
 rclone listremotes        # Should show: gdrive
-rclone ls gdrive:         # List Google Drive contents
+rclone ls gdrive:/        # List Google Drive contents
 ```
 
 ---
@@ -86,7 +111,11 @@ BACKUP_SCHEDULE=0 2 * * *           # Cron: Daily at 2 AM UTC
 BACKUP_DB_NAME=breathart            # Your MongoDB database name
 BACKUP_COLLECTIONS=users,exams,videos,exam-participants  # Collections to backup
 BACKUP_RETENTION_DAYS=7             # Keep local backups for 7 days
-RCLONE_GDRIVE_REMOTE=gdrive         # Must match rclone config name
+
+# Choose one (must match your rclone config name):
+RCLONE_GDRIVE_REMOTE=mega           # If using Mega
+# OR
+RCLONE_GDRIVE_REMOTE=gdrive         # If using Google Drive
 ```
 
 ### Cron Schedule Reference

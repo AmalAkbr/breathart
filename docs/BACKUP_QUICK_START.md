@@ -1,6 +1,32 @@
-# Quick Backup Setup for VPS
+# Quick Backup Setup
 
-## TL;DR - Just Want It Working?
+## ⚡ Option 1: Mega (Easiest - No Browser Auth)
+
+### On your Windows PC OR VPS:
+
+```bash
+# 1. Install rclone
+curl https://rclone.org/install.sh | sudo bash
+
+# 2. Configure Mega (no browser needed!)
+rclone config
+# n → new
+# mega → name it
+# mega → type
+# your-email@gmail.com → email
+# your-password → password
+# Done! ✅
+
+# 3. Add to .env
+BACKUP_ENABLED=true
+BACKUP_SCHEDULE=0 2 * * *
+RCLONE_GDRIVE_REMOTE=mega
+BACKUP_COLLECTIONS=users,exams,videos,exam-participants
+```
+
+---
+
+## 🔐 Option 2: Google Drive (Production VPS)
 
 ### On your VPS:
 
@@ -10,7 +36,7 @@ curl https://rclone.org/install.sh | sudo bash
 
 # 2. Configure Google Drive
 rclone config
-# (follow browser auth - log in with your Google account)
+# (follow browser auth)
 
 # 3. Add to .env
 BACKUP_ENABLED=true

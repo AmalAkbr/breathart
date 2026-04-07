@@ -23,18 +23,22 @@ Your backend now has **production-ready automated MongoDB backups** to Google Dr
 
 ---
 
-## 🚀 Quick Start (3 Steps)
+## 🚀 Quick Start (3 Steps) - Mega (Easiest)
 
-### Step 1️⃣: On Your VPS
+### Step 1️⃣: On Your Local PC or VPS
 
 ```bash
 # Install rclone
 curl https://rclone.org/install.sh | sudo bash
 
-# Set up Google Drive
+# Set up Mega (NO browser needed!)
 rclone config
-# → Choose: n (new) → gdrive → Google Drive → y (browser auth)
-# → Log in with your Google account → Done
+# → n (new)
+# → mega (name)
+# → mega (type)
+# → your-email@gmail.com
+# → your-password
+# ✅ Done!
 ```
 
 ### Step 2️⃣: Update .env
@@ -42,7 +46,7 @@ rclone config
 ```env
 BACKUP_ENABLED=true
 BACKUP_SCHEDULE=0 2 * * *
-RCLONE_GDRIVE_REMOTE=gdrive
+RCLONE_GDRIVE_REMOTE=mega
 BACKUP_COLLECTIONS=users,exams,videos,exam-participants
 BACKUP_RETENTION_DAYS=7
 BACKUP_DB_NAME=breathart
@@ -51,13 +55,18 @@ BACKUP_DB_NAME=breathart
 ### Step 3️⃣: Deploy
 
 ```bash
-# Pull latest code (includes backupService.js)
+# Pull latest code
 git pull origin main
 
 # Restart backend
 npm start
 # OR
 docker-compose restart backend
+# OR 
+pm2 restart breathart-backend
+```
+
+**Done!** ✅ Backups will run automatically at 2 AM UTC daily.
 # OR 
 pm2 restart breathart-backend
 ```
@@ -74,9 +83,14 @@ pm2 restart breathart-backend
 # ✅ Backup scheduler started (cron: 0 2 * * *)
 ```
 
-### Check Google Drive
+### Check Mega or Google Drive
 ```bash
+# If using Mega:
+rclone ls mega:/mongo-backups/
+
+# If using Google Drive:
 rclone ls gdrive:/mongo-backups/
+
 # Should show backup files
 ```
 
@@ -95,10 +109,10 @@ Auto-triggers backup:
     ├─ Export users.json via mongoexport
     ├─ Export exams.json via mongoexport
     ├─ Compress as .gz files
-    ├─ Upload to Google Drive via rclone
+    ├─ Upload to Mega or Google Drive via rclone
     └─ Clean local backups older than 7 days
     ↓
-Files appear in: Google Drive / mongo-backups / 2024-01-15 / ...
+Files appear in: Mega/GoogleDrive / mongo-backups / 2024-01-15 / ...
 ```
 
 ---
@@ -114,7 +128,7 @@ Files appear in: Google Drive / mongo-backups / 2024-01-15 / ...
 | `BACKUP_DB_NAME` | `breathart` | `breathart` | MongoDB DB name |
 | `BACKUP_COLLECTIONS` | Built-in | `users,exams` | What to export |
 | `BACKUP_RETENTION_DAYS` | `7` | `14` | Keep local X days |
-| `RCLONE_GDRIVE_REMOTE` | Required | `gdrive` | rclone remote name |
+| `RCLONE_GDRIVE_REMOTE` | Required | `mega` or `gdrive` | rclone remote name |
 
 ### Cron Schedules
 
@@ -138,7 +152,7 @@ backend/temp/backups/
 └── ... (deleted after 7 days)
 ```
 
-### In Google Drive (permanent)
+### In Mega or Google Drive (permanent)
 ```
 mongo-backups/
 ├── 2024-01-15/
@@ -148,6 +162,10 @@ mongo-backups/
 │   └── backup-exam-participants-*.json.gz
 ├── 2024-01-16/
 │   └── ...
+
+# Access via:
+# Mega:  rclone ls mega:/mongo-backups/
+# GDrive: rclone ls gdrive:/mongo-backups/
 ```
 
 ---
@@ -175,7 +193,7 @@ curl -X POST http://localhost:3000/api/admin/backup/trigger \
 
 ## 🔒 Security Notes
 
-1. **rclone config** stores Google Drive token at:
+1. **rclone config** stores credentials at:
    ```bash
    ~/.config/rclone/rclone.conf
    ```
@@ -184,12 +202,11 @@ curl -X POST http://localhost:3000/api/admin/backup/trigger \
    sudo chmod 600 ~/.config/rclone/rclone.conf
    ```
 
-2. **Google Drive integration** uses OAuth:
-   - You authenticate once in your browser
-   - rclone stores the token locally on VPS
-   - Never hardcoded in .env
+2. **Mega** - Uses email/password auth (stored locally)
 
-3. **Backups are uploaded encrypted** over HTTPS
+3. **Google Drive** - Uses OAuth token (browser-based, stored locally on VPS)
+
+4. **Backups are encrypted** over HTTPS during upload
 
 ---
 
@@ -241,7 +258,7 @@ For more details, see:
 ✅ **Automatic scheduling** — Runs on cron schedule  
 ✅ **Parallel collections** — Exports all collections  
 ✅ **Compression** — Saves bandwidth (10x typical)  
-✅ **Cloud upload** — Direct to Google Drive  
+✅ **Cloud upload** — Direct to Mega or Google Drive  
 ✅ **Error handling** — Continues on individual failures  
 ✅ **Retention policy** — Auto-cleanup old local files  
 ✅ **Manual trigger** — Optional admin endpoint  
@@ -253,6 +270,16 @@ For more details, see:
 
 ## 📊 Next Steps
 
+### Option A: Mega (Easiest - Recommended for Testing)
+- [ ] Install rclone (local PC or VPS)
+- [ ] Run `rclone config` with Mega (no browser auth needed!)
+- [ ] Add env variables to `.env`
+- [ ] Pull latest backend code
+- [ ] Restart backend service
+- [ ] Check logs for "✅ Backup scheduler started"
+- [ ] Verify files appear in Mega
+
+### Option B: Google Drive (Production VPS)
 - [ ] SSH to VPS
 - [ ] Install rclone
 - [ ] Run `rclone config` with Google Drive auth
@@ -260,7 +287,6 @@ For more details, see:
 - [ ] Pull latest backend code
 - [ ] Restart backend service
 - [ ] Check logs for "✅ Backup scheduler started"
-- [ ] Wait for scheduled time or manually trigger
 - [ ] Verify files in Google Drive
 
 ---
@@ -270,9 +296,13 @@ For more details, see:
 Your MongoDB backups are production-ready. They'll:
 - 📅 Run automatically on schedule
 - 💾 Export as compressed JSON
-- ☁️ Upload to Google Drive
+- ☁️ Upload to Mega or Google Drive
 - 🗑️ Clean old local files
 - 📊 Log everything for monitoring
+
+**Pick your storage:**
+- ⚡ **Mega** (easier, works on Windows/VPS, no browser auth)
+- 🔐 **Google Drive** (better for production, requires browser auth)
 
 **Questions?** Check the documentation files or the comments in `backupService.js`.
 

@@ -21,10 +21,7 @@ This guide walks you through setting up automated MongoDB backups to Google Driv
 - `mongoexport` installed (MongoDB tools)
 - `gzip` installed (standard on Linux)
 - `rclone` installed
-- Google account with Drive
-```sudo apt-get update
-sudo apt-get install -y unzip
-```
+- Google account with Drive OR Mega account
 ---
 
 ## 🔧 Installation
@@ -56,43 +53,44 @@ sudo apt-get update
 sudo apt-get install -y mongodb-org-tools
 ```
 
-### Step 3: Configure Google Drive Access
+### Step 3: Configure Google Drive Access OR Mega
+
+**Option A: Mega (Simpler - No Browser Auth)**
+
+On your VPS:
+```bash
+rclone config
+```
+
+Follow prompts:
+```
+n → new remote
+mega → name it
+mega → type
+your-email@gmail.com → username
+your-password → password
+```
+
+✅ Done! No browser needed.
+
+**Option B: Google Drive (Better for Production)**
 
 On your VPS, run:
 ```bash
 rclone config
 ```
 
-**Follow the prompts exactly:**
-
+Follow prompts:
 ```
-n/s/q> n                          # Create NEW remote
-name> gdrive                       # Name it exactly "gdrive"
-Type of storage> 17               # Google Drive (varies, look for it)
-ID of Google Drive to use> (press enter - leave blank)
-Service Account Credentials?> (press enter - leave blank)
-scope> drive                       # Choose "Full access to all files"
-root_folder_id> (press enter - leave blank)
-config_refresh_token> (press enter - leave blank)
-Edit advanced config?> n          # No advanced options
-Use web browser to authorize?> y  # YES - open browser
+n → new remote
+gdrive → name it
+17 → Google Drive
+(leave blank for credentials)
+drive → scope
+y → Use web browser
 ```
 
-**In your browser:**
-- You'll see a long URL
-- Click it (or copy/paste)
-- Log in with your Google Account
-- Grant rclone access to Google Drive
-- You'll get a token — rclone saves it automatically
-
-**Verify success:**
-```bash
-rclone listremotes
-# Should show: gdrive
-
-rclone ls gdrive:
-# Should show your Google Drive contents
-```
+When prompted, open browser and authenticate.
 
 ### Step 4: Update Your .env File
 
@@ -102,7 +100,7 @@ SSH into your backend directory and edit `.env`:
 nano .env
 ```
 
-Add these lines:
+Add these lines (choose one remote):
 
 ```env
 # Backup Configuration
@@ -111,7 +109,11 @@ BACKUP_SCHEDULE=0 2 * * *
 BACKUP_DB_NAME=breathart
 BACKUP_COLLECTIONS=users,exams,videos,exam-participants
 BACKUP_RETENTION_DAYS=7
-RCLONE_GDRIVE_REMOTE=gdrive
+
+# Choose one:
+RCLONE_GDRIVE_REMOTE=mega           # If using Mega
+# OR
+RCLONE_GDRIVE_REMOTE=gdrive         # If using Google Drive
 ```
 
 Save: `Ctrl+X → Y → Enter`
@@ -165,19 +167,22 @@ And (at scheduled time):
 ✅ Uploaded to Google Drive: mongo-backups/2024-01-15
 ```
 
-**Check Google Drive:**
+**Check Google Drive OR Mega:**
 ```bash
-# List backups
+# If using Mega:
+rclone ls mega:/mongo-backups/
+
+# If using Google Drive:
 rclone ls gdrive:/mongo-backups/
 
 # Example output:
 # 12345678 backup-users-2024-01-15_02-00-00.json.gz
 # 87654321 backup-exams-2024-01-15_02-00-00.json.gz
-# ...
 
-# Check total size
+# Check total size:
+rclone du mega:/mongo-backups/
+# or
 rclone du gdrive:/mongo-backups/
-# Example: Total: 250 MB
 ```
 
 ---

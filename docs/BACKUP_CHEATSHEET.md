@@ -9,15 +9,24 @@ curl https://rclone.org/install.sh | sudo bash
 # Verify
 rclone version
 
-# Configure Google Drive (INTERACTIVE - follow prompts)
+# Configure (Choose ONE):
+
+# OPTION A: Mega (easier, no browser needed)
 rclone config
-# When prompted:
-# - n (new remote)
-# - gdrive (name)
-# - 17 (Google Drive option number)
-# - Leave blank for ID, service account, scope
-# - y (use web browser)
-# - Log in when browser opens
+# n → new
+# mega → name
+# mega → type
+# your-email@gmail.com → username
+# your-password → password
+
+# OPTION B: Google Drive (production)
+rclone config
+# n → new
+# gdrive → name
+# 17 → Google Drive
+# Leave blank for ID/service account
+# drive → scope
+# y → Use web browser to authorize
 ```
 
 ## 📝 Add to .env
@@ -28,7 +37,8 @@ BACKUP_SCHEDULE=0 2 * * *
 BACKUP_DB_NAME=breathart
 BACKUP_COLLECTIONS=users,exams,videos,exam-participants
 BACKUP_RETENTION_DAYS=7
-RCLONE_GDRIVE_REMOTE=gdrive
+RCLONE_GDRIVE_REMOTE=mega
+# OR use: RCLONE_GDRIVE_REMOTE=gdrive (if using Google Drive)
 ```
 
 ## 🔄 Deploy Backend
@@ -129,17 +139,13 @@ rclone ls gdrive:/
 ## 📊 Check Backups
 
 ```bash
-# List all backups
+# If using Mega:
+rclone ls mega:/mongo-backups/
+rclone du mega:/mongo-backups/
+
+# If using Google Drive:
 rclone ls gdrive:/mongo-backups/
-
-# Check size
 rclone du gdrive:/mongo-backups/
-
-# List by date
-rclone lsf -R gdrive:/mongo-backups/ | grep "2024-01-15"
-
-# Check local backups
-ls -lh backend/temp/backups/
 ```
 
 ## 🎯 Enable/Disable

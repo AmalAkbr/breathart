@@ -4,20 +4,20 @@ sudo nano /etc/nginx/sites-available/habeeb.qzz.io
 # Redirect all HTTP traffic to HTTPS
 server {
     listen 80;
-    server_name habeeb.qzz.io;
+    server_name breathartinstitute.in;
 
     return 301 https://$host$request_uri;
 }
 
 # HTTPS server block
 server {
-    listen 443 ssl;
-    server_name habeeb.qzz.io;
+    #listen 443 ssl;
+    #server_name breathartinstitute.in;
 
-    ssl_certificate /etc/letsencrypt/live/habeeb.qzz.io/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/habeeb.qzz.io/privkey.pem;
-    include /etc/letsencrypt/options-ssl-nginx.conf;
-    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+   # ssl_certificate /etc/letsencrypt/live/habeeb.qzz.io/fullchain.pem;
+   # ssl_certificate_key /etc/letsencrypt/live/habeeb.qzz.io/privkey.pem;
+   # include /etc/letsencrypt/options-ssl-nginx.conf;
+   # ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 
 
  client_max_body_size 500M;
@@ -37,3 +37,9 @@ server {
         proxy_cache_bypass $http_upgrade;
     }
 }
+
+
+command
+Create symbolic links to enable the sites.
+
+ln -s /etc/nginx/sites-available/breathartinstitute.in /etc/nginx/sites-enabled/
