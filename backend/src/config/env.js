@@ -72,6 +72,14 @@ export const env = {
   CLOUDFLARE_R2_SECRET_ACCESS_KEY: process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY,
   CLOUDFLARE_R2_PUBLIC_URL: process.env.CLOUDFLARE_R2_PUBLIC_URL,
 
+  // Backup Configuration
+  BACKUP_ENABLED: process.env.BACKUP_ENABLED === 'true',
+  BACKUP_SCHEDULE: process.env.BACKUP_SCHEDULE || '0 2 * * *', // Cron: Daily at 2 AM
+  BACKUP_DB_NAME: process.env.BACKUP_DB_NAME || 'breathart',
+  BACKUP_COLLECTIONS: process.env.BACKUP_COLLECTIONS || 'users,exams,videos,exam-participants',
+  BACKUP_RETENTION_DAYS: parseInt(process.env.BACKUP_RETENTION_DAYS || '7', 10),
+  RCLONE_GDRIVE_REMOTE: process.env.RCLONE_GDRIVE_REMOTE, // e.g., 'gdrive'
+
   // Helpers
   isDev: process.env.NODE_ENV === 'development',
   isProd: process.env.NODE_ENV === 'production',

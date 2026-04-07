@@ -1,0 +1,6 @@
+breathart@breathart:~/web/breathart$   sudo systemctl daemon-reload
+breathart@breathart:~/web/breathart$   sudo systemctl start mongod
+breathart@breathart:~/web/breathart$   sudo systemctl enable mongod
+Created symlink /etc/systemd/system/multi-user.target.wants/mongod.service → /usr/lib/systemd/system/mongod.service.
+breathart@breathart:~/web/breathart$ 
+

@@ -5,5 +5,6 @@ export * as examService from './examService.js';
 export * as authService from './authService.js';
 export * as videoService from './videoService.js';
 export * as uploadService from './uploadService.js';
+export * as backupService from './backupService.js';
 
 export { default as emailService } from './emailService.js';

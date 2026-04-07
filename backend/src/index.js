@@ -33,6 +33,7 @@ import {
 
 // Import cron job service
 import { initCleanupCron } from './services/cropJobService.js';
+import { backupService } from './services/index.js';
 import { initializeUploadSocketServer } from './websocket/uploadSocketServer.js';
 
 const app = express();
@@ -225,6 +226,9 @@ Ready to receive requests! 🚀
 
   // Initialize cleanup cron job
   initCleanupCron();
+
+  // Initialize MongoDB backup scheduler
+  backupService.scheduleBackups();
 
   // Log email service status
   console.log('✅ Email service ready (main load)');
