@@ -22,9 +22,11 @@ export const configureSecurityMiddleware = (app, env) => {
     'https://s.ytimg.com',
     'https://*.gstatic.com',
     'https://*.googleapis.com',
-    'https://*.google.com'
+    'https://*.google.com',
+    'https://analytics.breathartinstitute.in',
+    'https://*.breathartinstitute.in'
   ];
-  const scriptSrcAttr = ["'self'", "'unsafe-inline'"];
+  const scriptSrcAttr = ["'self'", "'unsafe-inline'",'https://analytics.breathartinstitute.in'];
   const styleSrc = ["'self'", "'unsafe-inline'", 'blob:', 'data:', 'https://fonts.googleapis.com'];
   const fontSrc = ["'self'", 'data:', 'https://fonts.gstatic.com'];
   const connectSrc = [
@@ -39,7 +41,8 @@ export const configureSecurityMiddleware = (app, env) => {
     'https://*.gstatic.com',
     'https://*.googleapis.com',
     'https://*.google.com',
-    'https://maps.google.com'
+    'https://maps.google.com',
+    'https://analytics.breathartinstitute.in'
   ].filter(Boolean);
   const frameSrc = [
     "'self'",
@@ -49,7 +52,8 @@ export const configureSecurityMiddleware = (app, env) => {
     'https://*.googleapis.com',
     'https://maps.google.com',
     'https://www.google.com/maps',
-    'https://maps.google.com/maps'
+    'https://maps.google.com/maps',
+    'https://analytics.breathartinstitute.in'
   ];
   const mediaSrc = [
     "'self'",
@@ -57,7 +61,8 @@ export const configureSecurityMiddleware = (app, env) => {
     'data:',
     'https:',
     'https://*.googlevideo.com',
-    'https://*.youtube.com'
+    'https://*.youtube.com',
+    'https://analytics.breathartinstitute.in'
   ];
 
   app.use(helmet({
@@ -75,7 +80,8 @@ export const configureSecurityMiddleware = (app, env) => {
           'https://*.ytimg.com',
           'https://s.ytimg.com',
           'https://*.gstatic.com',
-          'https://*.google.com'
+          'https://*.google.com',
+          'https://analytics.breathartinstitute.in'
         ],
         connectSrc,
         frameSrc,
