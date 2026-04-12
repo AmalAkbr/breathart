@@ -22,6 +22,7 @@ import { getAuthToken } from "./utils/apiClient";
 // Lazy-loaded pages — each becomes a separate JS chunk (code splitting)
 const Home = lazy(() => import("./pages/Home"));
 const Terms = lazy(() => import("./pages/Terms"));
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 const Blogs = lazy(() => import("./pages/Blogs"));
 const AboutUs = lazy(() => import("./pages/AboutUs"));
 const Careers = lazy(() => import("./pages/Careers"));
@@ -97,6 +98,8 @@ const MainLayout = () => {
           <Route path="/admission" element={<Admission />} />
           <Route path="/brochure" element={<Brochure />} />
           <Route path="/terms" element={<Terms />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/privacy" element={<Navigate to="/privacy-policy" replace />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>

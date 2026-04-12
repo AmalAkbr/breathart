@@ -145,6 +145,22 @@ const Footer = ({ isLanding = false }) => {
                       Brochure
                     </Link>
                   </li>
+                  <li>
+                    <Link
+                      to="/terms"
+                      className="hover:text-accent-cyan transition-colors"
+                    >
+                      Terms & Conditions
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/privacy-policy"
+                      className="hover:text-accent-cyan transition-colors"
+                    >
+                      Privacy Policy
+                    </Link>
+                  </li>
                 </>
               )}
             </ul>

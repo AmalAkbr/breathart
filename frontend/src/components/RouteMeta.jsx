@@ -29,13 +29,30 @@ const META_BY_ROUTE = [
     image: `${SITE_URL}/app/og-courses.png?v=1`,
     imageAlt: "Courses page preview",
   },
-{
+  {
     match: (pathname) => pathname.startsWith("/blogs"),
     title: "Blogs | Digital Marketing Tips and Insights from BICT",
     description:
       "Read the latest digital marketing blogs, industry insights, and career guidance from Breathart Institute experts.",
     image: `${SITE_URL}/app/og-blogs.png?v=1`,
     imageAlt: "Blogs page preview",
+  },
+  {
+    match: (pathname) => pathname.startsWith("/terms"),
+    title: "Terms and Conditions | Breathart Institute",
+    description:
+      "Read the Terms and Conditions for using Breathart Institute services and website.",
+    image: `${SITE_URL}/app/og-home.png?v=1`,
+    imageAlt: "Breathart Institute terms page preview",
+  },
+  {
+    match: (pathname) =>
+      pathname.startsWith("/privacy-policy") || pathname.startsWith("/privacy"),
+    title: "Privacy Policy | Breathart Institute",
+    description:
+      "Read how Breathart Institute collects, uses, and protects your personal data.",
+    image: `${SITE_URL}/app/og-home.png?v=1`,
+    imageAlt: "Breathart Institute privacy policy page preview",
   },
 ];
 
@@ -74,7 +91,7 @@ const setCanonical = (href) => {
 const RouteMeta = () => {
   const { pathname } = useLocation();
 
-useEffect(() => {
+  useEffect(() => {
     const selected =
       META_BY_ROUTE.find((entry) => entry.match(pathname)) || DEFAULT_META;
     const normalizedPath = pathname === "/" ? "/" : pathname.replace(/\/+$/, "");

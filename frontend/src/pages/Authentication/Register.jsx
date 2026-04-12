@@ -349,7 +349,7 @@ export default function Register() {
 
         {/* Footer Note */}
         <p className="mt-6 text-center text-gray-500 text-sm">
-          By signing up, you agree to <Link to={'/terms'}>our terms and conditions</Link>
+          By signing up, you agree to <Link to={'/terms'}>our terms and conditions</Link> and <Link to={'/privacy-policy'}>privacy policy</Link>
         </p>
       </div>
     </div>
