@@ -6,21 +6,32 @@ import { httpRouter } from "convex/server";
 // ---------------------------------------------------------------------------
 
 function getCorsOrigin(request: Request): string {
+  const origin = request.headers.get("origin") || request.headers.get("Origin");
   const rawAllowed = process.env.ALLOWED_ORIGINS || "";
   const allowedOrigins = rawAllowed.split(",").map(d => d.trim()).filter(Boolean);
   
-  // Default to the first allowed origin safely if request has no origin
-  const fallbackOrigin = allowedOrigins.length > 0 ? allowedOrigins[0] : "https://breathartinstitute.in";
+  // Default to your production domain
+  const fallbackOrigin = "https://www.breathartinstitute.in";
 
-  const origin = request.headers.get("origin") || request.headers.get("Origin");
   if (!origin) return fallbackOrigin;
   
-  // 1. Exact match
+  // 1. Safety check: Always allow your own domain and localhost
+  try {
+    const originHost = new URL(origin).hostname;
+    if (originHost === "breathartinstitute.in" || 
+        originHost === "www.breathartinstitute.in" || 
+        originHost === "localhost" || 
+        originHost === "127.0.0.1") {
+      return origin;
+    }
+  } catch { /* skip invalid URL */ }
+
+  // 2. Exact match from env vars
   if (allowedOrigins.includes(origin)) {
     return origin;
   }
 
-  // 2. Smart match: if origin is www.domain.com and domain.com is allowed (or vice-versa)
+  // 3. Smart match for other domains in ALLOWED_ORIGINS
   try {
     const originHost = new URL(origin).hostname;
     const isMatched = allowedOrigins.some(allowed => {
@@ -33,11 +44,8 @@ function getCorsOrigin(request: Request): string {
     });
     
     if (isMatched) return origin;
-  } catch {
-    // Ignore invalid origin URLs
-  }
+  } catch { }
 
-  console.warn(`[CORS] Blocked unrecognized origin: ${origin}. Expected one of: ${rawAllowed}`);
   return fallbackOrigin;
 }
 
@@ -46,6 +54,7 @@ function corsHeaders(origin: string, extra: Record<string, string> = {}): Record
     "Access-Control-Allow-Origin": origin,
     "Access-Control-Allow-Methods": "POST, DELETE, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    "Access-Control-Max-Age": "86400",
     ...extra,
   };
 }
@@ -58,7 +67,7 @@ function jsonResponse(body: unknown, status = 200, origin: string): Response {
 }
 
 // ---------------------------------------------------------------------------
-// AWS Sig V4 helper (used for R2 PUT & DELETE)
+// AWS Sig V4 helper (updated for streaming/unsigned-payload support)
 // ---------------------------------------------------------------------------
 
 async function hmac(key: ArrayBuffer | Uint8Array, data: string): Promise<ArrayBuffer> {
@@ -88,7 +97,7 @@ async function buildR2AuthHeader(
   accessKey: string,
   secretKey: string,
   contentType: string,
-  bodyHash: string,
+  bodyHash: string, // Use "UNSIGNED-PAYLOAD" for memory efficiency on large files
   now: Date
 ): Promise<{ authorization: string; amzDate: string }> {
   const region = "auto";
@@ -153,8 +162,6 @@ const uploadThumbnail = httpAction(async (_ctx, request) => {
     return new Response(null, { status: 204, headers: corsHeaders(origin) });
   }
 
-  console.log(`[Upload] Received thumbnail upload request from origin: ${origin || "unknown"}`);
-
   try {
     const IMAGEKIT_PRIVATE_KEY = process.env.IMAGEKIT_PRIVATE_KEY ?? "";
     const IMAGEKIT_URL_ENDPOINT = process.env.IMAGEKIT_URL_ENDPOINT ?? "";
@@ -170,29 +177,22 @@ const uploadThumbnail = httpAction(async (_ctx, request) => {
       return jsonResponse({ success: false, error: "No thumbnail file provided" }, 400, origin);
     }
 
-    // Validate mime
     const allowedMimes = ["image/jpeg", "image/png", "image/webp"];
     if (!allowedMimes.includes(file.type)) {
       return jsonResponse({ success: false, error: "Thumbnail must be JPEG, PNG, or WebP" }, 400, origin);
     }
 
-    // Max 10 MB
     if (file.size > 10 * 1024 * 1024) {
       return jsonResponse({ success: false, error: "Thumbnail exceeds 10 MB limit" }, 400, origin);
     }
 
-    // Build multipart body for ImageKit upload API
     const ikForm = new FormData();
     ikForm.append("file", file);
-    ikForm.append(
-      "fileName",
-      `thumb_${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`
-    );
+    ikForm.append("fileName", `thumb_${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`);
     ikForm.append("folder", "/breathart/thumbnails");
     ikForm.append("useUniqueFileName", "true");
 
     const authHeader = "Basic " + btoa(`${IMAGEKIT_PRIVATE_KEY}:`);
-
     const ikRes = await fetch("https://upload.imagekit.io/api/v1/files/upload", {
       method: "POST",
       headers: { Authorization: authHeader },
@@ -200,29 +200,21 @@ const uploadThumbnail = httpAction(async (_ctx, request) => {
     });
 
     if (!ikRes.ok) {
-      const errText = await ikRes.text();
-      console.error("ImageKit upload failed:", errText);
       return jsonResponse({ success: false, error: "Thumbnail upload failed" }, 502, origin);
     }
 
     const ikData = (await ikRes.json()) as { url: string; fileId: string; name: string };
-
     return jsonResponse({
       success: true,
-      data: {
-        thumbnailUrl: ikData.url,
-        fileId: ikData.fileId,
-        fileName: ikData.name,
-      },
+      data: { thumbnailUrl: ikData.url, fileId: ikData.fileId, fileName: ikData.name },
     }, 200, origin);
   } catch (err) {
-    console.error("uploadThumbnail error:", err);
     return jsonResponse({ success: false, error: "Internal server error" }, 500, origin);
   }
 });
 
 // ---------------------------------------------------------------------------
-// Upload video → Cloudflare R2  (max 500 MB, AWS Sig V4)
+// Upload video → Cloudflare R2
 // ---------------------------------------------------------------------------
 
 const uploadVideoFile = httpAction(async (_ctx, request) => {
@@ -230,8 +222,6 @@ const uploadVideoFile = httpAction(async (_ctx, request) => {
   if (request.method === "OPTIONS") {
     return new Response(null, { status: 204, headers: corsHeaders(origin) });
   }
-
-  console.log(`[Upload] Received video upload request from origin: ${origin || "unknown"}`);
 
   try {
     const R2_ACCOUNT_ID = process.env.CLOUDFLARE_R2_ACCOUNT_ID ?? "";
@@ -246,46 +236,28 @@ const uploadVideoFile = httpAction(async (_ctx, request) => {
 
     const formData = await request.formData();
     const file = formData.get("video") as File | null;
+    if (!file) return jsonResponse({ success: false, error: "No video file provided" }, 400, origin);
 
-    if (!file) {
-      return jsonResponse({ success: false, error: "No video file provided" }, 400, origin);
-    }
-
-    // Validate mime type
     const allowedMimes = ["video/mp4", "video/webm", "video/x-msvideo", "video/quicktime"];
     if (!allowedMimes.includes(file.type)) {
-      return jsonResponse(
-        { success: false, error: "Invalid video format. Use MP4, WebM, AVI, or MOV." },
-        400, origin
-      );
+      return jsonResponse({ success: false, error: "Invalid video format" }, 400, origin);
     }
 
-    // Enforce 500 MB limit server-side
-    const MAX_SIZE = 500 * 1024 * 1024;
-    if (file.size > MAX_SIZE) {
+    if (file.size > 500 * 1024 * 1024) {
       return jsonResponse({ success: false, error: "Video exceeds 500 MB limit" }, 400, origin);
     }
 
     const ext = (file.name.split(".").pop() || "mp4").toLowerCase();
     const key = `breathart/videos/${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${ext}`;
-
-    const fileBuffer = await file.arrayBuffer();
-    const payloadHash = await sha256Hex(fileBuffer);
+    
+    // Memory optimization: Use UNSIGNED-PAYLOAD for large files
+    const payloadHash = "UNSIGNED-PAYLOAD";
 
     const { authorization, amzDate } = await buildR2AuthHeader(
-      "PUT",
-      R2_BUCKET,
-      key,
-      R2_ACCOUNT_ID,
-      R2_ACCESS_KEY,
-      R2_SECRET_KEY,
-      file.type,
-      payloadHash,
-      new Date()
+      "PUT", R2_BUCKET, key, R2_ACCOUNT_ID, R2_ACCESS_KEY, R2_SECRET_KEY, file.type, payloadHash, new Date()
     );
 
     const uploadUrl = `https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com/${R2_BUCKET}/${key}`;
-
     const r2Res = await fetch(uploadUrl, {
       method: "PUT",
       headers: {
@@ -294,26 +266,16 @@ const uploadVideoFile = httpAction(async (_ctx, request) => {
         "x-amz-content-sha256": payloadHash,
         "x-amz-date": amzDate,
       },
-      body: fileBuffer,
+      body: file, // Directly pipe the file blob to fetch
     });
 
-    console.log(`[Upload] R2 PUT response status: ${r2Res.status}`);
-
-    if (!r2Res.ok) {
-      const errText = await r2Res.text();
-      console.error("R2 upload failed:", r2Res.status, errText);
-      return jsonResponse({ success: false, error: "Video upload to storage failed" }, 502, origin);
-    }
-
-    const videoUrl = `${R2_PUBLIC_URL}/${key}`;
-    console.log(`✅ Video uploaded to R2: ${key} (${(file.size / 1024 / 1024).toFixed(1)} MB)`);
+    if (!r2Res.ok) return jsonResponse({ success: false, error: "Video storage failed" }, 502, origin);
 
     return jsonResponse({
       success: true,
-      data: { videoUrl, videoKey: key },
+      data: { videoUrl: `${R2_PUBLIC_URL}/${key}`, videoKey: key },
     }, 200, origin);
   } catch (err) {
-    console.error("uploadVideoFile error:", err);
     return jsonResponse({ success: false, error: "Internal server error" }, 500, origin);
   }
 });

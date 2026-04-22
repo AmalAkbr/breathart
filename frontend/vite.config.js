@@ -30,8 +30,15 @@ export default defineConfig({
   },
   server: {
     // Allow access from any local network IP for testing on mobile devices
-    // host: '172.30.83.187',
-    host:true,
+    host: true,
     port: 5173,
+    headers: {
+      "Content-Security-Policy": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https: blob:; media-src 'self' https: data: blob:; frame-src 'self' https://www.google.com https://maps.google.com https://www.youtube.com; connect-src 'self' https: ws: wss:;"
+    }
+  },
+  preview: {
+    headers: {
+      "Content-Security-Policy": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https: blob:; media-src 'self' https: data: blob:; frame-src 'self' https://www.google.com https://maps.google.com https://www.youtube.com; connect-src 'self' https: ws: wss:;"
+    }
   }
 })
