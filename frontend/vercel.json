@@ -1,0 +1,65 @@
+{
+  "redirects": [
+    { "source": "/best-digital-marketing-courses", "destination": "/courses", "permanent": true },
+    { "source": "/best-digital-marketing-course-in-trivandrum", "destination": "/courses", "permanent": true },
+    { "source": "/best-institute-for-digital-marketing-with-placement-in-kerala", "destination": "/#placement", "permanent": true },
+    { "source": "/breathart-group", "destination": "/about", "permanent": true },
+    { "source": "/google-digital-marketing-certification", "destination": "/#certifications", "permanent": true },
+    { "source": "/best-digital-marketing-institute-in-kerala", "destination": "/", "permanent": true },
+    { "source": "/best-digital-marketing-academy-in-kerala", "destination": "/", "permanent": true },
+    { "source": "/graphic-design-course-in-trivandrum", "destination": "/#graphic-design", "permanent": true },
+    { "source": "/traditional-marketing-vs-digital-marketing", "destination": "/#digital-marketing-courses", "permanent": true },
+    { "source": "/digital-marketing-blogs", "destination": "/blogs", "permanent": true }
+
+  ],
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=31536000; includeSubDomains; preload"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=()"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https: blob:; media-src 'self' https: data: blob:; frame-src 'self' https://www.google.com https://maps.google.com https://www.youtube.com; connect-src 'self' https: ws: wss:;"
+        }
+      ]
+    },
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    }
+  ]
+}

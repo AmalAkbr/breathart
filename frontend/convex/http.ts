@@ -6,10 +6,6 @@ import { httpRouter } from "convex/server";
 // ---------------------------------------------------------------------------
 
 function getCorsOrigin(request: Request): string {
-  if (!process.env.ALLOWED_ORIGINS) {
-    console.warn("⚠️ ALLOWED_ORIGINS environment variable is missing! CORS might block all external requests.");
-  }
-
   const rawAllowed = process.env.ALLOWED_ORIGINS || "";
   const allowedOrigins = rawAllowed.split(",").map(d => d.trim()).filter(Boolean);
   
@@ -19,11 +15,29 @@ function getCorsOrigin(request: Request): string {
   const origin = request.headers.get("origin") || request.headers.get("Origin");
   if (!origin) return fallbackOrigin;
   
+  // 1. Exact match
   if (allowedOrigins.includes(origin)) {
     return origin;
   }
 
-  console.warn(`[CORS] Blocked unrecognized origin: ${origin}`);
+  // 2. Smart match: if origin is www.domain.com and domain.com is allowed (or vice-versa)
+  try {
+    const originHost = new URL(origin).hostname;
+    const isMatched = allowedOrigins.some(allowed => {
+      try {
+        const allowedHost = new URL(allowed).hostname;
+        return originHost === allowedHost || 
+               originHost === `www.${allowedHost}` || 
+               `www.${originHost}` === allowedHost;
+      } catch { return false; }
+    });
+    
+    if (isMatched) return origin;
+  } catch {
+    // Ignore invalid origin URLs
+  }
+
+  console.warn(`[CORS] Blocked unrecognized origin: ${origin}. Expected one of: ${rawAllowed}`);
   return fallbackOrigin;
 }
 
@@ -141,11 +155,6 @@ const uploadThumbnail = httpAction(async (_ctx, request) => {
 
   console.log(`[Upload] Received thumbnail upload request from origin: ${origin || "unknown"}`);
 
-  if (origin === "https://breathartinstitute.in" && !request.headers.get("origin")?.includes("breathartinstitute.in")) {
-    console.error(`[Upload] Blocked thumbnail upload - CORS mismatch.`);
-    return jsonResponse({ success: false, error: "Unauthorized endpoint access (CORS)" }, 403, origin);
-  }
-
   try {
     const IMAGEKIT_PRIVATE_KEY = process.env.IMAGEKIT_PRIVATE_KEY ?? "";
     const IMAGEKIT_URL_ENDPOINT = process.env.IMAGEKIT_URL_ENDPOINT ?? "";
@@ -223,11 +232,6 @@ const uploadVideoFile = httpAction(async (_ctx, request) => {
   }
 
   console.log(`[Upload] Received video upload request from origin: ${origin || "unknown"}`);
-
-  if (origin === "https://breathartinstitute.in" && !request.headers.get("origin")?.includes("breathartinstitute.in")) {
-    console.error(`[Upload] Blocked video upload - CORS mismatch.`);
-    return jsonResponse({ success: false, error: "Unauthorized endpoint access (CORS)" }, 403, origin);
-  }
 
   try {
     const R2_ACCOUNT_ID = process.env.CLOUDFLARE_R2_ACCOUNT_ID ?? "";
