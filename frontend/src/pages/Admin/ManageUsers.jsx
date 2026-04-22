@@ -1,46 +1,27 @@
 // frontend/src/pages/Admin/ManageUsers.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Trash2, Edit2, Search, Loader, Check, X } from 'lucide-react';
-import { API_URL, getAuthToken } from '../../utils/apiClient';
+import {
+  useAllUsers,
+  useAuthFunctions,
+} from '../../hooks/useConvexFunctions';
 import { toast } from '../../utils/toast';
+import { getConvexErrorMessage } from '../../utils/convexError';
 import '../../styles/ManageUsers.css';
 
 const ManageUsers = () => {
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const allUsers = useAllUsers();
+  const { updateUserAdmin, deleteUserAdmin } = useAuthFunctions();
+
+  const loading = allUsers === undefined;
+  // Filter out admins for display
+  const users = (allUsers || []).filter(
+    (u) => u.role !== 'admin' && u.isAdmin !== true
+  );
+
   const [search, setSearch] = useState('');
   const [editingId, setEditingId] = useState(null);
   const [editData, setEditData] = useState({});
-
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
-  const fetchUsers = async () => {
-    try {
-      setLoading(true);
-      const token = getAuthToken();
-
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/admin/users`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) throw new Error('Failed to fetch users');
-
-      const data = await response.json();
-      const nonAdminUsers = (data.users || []).filter(
-        (u) => u.role !== 'admin' && u.isAdmin !== true
-      );
-      setUsers(nonAdminUsers);
-    } catch (error) {
-      console.error('Error fetching users:', error);
-      toast.error('Failed to load users');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleEditStart = (user) => {
     setEditingId(user._id);
@@ -60,54 +41,23 @@ const ManageUsers = () => {
 
   const handleEditSave = async (userId) => {
     try {
-      const token = getAuthToken();
-
-      const response = await fetch(`${API_URL}/admin/users/${userId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(editData),
-      });
-
-      if (!response.ok) throw new Error('Failed to update user');
-
-      const updatedUser = await response.json();
-      setUsers((prev) => {
-        const next = prev.map((u) => (u._id === userId ? updatedUser.user : u));
-        return next.filter((u) => u.role !== 'admin' && u.isAdmin !== true);
-      });
+      await updateUserAdmin({ userId, ...editData });
       setEditingId(null);
       toast.success('User updated successfully');
     } catch (error) {
-      console.error('Error updating user:', error);
-      toast.error(error.message || 'Failed to update user');
+      const msg = getConvexErrorMessage(error, 'Failed to update user');
+      toast.error(msg);
     }
   };
 
   const handleDelete = async (userId) => {
-    if (!window.confirm('Are you sure you want to delete this user?')) {
-      return;
-    }
-
+    if (!window.confirm('Are you sure you want to delete this user?')) return;
     try {
-      const token = getAuthToken();
-
-      const response = await fetch(`${API_URL}/admin/users/${userId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) throw new Error('Failed to delete user');
-
-      setUsers((prev) => prev.filter((u) => u._id !== userId));
+      await deleteUserAdmin({ userId });
       toast.success('User deleted successfully');
     } catch (error) {
-      console.error('Error deleting user:', error);
-      toast.error('Failed to delete user');
+      const msg = getConvexErrorMessage(error, 'Failed to delete user');
+      toast.error(msg);
     }
   };
 

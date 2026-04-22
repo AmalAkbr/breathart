@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Eye, EyeOff, Lock, CheckCircle, Loader } from "lucide-react";
-import {API_URL} from "../../utils/apiClient";
+import { useAuthFunctions } from "../../hooks/useConvexFunctions";
+import { toast } from "../../utils/toast";
+import { getConvexErrorMessage } from "../../utils/convexError";
 const ResetPassword = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { resetPassword } = useAuthFunctions();
   const [status, setStatus] = useState("loading"); // loading, form, success, error
   const [message, setMessage] = useState("");
   
@@ -110,36 +113,29 @@ const ResetPassword = () => {
 
       console.log("[RESET PASSWORD] Submitting new password");
 
-      const response = await fetch(`${API_URL}/auth/reset-password`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          token,
-          newPassword: formData.password,
-          confirmPassword: formData.confirmPassword,
-        }),
+      const response = await resetPassword({
+        token,
+        newPassword: formData.password,
+        confirmPassword: formData.confirmPassword,
       });
 
-      const data = await response.json();
-
-      if (response.ok) {
+      if (response.success) {
         console.log("[RESET PASSWORD] Success");
         setStatus("success");
-        setMessage("✓ Password reset successfully!");
-        showToast("Password updated! Please login with your new password.", "success");
-
-        // Redirect to login after 3 seconds
+        toast.success("Password updated! Please login with your new password.");
         setTimeout(() => {
-          navigate("/auth", { replace: true });
+          navigate("/login", { replace: true });
         }, 3000);
       } else {
-        console.error("[RESET PASSWORD] Failed:", data.error);
-        setErrors({ form: data.error || "Failed to reset password" });
+        const msg = response.message || "Failed to reset password";
+        setErrors({ form: msg });
+        toast.error(msg);
       }
     } catch (error) {
-      console.error("[RESET PASSWORD] Error:", error);
-      setErrors({ form: "Error resetting password. Try again." });
-      showToast("Error resetting password", "error");
+      const msg = getConvexErrorMessage(error, "Error resetting password. Try again.");
+      console.error("[RESET PASSWORD] Error:", msg);
+      setErrors({ form: msg });
+      toast.error(msg);
     } finally {
       setIsSubmitting(false);
     }

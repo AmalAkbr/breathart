@@ -5,26 +5,6 @@
  */
 
 const REQUIRED_ENV_VARS = {
-  // Backend API - Required
-  VITE_API_URL: {
-    label: 'Backend API URL',
-    required: true,
-    description: 'Backend API endpoint (e.g., http://localhost:8080/api). In production, same-origin /api is used if omitted.',
-    allowMissingInProd: true,
-    validate: (value) => {
-      if (!value) return import.meta.env.PROD;
-      try {
-        // Check if it's a valid URL
-        new URL(value);
-        // Check if it has /api suffix or is properly formatted
-        return value.includes('/api') || value.endsWith('/');
-      } catch {
-        return false;
-      }
-    },
-    errorMessage: 'Must be a valid URL with /api path (e.g., http://localhost:8080/api)'
-  },
-
   // Web3Forms for contact forms (optional)
   VITE_WEB3FORMS_KEY: {
     label: 'Web3Forms Key',

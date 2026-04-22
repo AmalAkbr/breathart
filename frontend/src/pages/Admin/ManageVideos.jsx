@@ -11,15 +11,21 @@ import {
   Layers,
   X,
 } from "lucide-react";
-import { API_URL, getAuthToken } from "../../utils/apiClient";
+import { useAllVideos, useVideoFunctions } from "../../hooks/useConvexFunctions";
+import { getConvexErrorMessage } from "../../utils/convexError";
 import { toast } from "../../utils/toast";
 import { getVideoDurationInSecondsFromFile } from "../../utils/videoDuration";
-import { io } from "socket.io-client";
 import "../../styles/ManageVideos.css";
 
+// Convex HTTP actions handle multipart file uploads — no Express backend
+const CONVEX_SITE_URL = (import.meta.env.VITE_CONVEX_SITE_URL || "").replace(/\/$/, "");
+
 const ManageVideos = () => {
-  const [videos, setVideos] = useState([]);
-  const [loading, setLoading] = useState(true);
+  // Convex reactive data
+  const allVideos = useAllVideos();
+  const { updateVideo, deleteVideo } = useVideoFunctions();
+
+  const convexLoading = allVideos === undefined;
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -50,7 +56,6 @@ const ManageVideos = () => {
   });
   const [uploadStage, setUploadStage] = useState("uploading");
   const isVideoUploading = uploading.video;
-  const socketRef = useRef(null);
   const currentVideoUploadIdRef = useRef(null);
   const modalBodyRef = useRef(null);
 
@@ -111,10 +116,6 @@ const ManageVideos = () => {
     });
   };
 
-  const getSocketServerUrl = () => {
-    return API_URL.replace(/\/api\/?$/, "");
-  };
-
   const createUploadId = () => {
     if (
       typeof crypto !== "undefined" &&
@@ -130,161 +131,22 @@ const ManageVideos = () => {
     return Math.round((clamped / 100) * 45);
   };
 
-  const mapR2ProgressToUi = (percent) => {
-    const clamped = Math.max(0, Math.min(100, percent));
-    return Math.min(99, 45 + Math.round((clamped / 100) * 54));
-  };
+  // No fetchVideos needed — useAllVideos() is reactive
+  // File uploads go to Convex HTTP actions which forward to R2 / ImageKit
 
-  useEffect(() => {
-    fetchVideos();
-  }, []);
-
-  // Setup Socket.IO for upload progress tracking
-  useEffect(() => {
-    const token = getAuthToken();
-    if (!token) {
-      return undefined;
-    }
-
-    const socket = io(getSocketServerUrl(), {
-      transports: ["websocket", "polling"],
-      auth: { token },
-      withCredentials: true,
-    });
-
-    socketRef.current = socket;
-
-    const onStage = (payload = {}) => {
-      if (
-        !payload.uploadId ||
-        payload.uploadId !== currentVideoUploadIdRef.current
-      ) {
-        return;
-      }
-
-      if (payload.stage === "r2_uploading") {
-        setUploadStage("processing");
-      } else if (payload.stage === "cancelled") {
-        setUploadStage("cancelled");
-      }
-    };
-
-    const onProgress = (payload = {}) => {
-      if (
-        !payload.uploadId ||
-        payload.uploadId !== currentVideoUploadIdRef.current
-      ) {
-        return;
-      }
-
-      if (payload.phase !== "r2") {
-        return;
-      }
-
-      const backendPercent = Number(payload.percent) || 0;
-      const mapped = mapR2ProgressToUi(backendPercent);
-
-      setUploadStage("processing");
-      setUploadProgress({
-        loaded: Number(payload.loaded) || 0,
-        total: Number(payload.total) || 0,
-        video: mapped,
-      });
-    };
-
-    const onCompleted = (payload = {}) => {
-      if (
-        !payload.uploadId ||
-        payload.uploadId !== currentVideoUploadIdRef.current
-      ) {
-        return;
-      }
-
-      setUploadStage("completed");
-      setUploadProgress((prev) => ({
-        ...prev,
-        video: Math.max(prev.video, 99),
-      }));
-    };
-
-    const onError = (payload = {}) => {
-      if (
-        !payload.uploadId ||
-        payload.uploadId !== currentVideoUploadIdRef.current
-      ) {
-        return;
-      }
-
-      setUploadStage("error");
-      if (payload.message) {
-        toast.error(payload.message);
-      }
-    };
-
-    socket.on("upload:stage", onStage);
-    socket.on("upload:progress", onProgress);
-    socket.on("upload:completed", onCompleted);
-    socket.on("upload:error", onError);
-
-    return () => {
-      socket.off("upload:stage", onStage);
-      socket.off("upload:progress", onProgress);
-      socket.off("upload:completed", onCompleted);
-      socket.off("upload:error", onError);
-      socket.disconnect();
-      socketRef.current = null;
-    };
-  }, []);
-
-  const fetchVideos = async () => {
-    try {
-      setLoading(true);
-      const token = getAuthToken();
-
-      const response = await fetch(`${API_URL}/videos`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) throw new Error("Failed to fetch videos");
-
-      const data = await response.json();
-      const list = data.data || data.videos || [];
-      setVideos(list);
-    } catch (error) {
-      console.error("Error fetching videos:", error);
-      toast.error("Failed to load videos");
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Convex reactive list replaces fetchVideos
+  // convexLoading / allVideos are used directly in filteredVideos below
 
   const handleDelete = async (videoId) => {
     if (!window.confirm("Are you sure you want to delete this video?")) {
       return;
     }
-
     try {
-      const token = getAuthToken();
-
-      const response = await fetch(
-        `${API_URL}/videos/${videoId}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-
-      if (!response.ok) throw new Error("Failed to delete video");
-
-      setVideos((prev) => prev.filter((v) => (v._id || v.id) !== videoId));
+      await deleteVideo({ videoId });
       toast.success("Video deleted");
     } catch (error) {
-      console.error("Error deleting video:", error);
-      toast.error("Failed to delete video");
+      const msg = getConvexErrorMessage(error, "Failed to delete video");
+      toast.error(msg);
     }
   };
 
@@ -324,14 +186,13 @@ const ManageVideos = () => {
   const uploadWithProgress = (
     url,
     formDataObj,
-    token,
     onProgress,
     onStageChange,
   ) =>
     new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
       xhr.open("POST", url, true);
-      xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+      // No auth header — Convex HTTP actions authenticate via env secrets server-side
 
       xhr.upload.onloadstart = () => {
         onStageChange?.("uploading");
@@ -382,52 +243,29 @@ const ManageVideos = () => {
   const saveEdit = async (override = {}) => {
     try {
       const safeOverride = override && override.nativeEvent ? {} : override;
-      const token = getAuthToken();
+      const { __silent, ...cleanOverride } = safeOverride;
+
       const payload = {
+        videoId: editForm.id,
         title: editForm.title,
         description: editForm.description,
         category: editForm.category,
-        status: editForm.status,
         duration: editForm.duration ? Number(editForm.duration) : undefined,
         thumbnail: editForm.thumbnail,
-        thumbnailFileId: editForm.thumbnailFileId,
+        thumbnailFileId: editForm.thumbnailFileId || undefined,
         videoUrl: editForm.videoUrl,
-        ...safeOverride,
+        ...cleanOverride,
       };
 
-      const response = await fetch(
-        `${API_URL}/videos/${editForm.id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(payload),
-        },
-      );
-
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok || !data.success) {
-        throw new Error(data.message || data.error || "Failed to update video");
-      }
-
-      const updated = data.data || data.video || payload;
-      setVideos((prev) =>
-        prev.map((v) =>
-          v._id === editForm.id || v.id === editForm.id
-            ? { ...v, ...updated }
-            : v,
-        ),
-      );
+      await updateVideo(payload);
 
       toast.success("Video updated");
-      if (!safeOverride.__silent) {
+      if (!__silent) {
         setEditModalOpen(false);
       }
     } catch (error) {
-      console.error("Error updating video:", error);
-      toast.error(error.message || "Failed to update video");
+      const msg = getConvexErrorMessage(error, "Failed to update video");
+      toast.error(msg);
     }
   };
 
@@ -435,14 +273,12 @@ const ManageVideos = () => {
     if (!file) return;
     try {
       setUploading((p) => ({ ...p, thumbnail: true }));
-      const token = getAuthToken();
       const fd = new FormData();
       fd.append("thumbnail", file);
       const res = await fetch(
-        `${API_URL}/upload/thumbnail`,
+        `${CONVEX_SITE_URL}/upload/thumbnail`,
         {
           method: "POST",
-          headers: { Authorization: `Bearer ${token}` },
           body: fd,
         },
       );
@@ -454,7 +290,7 @@ const ManageVideos = () => {
         thumbnail: data.data.thumbnailUrl,
         thumbnailFileId: data.data.fileId || prev.thumbnailFileId,
       }));
-      // Persist immediately
+      // Persist immediately via Convex
       await saveEdit({
         thumbnail: data.data.thumbnailUrl,
         thumbnailFileId: data.data.fileId || editForm.thumbnailFileId,
@@ -482,16 +318,12 @@ const ManageVideos = () => {
         total: file.size || 0,
       });
 
-      const token = getAuthToken();
       const fd = new FormData();
       fd.append("video", file);
       fd.append("title", editForm.title || "video");
       fd.append("uploadId", uploadId);
 
-      // Subscribe to upload progress via socket
-      if (socketRef.current?.connected) {
-        socketRef.current.emit("upload:subscribe", { uploadId });
-      }
+      // XHR progress tracks client→server; no Socket.IO needed
 
       const shouldAutoFillDuration = !Number(editForm.duration);
       const detectedDuration = shouldAutoFillDuration
@@ -499,9 +331,8 @@ const ManageVideos = () => {
         : 0;
 
       const data = await uploadWithProgress(
-        `${API_URL}/upload/video-file`,
+        `${CONVEX_SITE_URL}/upload/video-file`,
         fd,
-        token,
         ({ percent, loaded, total }) => {
           const mapped = mapClientProgressToUi(percent);
           setUploadProgress({
@@ -557,6 +388,7 @@ const ManageVideos = () => {
     }
   };
 
+  const videos = allVideos || [];
   const filteredVideos = videos
     .filter((video) => {
       const matchesSearch =
@@ -573,7 +405,7 @@ const ManageVideos = () => {
         new Date(a.createdAt || a.created_at),
     );
 
-  if (loading) {
+  if (convexLoading) {
     return (
       <div className="manage-videos-container">
         <div className="loading">

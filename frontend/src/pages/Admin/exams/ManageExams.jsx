@@ -1,97 +1,59 @@
 // frontend/src/pages/Admin/exams/ManageExams.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Trash2, Loader, Link as LinkIcon } from "lucide-react";
-import { API_URL, getAuthToken } from "../../../utils/apiClient";
+import { useAllExams, useExamFunctions } from "../../../hooks/useConvexFunctions";
+import { useQuery } from "convex/react";
+import { api } from "../../../../convex/_generated/api.js";
+import { toast } from "../../../utils/toast";
+import { getConvexErrorMessage } from "../../../utils/convexError";
+import { useUserStore } from "../../../store/userStore";
 import "../../../styles/ManageExams.css";
 
 const ManageExams = () => {
-  const [exams, setExams] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedExam, setSelectedExam] = useState(null);
+  const { user } = useUserStore();
+  const adminId = user?._id || user?.id;
+
+  const allExams = useAllExams(adminId);
+  const { deleteExam } = useExamFunctions();
+
+  const loading = allExams === undefined;
+  const rawExams = allExams || [];
+
+  const [selectedExamId, setSelectedExamId] = useState(null);
   const [showDetails, setShowDetails] = useState(false);
 
-  const getAuthHeaders = () => {
-    const token = getAuthToken();
-    const headers = {};
-    if (token) headers.Authorization = `Bearer ${token}`;
-    return headers;
-  };
+  // Load detail for the selected exam via Convex query
+  const selectedExam = useQuery(
+    api.exams.getExamDetail,
+    selectedExamId ? { examId: selectedExamId } : "skip"
+  );
 
   const normalizeExam = (exam) => ({
     id: exam?._id || exam?.id,
     title: exam?.title || "Untitled Exam",
     status: exam?.status || "draft",
     googleFormLink: exam?.googleFormLink || exam?.google_form_link || "",
-    createdAt: exam?.createdAt || exam?.created_at,
+    createdAt: exam?._creationTime || exam?.createdAt,
     description: exam?.description || "",
   });
 
-  useEffect(() => {
-    const fetchExams = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch(
-          `${API_URL}/admin/exams`,
-          {
-            headers: getAuthHeaders(),
-          },
-        );
-
-        if (!response.ok) throw new Error("Failed to fetch exams");
-
-        const data = await response.json();
-        const list = data?.data || data?.exams || [];
-        setExams(Array.isArray(list) ? list.map(normalizeExam) : []);
-      } catch (error) {
-        console.error("Error fetching exams:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchExams();
-  }, []);
+  const exams = rawExams.map(normalizeExam);
 
   const handleDelete = async (examId) => {
     if (!window.confirm("Are you sure you want to delete this exam?")) return;
-
     try {
-      const response = await fetch(
-        `${API_URL}/admin/exams/${examId}`,
-        {
-          method: "DELETE",
-          headers: getAuthHeaders(),
-        },
-      );
-
-      if (!response.ok) throw new Error("Failed to delete exam");
-
-      setExams((prev) => prev.filter((e) => e.id !== examId));
+      await deleteExam({ examId });
       setShowDetails(false);
+      toast.success("Exam deleted");
     } catch (error) {
-      console.error("Error deleting exam:", error);
-      alert("Failed to delete exam");
+      const msg = getConvexErrorMessage(error, "Failed to delete exam");
+      toast.error(msg);
     }
   };
 
-  const handleViewDetails = async (exam) => {
-    try {
-      const response = await fetch(
-        `${API_URL}/admin/exams/${exam.id}`,
-        {
-          headers: getAuthHeaders(),
-        },
-      );
-
-      if (!response.ok) throw new Error("Failed to fetch exam details");
-
-      const data = await response.json();
-      setSelectedExam(data?.data || data);
-      setShowDetails(true);
-    } catch (error) {
-      console.error("Error fetching exam details:", error);
-      alert("Failed to load exam details");
-    }
+  const handleViewDetails = (exam) => {
+    setSelectedExamId(exam.id);
+    setShowDetails(true);
   };
 
   if (loading) {
@@ -240,13 +202,10 @@ const ManageExams = () => {
                       {selectedExam.participants.map((p) => (
                         <tr key={p._id || p.id}>
                           <td>
-                            {p.userId?.fullName || p.users?.full_name || "-"}
+                            {p.user?.fullName || "-"}
                           </td>
                           <td>
-                            {p.userId?.email ||
-                              p.users?.email ||
-                              p.userEmail ||
-                              "-"}
+                            {p.user?.email || p.userEmail || "-"}
                           </td>
                           <td>{selectedExam.exam?.title}</td>
                           <td>
@@ -263,13 +222,11 @@ const ManageExams = () => {
                             </a>
                           </td>
                           <td>
-                            {p.emailSent || p.email_sent ? "Sent" : "Pending"}
+                            {p.emailSent ? "Sent" : "Pending"}
                           </td>
                           <td>
-                            {p.emailSentAt || p.email_sent_at
-                              ? new Date(
-                                  p.emailSentAt || p.email_sent_at,
-                                ).toLocaleString()
+                            {p.emailSentAt
+                              ? new Date(p.emailSentAt).toLocaleString()
                               : "-"}
                           </td>
                           <td>{p.submitted ? "Yes" : "No"}</td>

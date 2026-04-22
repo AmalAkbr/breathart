@@ -20,7 +20,6 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import Logo from "./Logo";
 import ContactUsModal from "./ContactUsModal";
 import { useUserStore } from "../store/userStore";
-import { authAPI } from "../utils/apiClient";
 import { toast } from "../utils/toast";
 
 const Navbar = () => {
@@ -101,20 +100,14 @@ const Navbar = () => {
 
   // Zustand auth state - automatically updates component
 
-  const handleLogout = async () => {
-    try {
-      console.log("[LOGOUT NAVBAR] Logout initiated");
-      await authAPI.logout();
-      logout();
-      localStorage.removeItem("auth_token");
-      toast.success("✓ Logged out successfully");
-      setMenuOpen(false);
-      setDesktopMenuOpen(false);
-      navigate("/", { replace: true });
-    } catch (err) {
-      console.error("[LOGOUT NAVBAR] Error:", err);
-      toast.error("Logout failed");
-    }
+  const handleLogout = () => {
+    console.log("[LOGOUT NAVBAR] Logout initiated");
+    logout();
+    localStorage.removeItem("auth_token");
+    toast.success("✓ Logged out successfully");
+    setMenuOpen(false);
+    setDesktopMenuOpen(false);
+    navigate("/", { replace: true });
   };
 
   // Get avatar letter

@@ -15,6 +15,7 @@ import RouteMeta from "./components/RouteMeta";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
 import PublicRoute from "./components/PublicRoute";
+import ConvexClientProvider from "./components/ConvexClientProvider";
 import { validateEnvironmentVariables } from "./utils/envValidator";
 import { useUserStore } from "./store/userStore";
 import { getAuthToken } from "./utils/apiClient";
@@ -221,11 +222,12 @@ function App() {
   }, []);
 
   return (
-    <Router>
-      <RouteMeta />
-      <ScrollToTop />
-      <div className="min-h-screen text-white font-sans selection:bg-accent-cyan/30 overflow-x-hidden w-full max-w-[100vw]">
-        <Routes>
+    <ConvexClientProvider>
+      <Router>
+        <RouteMeta />
+        <ScrollToTop />
+        <div className="min-h-screen text-white font-sans selection:bg-accent-cyan/30 overflow-x-hidden w-full max-w-[100vw]">
+          <Routes>
           {/* Isolated Landing Page (No Navbar/Footer) */}
           <Route
             path="/landing"
@@ -408,6 +410,7 @@ function App() {
         </Routes>
       </div>
     </Router>
+    </ConvexClientProvider>
   );
 }
 
