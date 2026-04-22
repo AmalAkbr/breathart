@@ -23,6 +23,7 @@ const VideoViewer = () => {
       return;
     }
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setError(null);
     setLoading(allVideos === undefined);
   }, [navigate, location.key, allVideos]);
