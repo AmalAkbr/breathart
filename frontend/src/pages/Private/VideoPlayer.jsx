@@ -23,7 +23,7 @@ function useDevtoolsDetection() {
       const sizeOpen = widthDiff > 160 || heightDiff > 160;
       let timingOpen = false;
       const t = performance.now();
-      console.log("%c", "");
+      // console.log("%c", "");
       if (performance.now() - t > 20) timingOpen = true;
       setIsOpen(sizeOpen || timingOpen);
     };
@@ -316,6 +316,7 @@ const VideoPlayer = () => {
     }
 
     if (!videoId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setError("No video selected");
       setLoading(false);
       return;

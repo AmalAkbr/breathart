@@ -88,7 +88,7 @@ export default function Login() {
         password: formData.password,
       });
 
-      console.log("[LOGIN] Convex response:", response);
+      // console.log("[LOGIN] Convex response:", response);
 
       if (response.success) {
         const user = response.user;
@@ -96,10 +96,10 @@ export default function Login() {
 
         // Store token in localStorage
         localStorage.setItem("authToken", token);
-        console.log("[LOGIN] Token stored:", token);
+        // console.log("[LOGIN] Token stored:", token);
 
         // Store user in Zustand
-        console.log("[LOGIN] Setting user in store:", user.email, "Role:", user.role);
+        // console.log("[LOGIN] Setting user in store:", user.email, "Role:", user.role);
         setUser(user);
 
         // Show success toast
@@ -110,10 +110,10 @@ export default function Login() {
 
         // Navigate based on role
         if (user.role === "admin" && user.isAdmin === true) {
-          console.log("[LOGIN] 🎯 Navigating to /admin");
+          // console.log("[LOGIN] 🎯 Navigating to /admin");
           navigate("/admin", { replace: true });
         } else {
-          console.log("[LOGIN] 🎯 Navigating to home");
+          // console.log("[LOGIN] 🎯 Navigating to home");
           navigate("/", { replace: true });
         }
       } else {

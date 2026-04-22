@@ -12,11 +12,11 @@ export const ProtectedAdminRoute = ({ children }) => {
   const { isLoggedIn, user, loading, canAccessAdmin } = useUserStore();
   const token = getAuthToken();
 
-  console.log("[PROTECTED ADMIN ROUTE] Checking access - loading:", loading, "isLoggedIn:", isLoggedIn, "user:", user?.email, "role:", user?.role, "isAdmin:", user?.isAdmin, "token:", token ? "✓" : "✗");
+  // console.log("[PROTECTED ADMIN ROUTE] Checking access - loading:", loading, "isLoggedIn:", isLoggedIn, "user:", user?.email, "role:", user?.role, "isAdmin:", user?.isAdmin, "token:", token ? "✓" : "✗");
 
   // Still loading user state
   if (loading) {
-    console.log("[PROTECTED ADMIN ROUTE] ⏳ Loading - showing loader");
+    // console.log("[PROTECTED ADMIN ROUTE]   ⏳ Loading - showing loader");
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-900">
         <div className="text-center">
@@ -29,22 +29,23 @@ export const ProtectedAdminRoute = ({ children }) => {
 
   // Not logged in
   if (!isLoggedIn || !token || !user) {
-    console.log("[PROTECTED ADMIN ROUTE] ❌ Not authenticated - redirecting to /auth");
+    // console.log("[PROTECTED ADMIN ROUTE] ❌ Not authenticated - redirecting to /auth");
     return <Navigate to="/auth" replace />;
   }
 
   // Not admin - DUAL VERIFICATION FAILED
   if (!canAccessAdmin()) {
-    console.warn(`🚫 [PROTECTED ADMIN ROUTE] Access denied: User ${user.email} (role=${user.role}, isAdmin=${user.isAdmin})`);
+    // console.warn(`🚫 [PROTECTED ADMIN ROUTE] Access denied: User ${user.email} (role=${user.role}, isAdmin=${user.isAdmin})`);
     toast.error('This account does not have admin privileges');
     // Redirect after a brief delay so user sees the error
     setTimeout(() => {
+      // eslint-disable-next-line react-hooks/immutability
       window.location.href = '/profile';
     }, 1500);
     return null;
   }
 
-  console.log("[PROTECTED ADMIN ROUTE] ✅ Access granted for admin:", user.email);
+  // console.log("[PROTECTED ADMIN ROUTE] ✅ Access granted for admin:", user.email);
   return children;
 };
 

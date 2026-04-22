@@ -54,11 +54,11 @@ export default function VerifyEmail() {
 
   const handleAutoVerify = useCallback(
     async (tokenToVerify) => {
-      console.log(
-        "[VERIFY EMAIL] Auto-verifying with token:",
-        tokenToVerify.substring(0, 20) + "...",
-      );
-      console.log("[VERIFY EMAIL] Email:", userEmail);
+      // console.log(
+      //   "[VERIFY EMAIL] Auto-verifying with token:",
+      //   tokenToVerify.substring(0, 20) + "...",
+      // );
+      // console.log("[VERIFY EMAIL] Email:", userEmail);
 
       setIsSubmitting(true);
       setError(null);
@@ -74,10 +74,10 @@ export default function VerifyEmail() {
           // Email verified! Update user in store
           if (response.user) {
             setUser(response.user);
-            console.log(
-              "[VERIFY EMAIL] User state updated:",
-              response.user.email,
-            );
+            // console.log(
+            //   "[VERIFY EMAIL] User state updated:",
+            //   response.user.email,
+            // );
           }
 
           // Show success toast
@@ -142,7 +142,7 @@ export default function VerifyEmail() {
       return;
     }
 
-    console.log("[VERIFY EMAIL] Resending verification to:", userEmail);
+    // console.log("[VERIFY EMAIL] Resending verification to:", userEmail);
     setIsResendingEmail(true);
     setResendMessage("");
     setError(null);
@@ -151,7 +151,7 @@ export default function VerifyEmail() {
       const response = await resendVerificationEmail({ email: userEmail });
 
       if (response.success) {
-        console.log("[VERIFY EMAIL] ✅ Verification email resent");
+        // console.log("[VERIFY EMAIL] ✅ Verification email resent");
         setResendMessage("✓ Verification email sent! Check your inbox.");
         toast.success("Verification email sent!");
       } else {
@@ -218,11 +218,11 @@ export default function VerifyEmail() {
   useEffect(() => {
     if (!urlToken || autoVerifyAttempted) return;
 
-    console.log(
-      "[VERIFY EMAIL COMPONENT] Token found - urlToken:",
-      urlToken.substring(0, 20) + "...",
-    );
-    console.log("[VERIFY EMAIL] Starting auto-verify...");
+    // console.log(
+    //   "[VERIFY EMAIL COMPONENT] Token found - urlToken:",
+    //   urlToken.substring(0, 20) + "...",
+    // );
+    // console.log("[VERIFY EMAIL] Starting auto-verify...");
 
     setAutoVerifyAttempted(true);
     handleAutoVerify(urlToken);

@@ -87,7 +87,7 @@ export default function Register() {
         password: formData.password,
       });
 
-      console.log("[REGISTER] Convex response:", response);
+      // console.log("[REGISTER] Convex response:", response);
 
       if (response.success) {
         const registeredEmail = response.email || formData.email;
@@ -96,7 +96,7 @@ export default function Register() {
 
         // Store token in localStorage
         localStorage.setItem("authToken", token);
-        console.log("[REGISTER] Token stored");
+        // console.log("[REGISTER] Token stored");
 
         // Create user object
         const userData = {

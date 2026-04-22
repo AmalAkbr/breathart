@@ -120,48 +120,48 @@ function App() {
     const initializeAuth = () => {
       try {
         const token = getAuthToken();
-        console.log("[APP INIT] Token from storage:", token ? "✓" : "✗");
+        // console.log("[APP INIT] Token from storage:", token ? "✓" : "✗");
 
         // Check localStorage for persisted user state
         const storedState = localStorage.getItem("user-store");
-        console.log(
-          "[APP INIT] Stored state:",
-          storedState ? "✓ found" : "✗ not found",
-        );
+        // // console.log(
+        //   "[APP INIT] Stored state:",
+        //   storedState ? "✓ found" : "✗ not found",
+        // );
 
         if (token && storedState) {
           const parsed = JSON.parse(storedState);
           const storedUser = parsed?.state?.user;
           const storedIsLoggedIn = parsed?.state?.isLoggedIn;
 
-          console.log(
-            "[APP INIT] Hydrating from storage - user:",
-            storedUser?.email,
-            "isLoggedIn:",
-            storedIsLoggedIn,
-          );
+          // console.log(
+          //   "[APP INIT] Hydrating from storage - user:",
+          //   storedUser?.email,
+          //   "isLoggedIn:",
+          //   storedIsLoggedIn,
+          // );
 
           if (storedUser && storedIsLoggedIn) {
-            console.log(
-              "[APP INIT] ✅ Restored user state from localStorage:",
-              storedUser.email,
-              "Role:",
-              storedUser.role,
-            );
+            //  console.log(
+            //   "[APP INIT] ✅ Restored user state from localStorage:",
+            //   storedUser.email,
+            //   "Role:",
+            //   storedUser.role,
+            // );
             setUser(storedUser);
           }
         } else if (!token && storedState) {
           // Token missing but state persisted - clear storage
-          console.log("[APP INIT] ⚠️ Token missing, clearing stored state");
+          // console.log("[APP INIT] ⚠️ Token missing, clearing stored state");
           localStorage.removeItem("user-store");
           logout();
         } else {
-          console.log("[APP INIT] ℹ️ No token or stored state available");
+          // console.log("[APP INIT] ℹ️ No token or stored state available");
         }
       } catch (error) {
         console.error("[APP INIT] Error restoring auth state:", error);
       } finally {
-        console.log("[APP INIT] Setting loading to false");
+        // console.log("[APP INIT] Setting loading to false");
         setLoading(false);
       }
     };
@@ -173,7 +173,7 @@ function App() {
   useEffect(() => {
     const handleStorageChange = (e) => {
       if (e.key === "auth_token" && !e.newValue) {
-        console.log("[APP] Auth token removed, clearing user store");
+        // console.log("[APP] Auth token removed, clearing user store");
         logout();
         localStorage.removeItem("user-store");
       }

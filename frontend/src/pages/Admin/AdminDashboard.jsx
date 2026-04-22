@@ -22,17 +22,17 @@ const AdminDashboard = () => {
   useEffect(() => {
     const verifyAdmin = async () => {
       try {
-        console.log("[ADMIN DASHBOARD] Verifying admin access...");
-        console.log("[ADMIN DASHBOARD] User:", user?.email, "Role:", user?.role);
+        // console.log("[ADMIN DASHBOARD] Verifying admin access...");
+        // console.log("[ADMIN DASHBOARD] User:", user?.email, "Role:", user?.role);
 
         if (!user || user.role !== "admin") {
-          console.warn("[ADMIN DASHBOARD] ❌ Not authorized - user role:", user?.role);
+          // console.warn("[ADMIN DASHBOARD] ❌ Not authorized - user role:", user?.role);
           toast.error("Access denied: Admin privileges required");
           navigate("/", { replace: true });
           return;
         }
 
-        console.log("[ADMIN DASHBOARD] ✅ Admin verified:", user.email);
+        // console.log("[ADMIN DASHBOARD] ✅ Admin verified:", user.email);
         setLoading(false);
       } catch (error) {
         console.error("[ADMIN DASHBOARD] Verification error:", error);

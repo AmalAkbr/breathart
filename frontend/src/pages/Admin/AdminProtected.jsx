@@ -19,22 +19,22 @@ const AdminProtected = ({ children }) => {
     const verifyAdminAccess = () => {
       try {
         const token = getAuthToken();
-        console.log('[ADMIN PROTECTED] Verifying admin access...');
-        console.log('[ADMIN PROTECTED] Token exists:', !!token);
-        console.log('[ADMIN PROTECTED] User:', user?.email);
-        console.log('[ADMIN PROTECTED] Role:', user?.role);
-        console.log('[ADMIN PROTECTED] isAdmin flag:', user?.isAdmin);
+        // console.log('[ADMIN PROTECTED] Verifying admin access...');
+        // console.log('[ADMIN PROTECTED] Token exists:', !!token);
+        // console.log('[ADMIN PROTECTED] User:', user?.email);
+        // console.log('[ADMIN PROTECTED] Role:', user?.role);
+        // console.log('[ADMIN PROTECTED] isAdmin flag:', user?.isAdmin);
 
         // Dual verification: Check both role AND isAdmin flag
         if (isLoggedIn && token && user?.role === 'admin' && user?.isAdmin === true) {
-          console.log('✅ Admin verification successful - role=admin AND isAdmin=true');
+          // console.log('✅ Admin verification successful - role=admin AND isAdmin=true');
           setIsAdmin(true);
           setLoading(false);
           return;
         }
 
         console.warn('❌ Admin verification failed - redirecting to login');
-        console.warn('[ADMIN PROTECTED] isLoggedIn:', isLoggedIn, '| role:', user?.role, '| isAdmin:', user?.isAdmin);
+        // console.warn('[ADMIN PROTECTED] isLoggedIn:', isLoggedIn, '| role:', user?.role, '| isAdmin:', user?.isAdmin);
         
         // Show error message
         if (isLoggedIn && token && user) {
