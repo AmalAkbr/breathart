@@ -113,6 +113,7 @@ export const createVideo = mutation({
     thumbnailFileId: v.optional(v.string()),
     thumbnailPath: v.optional(v.string()),
     videoUrl: v.optional(v.string()),
+    videoKey: v.optional(v.string()),
     duration: v.optional(v.number()),
     category: v.optional(
       v.union(
@@ -135,7 +136,7 @@ export const createVideo = mutation({
       thumbnailFileId: args.thumbnailFileId,
       thumbnailPath: args.thumbnailPath,
       videoUrl: args.videoUrl || "",
-      videoKey: undefined,
+      videoKey: args.videoKey,
       duration: args.duration || 0,
       category: args.category || "course",
       createdBy: args.createdBy,

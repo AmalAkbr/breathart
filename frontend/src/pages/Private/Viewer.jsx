@@ -8,12 +8,13 @@ import { motion } from "framer-motion";
 import { useAllVideos } from "../../hooks/useConvexFunctions";
 // import { useDevtoolsShield } from "../../hooks/useDevtoolsShield";
 const VideoViewer = () => {
-  const videos = useAllVideos() || [];
+  const allVideos = useAllVideos();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
-  // const { isProduction, isDevtoolsOpen } = useDevtoolsShield();
+
+  const videos = allVideos || [];
 
   useEffect(() => {
     const token = getAuthToken();
@@ -23,8 +24,8 @@ const VideoViewer = () => {
     }
 
     setError(null);
-    setLoading(videos === undefined);
-  }, [navigate, location.key, videos]);
+    setLoading(allVideos === undefined);
+  }, [navigate, location.key, allVideos]);
 
   const handleCardClick = (videoId) => {
     navigate(`/player/${videoId}`);

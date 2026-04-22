@@ -166,15 +166,8 @@ const UploadVideo = () => {
     return `upload_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
   };
 
-  const mapClientProgressToUi = (percent) => {
-    const clamped = Math.max(0, Math.min(100, percent));
-    return Math.round((clamped / 100) * 45);
-  };
+  // Progress trackers
 
-  const mapR2ProgressToUi = (percent) => {
-    const clamped = Math.max(0, Math.min(100, percent));
-    return Math.min(99, 45 + Math.round((clamped / 100) * 54));
-  };
 
   // Socket.IO removed — upload progress tracked via XHR onprogress only
 
@@ -615,10 +608,11 @@ const UploadVideo = () => {
         uploadUrl,
         files.video,
         ({ percent, loaded, total }) => {
-          const mappedClientPercent = mapClientProgressToUi(percent);
+          const mappedPercent = Math.round(percent);
+
           setProgress((prev) => ({
             ...prev,
-            video: Math.max(prev.video, mappedClientPercent),
+            video: Math.max(prev.video, mappedPercent),
           }));
           setVideoTransfer({ loaded, total });
         },
