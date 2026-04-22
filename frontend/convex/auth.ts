@@ -1,5 +1,5 @@
 import { mutation, query } from "./_generated/server";
-import { v } from "convex/values";
+import { v, ConvexError } from "convex/values";
 import { internal } from "./_generated/api";
 
 const TOKEN_EXPIRY_MINUTES = {
@@ -147,7 +147,7 @@ export const signup = mutation({
       .first();
 
     if (existingUser) {
-      throw new Error("Email already registered");
+      throw new ConvexError("Email already registered");
     }
 
     const hashedPassword = await hashPassword(args.password);
@@ -192,40 +192,57 @@ export const login = mutation({
     password: v.string(),
   },
   handler: async (ctx, args) => {
-    const email = args.email.toLowerCase();
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_email", (q) => q.eq("email", email))
-      .first();
+    try {
+      const email = args.email.toLowerCase();
+      console.log(`[AUTH] Login attempt for: ${email}`);
 
-    if (!user) {
-      throw new Error("User not found");
+      const user = await ctx.db
+        .query("users")
+        .withIndex("by_email", (q) => q.eq("email", email))
+        .first();
+
+      if (!user) {
+        console.log(`[AUTH] User not found: ${email}`);
+        throw new ConvexError("No user found with this email");
+      }
+
+      console.log(`[AUTH] User found, verifying password...`);
+      const isPasswordValid = await verifyPassword(args.password, user.password);
+      
+      if (!isPasswordValid) {
+        console.log(`[AUTH] Password invalid for: ${email}`);
+        throw new ConvexError("Incorrect password");
+      }
+
+      console.log(`[AUTH] Password valid, checking status...`);
+      if (!user.isEmailVerified) {
+        throw new ConvexError("Please verify your email before logging in");
+      }
+
+      if (!user.isActive) {
+        throw new ConvexError("Your account has been deactivated, Please contact admin");
+      }
+
+      console.log(`[AUTH] Status OK, generating token...`);
+      const token = generateJWTToken(user._id, user.email, user.role, user.isAdmin);
+
+      await ctx.db.patch(user._id, {
+        lastLogin: Date.now(),
+        updatedAt: Date.now(),
+      });
+
+      console.log(`[AUTH] Login successful for: ${email}`);
+      return {
+        success: true,
+        message: "Login successful",
+        token,
+        user: sanitizeUser(user),
+      };
+    } catch (error: any) {
+      console.error("[AUTH] Login error caught:", error.message || error);
+      // Re-throw so Convex still sees it as an error, but now we have logs
+      throw error;
     }
-
-    if (!user.isEmailVerified) {
-      throw new Error("Please verify your email before logging in");
-    }
-
-    if (!user.isActive) {
-      throw new Error("Your account has been deactivated, Please contact admin");
-    }
-
-    const isPasswordValid = await verifyPassword(args.password, user.password);
-    if (!isPasswordValid) {
-      throw new Error("Invalid email or password");
-    }
-
-    await ctx.db.patch(user._id, {
-      lastLogin: Date.now(),
-      updatedAt: Date.now(),
-    });
-
-    return {
-      success: true,
-      message: "Login successful",
-      token: generateJWTToken(user._id, user.email, user.role, user.isAdmin),
-      user: sanitizeUser(user),
-    };
   },
 });
 
@@ -306,9 +323,9 @@ export const verifyEmail = mutation({
       .filter((q) => q.eq(q.field("emailVerificationToken"), hashedToken))
       .first();
 
-    if (!user) throw new Error("Invalid or expired verification token");
+    if (!user) throw new ConvexError("Invalid or expired verification token");
     if (user.emailVerificationExpiry && user.emailVerificationExpiry < Date.now()) {
-      throw new Error("Verification token has expired");
+      throw new ConvexError("Verification token has expired");
     }
 
     await ctx.db.patch(user._id, {
@@ -339,8 +356,8 @@ export const resendVerificationEmail = mutation({
       .withIndex("by_email", (q) => q.eq("email", email))
       .first();
 
-    if (!user) throw new Error("User not found");
-    if (user.isEmailVerified) throw new Error("Email is already verified");
+    if (!user) throw new ConvexError("User not found");
+    if (user.isEmailVerified) throw new ConvexError("Email is already verified");
 
     const rawVerificationToken = generateRawToken();
     const hashedVerificationToken = await hashToken(rawVerificationToken);
@@ -409,7 +426,7 @@ export const forgotPassword = mutation({
   },
 });
 
-export const verifyResetToken = query({
+export const verifyResetToken = mutation({
   args: {
     token: v.string(),
   },
@@ -420,9 +437,9 @@ export const verifyResetToken = query({
       .filter((q) => q.eq(q.field("passwordResetToken"), hashedToken))
       .first();
 
-    if (!user) throw new Error("Invalid reset token");
+    if (!user) throw new ConvexError("Invalid reset token");
     if (user.passwordResetExpiry && user.passwordResetExpiry < Date.now()) {
-      throw new Error("Reset token has expired");
+      throw new ConvexError("Reset token has expired");
     }
 
     return {
@@ -442,7 +459,7 @@ export const resetPassword = mutation({
   },
   handler: async (ctx, args) => {
     if (args.confirmPassword && args.newPassword !== args.confirmPassword) {
-      throw new Error("Passwords do not match");
+      throw new ConvexError("Passwords do not match");
     }
 
     const hashedToken = await hashToken(args.token);
@@ -451,9 +468,9 @@ export const resetPassword = mutation({
       .filter((q) => q.eq(q.field("passwordResetToken"), hashedToken))
       .first();
 
-    if (!user) throw new Error("Invalid or expired reset token");
+    if (!user) throw new ConvexError("Invalid or expired reset token");
     if (user.passwordResetExpiry && user.passwordResetExpiry < Date.now()) {
-      throw new Error("Reset token has expired");
+      throw new ConvexError("Reset token has expired");
     }
 
     const hashedPassword = await hashPassword(args.newPassword);

@@ -1,13 +1,18 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Eye, EyeOff, Lock, CheckCircle, Loader } from "lucide-react";
-import { useAuthFunctions } from "../../hooks/useConvexFunctions";
+import { useAuthFunctions, useVerifyResetToken } from "../../hooks/useConvexFunctions";
 import { toast } from "../../utils/toast";
 import { getConvexErrorMessage } from "../../utils/convexError";
+
 const ResetPassword = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const token = searchParams.get("token") || "";
+  
   const { resetPassword } = useAuthFunctions();
+  const verifyToken = useVerifyResetToken();
+  
   const [status, setStatus] = useState("loading"); // loading, form, success, error
   const [message, setMessage] = useState("");
   
@@ -31,43 +36,32 @@ const ResetPassword = () => {
   }, [message]);
 
   useEffect(() => {
-    validateToken();
-  }, []);
-
-  const showToast = (msg, type = "info") => {
-    const bgColor = type === "success" ? "bg-green-600" : type === "error" ? "bg-red-600" : "bg-blue-600";
-    const toast = document.createElement("div");
-    toast.className = `fixed top-4 right-4 ${bgColor} text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fadeIn`;
-    toast.textContent = msg;
-    document.body.appendChild(toast);
-
-    setTimeout(() => {
-      toast.classList.add("animate-fadeOut");
-      setTimeout(() => document.body.removeChild(toast), 300);
-    }, 4000);
-  };
-
-  const validateToken = () => {
-    try {
-      const token = searchParams.get("token");
-
-      console.log("[RESET PASSWORD] Token:", token?.substring(0, 10) + "...");
-
+    const performVerification = async () => {
       if (!token) {
         setStatus("error");
-        setMessage("Invalid or missing reset token. Please request a new password reset link.");
-        console.error("[RESET PASSWORD] Missing token");
+        setMessage("Missing reset token. Please check your email link.");
         return;
       }
 
-      // Token is valid, show form
-      setStatus("form");
-    } catch (error) {
-      console.error("[RESET PASSWORD] Error validating token:", error);
-      setStatus("error");
-      setMessage("An error occurred. Please try requesting a password reset again.");
-    }
-  };
+      try {
+        setStatus("loading");
+        const result = await verifyToken({ token });
+        if (result.success) {
+          setStatus("form");
+        } else {
+          setStatus("error");
+          setMessage(result.message || "Invalid or expired reset token.");
+        }
+      } catch (err) {
+        console.log("[RESET PASSWORD] Verification Error:", err);
+        setStatus("error");
+        const errorMessage = getConvexErrorMessage(err, "Invalid or expired reset token.");
+        setMessage(errorMessage);
+      }
+    };
+
+    performVerification();
+  }, [token]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -109,8 +103,6 @@ const ResetPassword = () => {
 
     try {
       setIsSubmitting(true);
-      const token = searchParams.get("token");
-
       console.log("[RESET PASSWORD] Submitting new password");
 
       const response = await resetPassword({
@@ -131,11 +123,11 @@ const ResetPassword = () => {
         setErrors({ form: msg });
         toast.error(msg);
       }
-    } catch (error) {
-      const msg = getConvexErrorMessage(error, "Error resetting password. Try again.");
-      console.error("[RESET PASSWORD] Error:", msg);
-      setErrors({ form: msg });
-      toast.error(msg);
+    } catch (err) {
+      console.log("[RESET PASSWORD] Raw Error:", err);
+      const errorMessage = getConvexErrorMessage(err, "Failed to reset password.");
+      setErrors({ form: errorMessage });
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }

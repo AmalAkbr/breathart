@@ -128,10 +128,13 @@ export default function Register() {
         toast.error(response.message || "Registration failed");
       }
     } catch (err) {
+      console.log("[REGISTER] Raw Error:", err);
       const errorMessage = getConvexErrorMessage(err, "Registration failed. Please try again.");
+      console.error("[REGISTER] Cleaned Error:", errorMessage);
+
       if (errorMessage.toLowerCase().includes("already")) {
-        setValidationErrors((prev) => ({ ...prev, email: "Email already registered" }));
-        toast.error("Email already registered");
+        setValidationErrors((prev) => ({ ...prev, email: "This email is already registered" }));
+        toast.error("This email is already registered");
       } else if (errorMessage.toLowerCase().includes("email")) {
         setValidationErrors((prev) => ({ ...prev, email: errorMessage }));
         toast.error(errorMessage);
@@ -139,7 +142,6 @@ export default function Register() {
         setError(errorMessage);
         toast.error(errorMessage);
       }
-      console.error("[REGISTER] Error:", errorMessage);
     } finally {
       setLoading(false);
       setIsSubmitting(false);
@@ -352,7 +354,7 @@ export default function Register() {
           </p>
 
           {/* Admin Login Link */}
-          <p className="text-center text-gray-500 text-sm">
+          {/* <p className="text-center text-gray-500 text-sm">
             Admin?{" "}
             <Link
               to="/login?admin=true"
@@ -360,7 +362,7 @@ export default function Register() {
             >
               Login here
             </Link>
-          </p>
+          </p> */}
         </div>
 
         {/* Footer Note */}

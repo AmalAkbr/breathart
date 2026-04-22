@@ -8,7 +8,7 @@ import { getConvexErrorMessage } from '../../utils/convexError';
 
 export default function ForgotPassword() {
   const { setError, error } = useUserStore();
-  const { forgotPassword, verifyResetToken, resetPassword } = useAuthFunctions();
+  const { forgotPassword, resetPassword } = useAuthFunctions();
 
   const [step, setStep] = useState('email'); // 'email' | 'token' | 'password' | 'success'
   const [userEmail, setUserEmail] = useState('');
@@ -50,9 +50,10 @@ export default function ForgotPassword() {
         toast.error(msg);
       }
     } catch (err) {
-      const msg = getConvexErrorMessage(err, 'Failed to request password reset');
-      setError(msg);
-      toast.error(msg);
+      console.log("[FORGOT PASSWORD] Raw Error:", err);
+      const errorMessage = getConvexErrorMessage(err, "Failed to request password reset.");
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -76,9 +77,9 @@ export default function ForgotPassword() {
       // We just advance the step; the token is validated when resetPassword is called
       setStep('password');
     } catch (err) {
-      const msg = getConvexErrorMessage(err, 'Error verifying token. Please try again.');
-      setError(msg);
-      toast.error(msg);
+      const errorMessage = getConvexErrorMessage(err, "Failed to verify token.");
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -119,9 +120,9 @@ export default function ForgotPassword() {
         toast.error(msg);
       }
     } catch (err) {
-      const msg = getConvexErrorMessage(err, 'Failed to reset password');
-      setError(msg);
-      toast.error(msg);
+      const errorMessage = getConvexErrorMessage(err, "Failed to reset password.");
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }

@@ -40,8 +40,8 @@ export const useAllUsers = (role) => {
   return useQuery(api.auth.getAllUsers, role ? { role } : {});
 };
 
-export const useVerifyResetToken = (token) => {
-  return useQuery(api.auth.verifyResetToken, token ? { token } : "skip");
+export const useVerifyResetToken = () => {
+  return useMutation(api.auth.verifyResetToken);
 };
 
 export const useProfile = (userId) => {

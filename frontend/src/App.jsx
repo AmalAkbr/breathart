@@ -365,9 +365,9 @@ function App() {
             }
           />
 
-          {/* Reset Password - Standalone page (no navbar/footer) */}
+          {/* Reset Password routes */}
           <Route
-            path="/auth/reset-password"
+            path="/reset-password"
             element={
               <>
                 <Navbar />
@@ -376,6 +376,11 @@ function App() {
                 </Suspense>
               </>
             }
+          />
+
+          <Route
+            path="/auth/reset-password"
+            element={<Navigate to="/reset-password" replace />}
           />
 
           {/* Admin Dashboard - Protected by Zustand role check */}

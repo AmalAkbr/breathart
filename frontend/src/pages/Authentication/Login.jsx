@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, Link, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { useUserStore } from "../../store/userStore";
 import { useAuthFunctions } from "../../hooks/useConvexFunctions";
@@ -122,8 +122,9 @@ export default function Login() {
         setLoading(false);
       }
     } catch (err) {
+      console.log("[LOGIN] Raw Error:", err);
       const errorMessage = getConvexErrorMessage(err, "Login failed. Please try again.");
-      console.error("[LOGIN] Error:", errorMessage);
+      console.error("[LOGIN] Cleaned Error:", errorMessage);
 
       if (errorMessage.toLowerCase().includes("verify") && errorMessage.toLowerCase().includes("email")) {
         setError(errorMessage);

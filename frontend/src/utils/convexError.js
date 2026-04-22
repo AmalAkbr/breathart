@@ -1,27 +1,38 @@
 /**
- * Extracts a clean, user-friendly error message from a Convex server error.
- *
- * Convex errors look like:
- *   "[CONVEX M(auth:signup)] [Request ID: abc123] Server Error\nUncaught Error: Email already registered\n    at handler..."
- *
- * This function pulls out just "Email already registered".
+ * Centralized utility to clean and format Convex error messages.
  */
-export function getConvexErrorMessage(err, fallback = "Something went wrong. Please try again.") {
-  const raw = err?.message || "";
 
-  // Try to extract the message after "Uncaught Error: " or "Error: "
-  const uncaughtMatch = raw.match(/Uncaught Error:\s*(.+?)(\n|$)/);
-  if (uncaughtMatch) return uncaughtMatch[1].trim();
+export const getConvexErrorMessage = (err, fallback = "Something went wrong.") => {
+  if (!err) return fallback;
 
-  const errorMatch = raw.match(/Error:\s*(.+?)(\n|$)/);
-  if (errorMatch) return errorMatch[1].trim();
+  // 1. Check for ConvexError data (The cleanest path)
+  // When 'throw new ConvexError("Message")' is used on server, err.data contains "Message"
+  if (err.data && typeof err.data === "string") {
+    return err.data;
+  }
 
-  // If no match, strip the CONVEX prefix lines and return the first meaningful line
-  const lines = raw.split("\n").map((l) => l.trim()).filter(Boolean);
-  const firstMeaningful = lines.find(
-    (l) => !l.startsWith("[CONVEX") && !l.startsWith("Called by") && !l.startsWith("at ")
-  );
-  if (firstMeaningful) return firstMeaningful;
+  // 2. Extract from standard error message
+  const rawMessage = err.message || String(err);
 
-  return fallback;
-}
+  // If it's a "Server Error" wrapper, we try to find the actual Uncaught Error message inside
+  if (rawMessage.includes("Server Error")) {
+    // Look for the "Uncaught Error: XXX" pattern which usually follows the technical prefix
+    const match = rawMessage.match(/Uncaught Error: ([^\\n]+)/);
+    if (match && match[1]) {
+      return match[1].trim();
+    }
+  }
+
+  // 3. Fallback: Strip common technical noise if nothing else worked
+  // Removes "[CONVEX M(auth:login)] [Request ID: ...] Server Error" etc.
+  let cleanMessage = rawMessage
+    .replace(/^Error:\s*/, "") // Remove starting "Error: "
+    .replace(/\[CONVEX[^\]]*\]\s*/g, "") // Remove [CONVEX ...] tags
+    .replace(/\[Request ID:[^\]]*\]\s*/g, "") // Remove Request ID
+    .replace(/Server Error\s*/g, "") // Remove "Server Error"
+    .replace(/at handler\s*\(.*\)/g, "") // Remove stack trace line
+    .split("\n")[0] // Take only the first line
+    .trim();
+
+  return cleanMessage || fallback;
+};

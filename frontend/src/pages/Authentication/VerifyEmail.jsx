@@ -65,7 +65,6 @@ export default function VerifyEmail() {
       
       try {
         const response = await verifyEmail({ token: tokenToVerify });
-        console.log(urlToken);
 
         if (response.success) {
           console.log("[VERIFY EMAIL] ✅ Verification successful!");
@@ -96,7 +95,8 @@ export default function VerifyEmail() {
           toast.error(errorMsg);
         }
       } catch (err) {
-        const errorMessage = getConvexErrorMessage(err, "Failed to verify email");
+        console.log("[VERIFY EMAIL] Raw Error:", err);
+        const errorMessage = getConvexErrorMessage(err, "Failed to verify email. Please try again.");
 
         if (
           user?.isEmailVerified &&
@@ -108,7 +108,7 @@ export default function VerifyEmail() {
           return;
         }
 
-        console.error("[VERIFY EMAIL] ❌ Error:", errorMessage);
+        console.error("[VERIFY EMAIL] Cleaned Error:", errorMessage);
         setError(errorMessage);
         toast.error(errorMessage);
       } finally {
@@ -162,8 +162,8 @@ export default function VerifyEmail() {
         toast.error(errorMsg);
       }
     } catch (err) {
-      const errorMessage = getConvexErrorMessage(err, "Failed to resend email");
-      console.error("[VERIFY EMAIL] ❌ Resend error:", errorMessage);
+      const errorMessage = getConvexErrorMessage(err, "Failed to resend verification email.");
+      console.error("[VERIFY EMAIL] Resend Cleaned Error:", errorMessage);
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {
