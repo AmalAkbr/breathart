@@ -30,6 +30,7 @@
     "tsx": "^4.7.0"
   },
   "dependencies": {
+    "convex": "latest",
     "dotenv": "^16.3.1"
   }
 }
