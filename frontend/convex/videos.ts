@@ -11,7 +11,7 @@ export const getDbVideoKeys = internalQuery({
     const records = await ctx.db.query("videos").collect();
     
     // R2 uses publicUrl checking to find keys
-    const r2PublicUrl = process.env.CLOUDFLARE_R2_PUBLIC_URL || "";
+    const r2PublicUrl = process.env.VITE_CLOUDFLARE_R2_PUBLIC_URL || "";
     const normalizedPrefix = r2PublicUrl.replace(/\/$/, "");
 
     const r2keySet = new Set<string>();
@@ -271,10 +271,10 @@ export const generateVideoUploadUrl = action({
     fileType: v.string(),
   },
   handler: async (ctx, args) => {
-    const accountId = process.env.CLOUDFLARE_R2_ACCOUNT_ID;
-    const accessKeyId = process.env.CLOUDFLARE_R2_ACCESS_KEY_ID;
-    const secretAccessKey = process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY;
-    const bucketName = process.env.CLOUDFLARE_R2_BUCKET;
+    const accountId = process.env.VITE_CLOUDFLARE_R2_ACCOUNT_ID;
+    const accessKeyId = process.env.VITE_CLOUDFLARE_R2_ACCESS_KEY_ID;
+    const secretAccessKey = process.env.VITE_CLOUDFLARE_R2_SECRET_ACCESS_KEY;
+    const bucketName = process.env.VITE_CLOUDFLARE_R2_BUCKET;
 
     if (!accountId || !accessKeyId || !secretAccessKey || !bucketName) {
       throw new Error("Cloudflare R2 configuration missing.");
@@ -287,6 +287,7 @@ export const generateVideoUploadUrl = action({
         accessKeyId,
         secretAccessKey,
       },
+      forcePathStyle: true,
     });
 
     const timestamp = Date.now();
@@ -299,8 +300,12 @@ export const generateVideoUploadUrl = action({
       ContentType: args.fileType,
     });
 
-    // URL valid for 3 hours (10800 seconds) - handles slow uploads for heavy ~500mb files
-    const uploadUrl = await getSignedUrl(s3Client, command, { expiresIn: 10800 });
+    // URL valid for 3 hours. 
+    // We explicitly set checksumAlgorithm to undefined to prevent the SDK from adding 403-triggering checksums
+    const uploadUrl = await getSignedUrl(s3Client, command, { 
+      expiresIn: 10800,
+      signableHeaders: new Set(["host", "content-type"]), // Only sign essential headers to avoid mismatches
+    });
 
     return { uploadUrl, videoKey };
   },

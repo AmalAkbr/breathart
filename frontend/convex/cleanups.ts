@@ -42,17 +42,17 @@ export const runOrphanCleanup = internalAction({
     };
 
     // 1. R2 Cleanup
-    if (process.env.CLOUDFLARE_R2_BUCKET && process.env.CLOUDFLARE_R2_ACCOUNT_ID) {
+    if (process.env.VITE_CLOUDFLARE_R2_BUCKET && process.env.VITE_CLOUDFLARE_R2_ACCOUNT_ID) {
         try {
             const r2Client = new S3Client({
                 region: "auto",
                 credentials: {
-                  accessKeyId: process.env.CLOUDFLARE_R2_ACCESS_KEY_ID!,
-                  secretAccessKey: process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY!,
+                  accessKeyId: process.env.VITE_CLOUDFLARE_R2_ACCESS_KEY_ID!,
+                  secretAccessKey: process.env.VITE_CLOUDFLARE_R2_SECRET_ACCESS_KEY!,
                 },
-                endpoint: `https://${process.env.CLOUDFLARE_R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+                endpoint: `https://${process.env.VITE_CLOUDFLARE_R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
             });
-            const r2Bucket = process.env.CLOUDFLARE_R2_BUCKET;
+            const r2Bucket = process.env.VITE_CLOUDFLARE_R2_BUCKET;
 
             let continuationToken: string | undefined;
             const allR2Keys: string[] = [];
