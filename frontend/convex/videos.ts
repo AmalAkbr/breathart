@@ -271,10 +271,10 @@ export const generateVideoUploadUrl = action({
     fileType: v.string(),
   },
   handler: async (ctx, args) => {
-    const accountId = process.env.VITE_CLOUDFLARE_R2_ACCOUNT_ID;
-    const accessKeyId = process.env.VITE_CLOUDFLARE_R2_ACCESS_KEY_ID;
-    const secretAccessKey = process.env.VITE_CLOUDFLARE_R2_SECRET_ACCESS_KEY;
-    const bucketName = process.env.VITE_CLOUDFLARE_R2_BUCKET;
+    const accountId = process.env.CLOUDFLARE_R2_ACCOUNT_ID;
+    const accessKeyId = process.env.CLOUDFLARE_R2_ACCESS_KEY_ID;
+    const secretAccessKey = process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY;
+    const bucketName = process.env.CLOUDFLARE_R2_BUCKET;
 
     if (!accountId || !accessKeyId || !secretAccessKey || !bucketName) {
       throw new Error("Cloudflare R2 configuration missing.");

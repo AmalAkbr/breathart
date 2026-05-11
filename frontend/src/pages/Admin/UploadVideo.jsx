@@ -624,7 +624,7 @@ const UploadVideo = () => {
         { "Content-Type": files.video.type }
       );
 
-      const publicBaseUrl = import.meta.env.VITE_CLOUDFLARE_R2_PUBLIC_URL || "";
+      const publicBaseUrl = import.meta.env.VITE_CLOUDFLARE_R2_PUBLIC_URL;
       const videoUrl = `${publicBaseUrl}/${videoKey}`;
       
       setProgress((prev) => ({ ...prev, video: 100 }));
