@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { LogOut, Home, Shield } from "lucide-react";
 import { useUserStore } from "../store/userStore";
-import { authAPI } from "../utils/apiClient";
 import { motion } from "framer-motion";
 import { toast } from "../utils/toast";
 import Logo from "./Logo";
@@ -14,17 +13,11 @@ const PageHeader = ({ hideUserSection = false, showHomeBtn = false, showAdminBtn
   const navigate = useNavigate();
   const { user, isLoggedIn, logout } = useUserStore();
 
-  const handleLogout = async () => {
-    try {
-      await authAPI.logout();
-      logout();
-      localStorage.removeItem("auth_token");
-      toast.success("✓ Logged out successfully");
-      navigate("/", { replace: true });
-    } catch (err) {
-      console.error("Logout error:", err);
-      toast.error("Logout failed");
-    }
+  const handleLogout = () => {
+    logout();
+    localStorage.removeItem("auth_token");
+    toast.success("✓ Logged out successfully");
+    navigate("/", { replace: true });
   };
 
   // Get first letter of email for avatar

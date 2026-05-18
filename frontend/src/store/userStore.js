@@ -33,6 +33,7 @@ export const useUserStore = create(
         // Clear localStorage completely
         localStorage.removeItem('user-store');
         localStorage.removeItem('auth_token');
+        localStorage.removeItem('authToken');
         localStorage.removeItem('admin-token');
         return set({ 
           user: null, 

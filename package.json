@@ -5,14 +5,16 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\" --names frontend,backend --prefix-colors cyan,yellow",
+    "dev": "npm run dev:frontend",
     "dev:frontend": "cd frontend && npm run dev",
     "dev:backend": "cd backend && npm run dev",
     "prod:backend": "cd backend && npm run start",
+    "prod:frontend": "cd frontend && npm run build",
     "build": "npm run build:frontend",
     "build:frontend": "cd frontend && npm run build",
     "preview": "cd frontend && npm run preview",
     "lint": "cd frontend && npm run lint",
+    "install:frontend": "npm install && cd frontend && npm install",
     "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install",
     "install:all:prod": "npm ci && cd frontend && npm ci && cd ../backend && npm ci"
   },
@@ -20,7 +22,6 @@
     "react",
     "vite",
     "express",
-    "supabase",
     "video-player"
   ],
   "devDependencies": {
@@ -29,6 +30,7 @@
     "tsx": "^4.7.0"
   },
   "dependencies": {
+    "convex": "latest",
     "dotenv": "^16.3.1"
   }
 }

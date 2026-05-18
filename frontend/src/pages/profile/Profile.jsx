@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useUserStore } from "../../store/userStore";
-import { authAPI } from "../../utils/apiClient";
+import { useExamNotifications } from "../../hooks/useConvexFunctions";
 import { toast } from "../../utils/toast";
 
 // Import child components
@@ -15,8 +15,11 @@ const Profile = () => {
   const navigate = useNavigate();
   const { user, isLoggedIn, loading, logout } = useUserStore();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const [examNotifications, setExamNotifications] = useState([]);
-  const [notificationsLoading, setNotificationsLoading] = useState(false);
+
+  // Reactive exam notifications from Convex
+  const examNotificationsData = useExamNotifications(user?._id);
+  const examNotifications = Array.isArray(examNotificationsData) ? examNotificationsData : [];
+  const notificationsLoading = examNotificationsData === undefined;
 
   // Redirect if not logged in
   useEffect(() => {
@@ -25,56 +28,21 @@ const Profile = () => {
     }
   }, [isLoggedIn, loading, navigate]);
 
-  useEffect(() => {
-    const fetchExamNotifications = async () => {
-      try {
-        setNotificationsLoading(true);
-        const response = await authAPI.getExamNotifications();
-        setExamNotifications(Array.isArray(response?.data) ? response.data : []);
-      } catch (error) {
-        console.error("[PROFILE] Failed to fetch exam notifications:", error.message);
-        setExamNotifications([]);
-      } finally {
-        setNotificationsLoading(false);
-      }
-    };
-
-    if (!loading && isLoggedIn && user) {
-      fetchExamNotifications();
-    }
-  }, [isLoggedIn, loading, user]);
-
-  const handleLogout = async () => {
-    try {
-      setIsLoggingOut(true);
-      console.log("[LOGOUT PROFILE] Logout initiated");
-      
-      // Call backend logout endpoint
-      await authAPI.logout();
-      
-      // Clear Zustand store
-      logout();
-      
-      // Clear localStorage
-      localStorage.removeItem("auth_token");
-      
-      console.log("[LOGOUT PROFILE] Logout successful!");
-      toast.success("✓ Logged out successfully");
-      
-      // Navigate to login
-      navigate("/login", { replace: true });
-    } catch (err) {
-      console.error("[LOGOUT PROFILE] Logout error:", err);
-      toast.error("Logout failed");
-    } finally {
-      setIsLoggingOut(false);
-    }
+  const handleLogout = () => {
+    setIsLoggingOut(true);
+    console.log("[LOGOUT PROFILE] Logout initiated");
+    logout();
+    localStorage.removeItem("auth_token");
+    console.log("[LOGOUT PROFILE] Logout successful!");
+    toast.success("✓ Logged out successfully");
+    navigate("/login", { replace: true });
+    setIsLoggingOut(false);
   };
 
   // Loading state
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-linear-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
         <motion.div
           animate={{ opacity: [0.5, 1, 0.5] }}
           transition={{ duration: 2, repeat: Infinity }}
@@ -90,7 +58,7 @@ const Profile = () => {
   // Not authenticated - this should be handled by ProtectedRoute, but just in case
   if (!isLoggedIn || !user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-linear-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -109,7 +77,7 @@ const Profile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 pt-32 pb-20">
+    <div className="min-h-screen bg-linear-to-br from-slate-900 via-slate-800 to-slate-900 pt-32 pb-20">
       {/* Decorative background elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 right-10 w-72 h-72 bg-accent-cyan/5 rounded-full blur-3xl" />

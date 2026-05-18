@@ -2,13 +2,15 @@ import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { User, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { useUserStore } from "../../store/userStore";
-import { authAPI, setAuthToken } from "../../utils/apiClient";
+import { useAuthFunctions } from "../../hooks/useConvexFunctions";
 import { validateRegisterForm } from "../../utils/validators";
 import { toast } from "../../utils/toast";
+import { getConvexErrorMessage } from "../../utils/convexError";
 
 export default function Register() {
   const navigate = useNavigate();
   const { setUser, setLoading, setError, clearError, error } = useUserStore();
+  const { signup } = useAuthFunctions();
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -78,30 +80,45 @@ export default function Register() {
       setLoading(true);
       setError(null);
 
-      // Call backend
-      const response = await authAPI.signup(
-        formData.fullName,
-        formData.email,
-        formData.password,
-        formData.confirmPassword,
-      );
+      // Call Convex backend
+      const response = await signup({
+        fullName: formData.fullName,
+        email: formData.email,
+        password: formData.password,
+      });
+
+      // console.log("[REGISTER] Convex response:", response);
 
       if (response.success) {
-        const registeredEmail = response?.data?.user?.email || formData.email;
+        const registeredEmail = response.email || formData.email;
+        const token = response.token;
+        const verificationToken = response.verificationToken;
 
-        // Store token
-        setAuthToken(response.data.token);
+        // Store token in localStorage
+        localStorage.setItem("authToken", token);
+        // console.log("[REGISTER] Token stored");
+
+        // Create user object
+        const userData = {
+          _id: response.userId,
+          email: registeredEmail,
+          fullName: formData.fullName,
+          role: "user",
+          isAdmin: false,
+          isEmailVerified: false,
+        };
 
         // Store user in Zustand
-        setUser(response.data.user);
+        setUser(userData);
 
-        // Keep pending email available for verify-email page autofill
+        // Save verification token for email verification
+        sessionStorage.setItem("verificationToken", verificationToken);
         sessionStorage.setItem("pendingVerifyEmail", registeredEmail);
 
         // Show success toast
         toast.success("✓ Registration successful! Verify your email.");
 
-        // Go directly to verify-email with prefilled email
+        // Go to verify-email with prefilled email
         navigate(`/verify-email?email=${encodeURIComponent(registeredEmail)}`, {
           replace: true,
           state: { email: registeredEmail },
@@ -111,19 +128,20 @@ export default function Register() {
         toast.error(response.message || "Registration failed");
       }
     } catch (err) {
-      const errorMessage =
-        err.data?.message ||
-        err.message ||
-        "Registration failed. Please try again.";
-      if (/valid email|email/i.test(errorMessage)) {
-        setValidationErrors((prev) => ({
-          ...prev,
-          email: "Please provide a valid email",
-        }));
+      console.log("[REGISTER] Raw Error:", err);
+      const errorMessage = getConvexErrorMessage(err, "Registration failed. Please try again.");
+      console.error("[REGISTER] Cleaned Error:", errorMessage);
+
+      if (errorMessage.toLowerCase().includes("already")) {
+        setValidationErrors((prev) => ({ ...prev, email: "This email is already registered" }));
+        toast.error("This email is already registered");
+      } else if (errorMessage.toLowerCase().includes("email")) {
+        setValidationErrors((prev) => ({ ...prev, email: errorMessage }));
+        toast.error(errorMessage);
+      } else {
+        setError(errorMessage);
+        toast.error(errorMessage);
       }
-      console.error("[REGISTER] Error:", errorMessage);
-      setError(errorMessage);
-      toast.error(errorMessage);
     } finally {
       setLoading(false);
       setIsSubmitting(false);
@@ -336,7 +354,7 @@ export default function Register() {
           </p>
 
           {/* Admin Login Link */}
-          <p className="text-center text-gray-500 text-sm">
+          {/* <p className="text-center text-gray-500 text-sm">
             Admin?{" "}
             <Link
               to="/login?admin=true"
@@ -344,7 +362,7 @@ export default function Register() {
             >
               Login here
             </Link>
-          </p>
+          </p> */}
         </div>
 
         {/* Footer Note */}

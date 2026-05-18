@@ -1,48 +1,19 @@
 // frontend/src/pages/Admin/Overview.jsx
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Users, Play, CheckCircle2, Activity, Sparkles, Clock3, Shield } from 'lucide-react';
-import { API_URL, getAuthToken } from '../../utils/apiClient';
-import { toast } from '../../utils/toast';
+import { useOverview } from '../../hooks/useConvexFunctions';
 import '../../styles/AdminOverview.css';
 
 const Overview = () => {
-  const [stats, setStats] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const overviewData = useOverview();
+  const loading = overviewData === undefined;
+  const stats = overviewData || null;
 
   const formatDuration = (seconds) => {
     if (!seconds && seconds !== 0) return '—';
     const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60)
-      .toString()
-      .padStart(2, '0');
+    const secs = Math.floor(seconds % 60).toString().padStart(2, '0');
     return `${mins}:${secs}`;
-  };
-
-  useEffect(() => {
-    fetchStats();
-  }, []);
-
-  const fetchStats = async () => {
-    try {
-      const token = getAuthToken();
-      if (!token) throw new Error('Session expired');
-
-      const res = await fetch(`${API_URL}/admin/overview`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || 'Failed to load overview');
-      }
-
-      setStats(data.data);
-    } catch (err) {
-      console.error('[Overview] load error:', err.message);
-      toast.error(err.message || 'Failed to load overview');
-    } finally {
-      setLoading(false);
-    }
   };
 
   const cards = [

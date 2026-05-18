@@ -1,15 +1,17 @@
 import { useState, useEffect } from "react";
-import { useNavigate, Link, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { useUserStore } from "../../store/userStore";
-import { authAPI, setAuthToken } from "../../utils/apiClient";
+import { useAuthFunctions } from "../../hooks/useConvexFunctions";
 import { validateLoginForm } from "../../utils/validators";
 import { toast } from "../../utils/toast";
+import { getConvexErrorMessage } from "../../utils/convexError";
 
 export default function Login() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { setUser, setLoading, setError, clearError, error } = useUserStore();
+  const { login } = useAuthFunctions();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -80,85 +82,53 @@ export default function Login() {
       setLoading(true);
       setError(null);
 
-      // Call backend
-      const response = await authAPI.login(formData.email, formData.password);
-      console.log("[LOGIN] Response received:", response);
-      
+      // Call Convex backend
+      const response = await login({
+        email: formData.email,
+        password: formData.password,
+      });
+
+      // console.log("[LOGIN] Convex response:", response);
+
       if (response.success) {
-        // Check role matches mode
-        const userRole = response.data.user.role;
-        const isUserAdmin = userRole === "admin";
-        const userIsAdmin = response.data.user.isAdmin === true;
+        const user = response.user;
+        const token = response.token;
 
-        console.log("[LOGIN] User role:", userRole, "isAdmin flag:", userIsAdmin);
-
-        // ADMIN TRYING TO LOGIN AS REGULAR USER - BLOCK
-        if (!isAdminMode && isUserAdmin && userIsAdmin) {
-          console.log("[LOGIN] 🔐 BLOCKED: Admin account cannot login as regular user");
-          setError("Your account is not permitted to use as user. Please use admin panel.");
-          toast.error("Admin accounts cannot login as regular users");
-          setIsSubmitting(false);
-          setLoading(false);
-          return;
-        }
-
-        // REGULAR USER TRYING TO LOGIN TO ADMIN - BLOCK
-        if (isAdminMode && !isUserAdmin) {
-          setError("This account does not have admin privileges");
-          toast.error("Admin account required");
-          setIsSubmitting(false);
-          setLoading(false);
-          return;
-        }
-
-        if (!isAdminMode && isUserAdmin) {
-          console.log("[LOGIN] 🔐 Admin account detected - use /admin to login");
-        }
-
-        // Store token
-        setAuthToken(response.data.token);
-        console.log("[LOGIN] Token stored");
+        // Store token in localStorage
+        localStorage.setItem("authToken", token);
+        // console.log("[LOGIN] Token stored:", token);
 
         // Store user in Zustand
-        const userData = response.data.user;
-        console.log("[LOGIN] Setting user in store:", userData.email, "Role:", userData.role);
-        setUser(userData);
+        // console.log("[LOGIN] Setting user in store:", user.email, "Role:", user.role);
+        setUser(user);
 
         // Show success toast
-        const accountType = isUserAdmin ? "Admin" : "User";
-        toast.success(`✓ ${accountType} login successful!`);
+        toast.success(`✓ Login successful!`);
 
         // Set loading to false before navigation
         setLoading(false);
 
-        // Navigate based on role and email verification
-        if (isUserAdmin) {
-          console.log("[LOGIN] 🎯 Navigating to /admin");
+        // Navigate based on role
+        if (user.role === "admin" && user.isAdmin === true) {
+          // console.log("[LOGIN] 🎯 Navigating to /admin");
           navigate("/admin", { replace: true });
         } else {
-          console.log("[LOGIN] 🎯 Navigating to /");
-          // Redirect to home (/) for both verified and unverified users
-          // Email verification will prompt from home page or user profile
+          // console.log("[LOGIN] 🎯 Navigating to home");
           navigate("/", { replace: true });
         }
       } else {
         setError(response.message || "Login failed");
         toast.error(response.message || "Login failed");
+        setLoading(false);
       }
     } catch (err) {
-      const errorMessage =
-        err.data?.message || err.message || "Login failed. Please try again.";
+      console.log("[LOGIN] Raw Error:", err);
+      const errorMessage = getConvexErrorMessage(err, "Login failed. Please try again.");
+      console.error("[LOGIN] Cleaned Error:", errorMessage);
 
-      console.error("[LOGIN] Error:", errorMessage);
-
-      // Check if error is about email verification
-      if (
-        errorMessage.toLowerCase().includes("verify") &&
-        errorMessage.toLowerCase().includes("email")
-      ) {
+      if (errorMessage.toLowerCase().includes("verify") && errorMessage.toLowerCase().includes("email")) {
         setError(errorMessage);
         toast.warning(errorMessage);
-        // Store email for potential verify page redirect
         sessionStorage.setItem("pendingVerifyEmail", formData.email);
       } else {
         setError(errorMessage);

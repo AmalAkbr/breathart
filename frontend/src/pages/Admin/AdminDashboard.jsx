@@ -10,7 +10,6 @@ import ManageExams from "./exams/ManageExams";
 import ManageUsers from "./ManageUsers";
 import "../../styles/AdminDashboard.css";
 import { useUserStore } from "../../store/userStore";
-import { API_URL, getAuthToken } from "../../utils/apiClient";
 import { toast } from "../../utils/toast";
 
 const AdminDashboard = () => {
@@ -23,56 +22,17 @@ const AdminDashboard = () => {
   useEffect(() => {
     const verifyAdmin = async () => {
       try {
-        console.log("[ADMIN DASHBOARD] Verifying admin access...");
-        console.log(
-          "[ADMIN DASHBOARD] User:",
-          user?.email,
-          "Role:",
-          user?.role,
-        );
-        const token = getAuthToken();
+        // console.log("[ADMIN DASHBOARD] Verifying admin access...");
+        // console.log("[ADMIN DASHBOARD] User:", user?.email, "Role:", user?.role);
 
-        // Check if token exists and user is admin
-        if (!token || !user || user.role !== "admin") {
-          console.warn(
-            "[ADMIN DASHBOARD] ❌ Not authorized - user role:",
-            user?.role,
-          );
+        if (!user || user.role !== "admin") {
+          // console.warn("[ADMIN DASHBOARD] ❌ Not authorized - user role:", user?.role);
           toast.error("Access denied: Admin privileges required");
           navigate("/", { replace: true });
           return;
         }
 
-        // Enable admin flag on backend if needed
-        try {
-          const enableResponse = await fetch(
-            `${API_URL}/admin/enable-admin`,
-            {
-              method: "POST",
-              headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-              },
-            },
-          );
-
-          if (enableResponse.ok) {
-            const enableData = await enableResponse.json();
-            console.log(
-              "[ADMIN DASHBOARD] ✅ Admin mode enabled:",
-              enableData.user?.email,
-            );
-          } else {
-            console.warn(
-              "[ADMIN DASHBOARD] Admin enable response:",
-              enableResponse.status,
-            );
-          }
-        } catch (enableError) {
-          console.error("[ADMIN DASHBOARD] Error enabling admin:", enableError);
-        }
-
-        console.log("[ADMIN DASHBOARD] ✅ Admin verified:", user.email);
+        // console.log("[ADMIN DASHBOARD] ✅ Admin verified:", user.email);
         setLoading(false);
       } catch (error) {
         console.error("[ADMIN DASHBOARD] Verification error:", error);

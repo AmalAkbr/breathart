@@ -1,15 +1,17 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { useUserStore } from "../../store/userStore";
-import { authAPI, getAuthToken } from "../../utils/apiClient";
+import { useAuthFunctions } from "../../hooks/useConvexFunctions";
 import { validateToken } from "../../utils/validators";
 import { toast } from "../../utils/toast";
+import { getConvexErrorMessage } from "../../utils/convexError";
 
 export default function VerifyEmail() {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
-  const { user, setUser, setError, clearError, error } = useUserStore();
+  const { user, setUser, setError, clearError, error, logout } = useUserStore();
+  const { verifyEmail, resendVerificationEmail } = useAuthFunctions();
   const [verificationToken, setVerificationToken] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [validationError, setValidationError] = useState("");
@@ -24,6 +26,15 @@ export default function VerifyEmail() {
   const storeEmail = user?.email || "";
   const userEmail = urlEmail || stateEmail || pendingEmail || storeEmail || "";
   const urlToken = searchParams.get("token");
+
+  useEffect(() => {
+    if (!user?.isEmailVerified) return;
+
+    sessionStorage.removeItem("pendingVerifyEmail");
+    sessionStorage.removeItem("verificationToken");
+    navigate("/profile", { replace: true });
+  }, [user?.isEmailVerified, navigate]);
+
   // Persist resolved email for refresh/revisit autofill
   useEffect(() => {
     if (userEmail) {
@@ -34,7 +45,7 @@ export default function VerifyEmail() {
   // Redirect only when we have neither auth nor recoverable verify context
   useEffect(() => {
     console.log("[VERIFY EMAIL] Checking verification context...");
-    if (!getAuthToken() && !userEmail && !urlToken) {
+    if (!userEmail && !urlToken) {
       navigate("/login");
     }
   }, [userEmail, urlToken, navigate]);
@@ -43,30 +54,30 @@ export default function VerifyEmail() {
 
   const handleAutoVerify = useCallback(
     async (tokenToVerify) => {
-      console.log(
-        "[VERIFY EMAIL] Auto-verifying with token:",
-        tokenToVerify.substring(0, 20) + "...",
-      );
-      console.log("[VERIFY EMAIL] Email:", userEmail);
+      // console.log(
+      //   "[VERIFY EMAIL] Auto-verifying with token:",
+      //   tokenToVerify.substring(0, 20) + "...",
+      // );
+      // console.log("[VERIFY EMAIL] Email:", userEmail);
 
       setIsSubmitting(true);
       setError(null);
       
       try {
-        const response = await authAPI.verifyEmail(userEmail, tokenToVerify);
-        console.log(urlToken);
+        const response = await verifyEmail({ token: tokenToVerify });
 
         if (response.success) {
           console.log("[VERIFY EMAIL] ✅ Verification successful!");
           sessionStorage.removeItem("pendingVerifyEmail");
+          sessionStorage.removeItem("verificationToken");
 
           // Email verified! Update user in store
-          if (response.data?.user) {
-            setUser(response.data.user);
-            console.log(
-              "[VERIFY EMAIL] User state updated:",
-              response.data.user.email,
-            );
+          if (response.user) {
+            setUser(response.user);
+            // console.log(
+            //   "[VERIFY EMAIL] User state updated:",
+            //   response.user.email,
+            // );
           }
 
           // Show success toast
@@ -84,16 +95,27 @@ export default function VerifyEmail() {
           toast.error(errorMsg);
         }
       } catch (err) {
-        const errorMessage =
-          err.data?.message || err.message || "Failed to verify email";
-        console.error("[VERIFY EMAIL] ❌ Error:", errorMessage, err);
+        console.log("[VERIFY EMAIL] Raw Error:", err);
+        const errorMessage = getConvexErrorMessage(err, "Failed to verify email. Please try again.");
+
+        if (
+          user?.isEmailVerified &&
+          /invalid or expired verification token|verification token/i.test(errorMessage)
+        ) {
+          sessionStorage.removeItem("pendingVerifyEmail");
+          sessionStorage.removeItem("verificationToken");
+          navigate("/profile", { replace: true });
+          return;
+        }
+
+        console.error("[VERIFY EMAIL] Cleaned Error:", errorMessage);
         setError(errorMessage);
         toast.error(errorMessage);
       } finally {
         setIsSubmitting(false);
       }
     },
-    [userEmail, setUser, setError, navigate],
+    [user, userEmail, setUser, setError, navigate],
   );
 
   const handleSubmit = useCallback(
@@ -120,16 +142,16 @@ export default function VerifyEmail() {
       return;
     }
 
-    console.log("[VERIFY EMAIL] Resending verification to:", userEmail);
+    // console.log("[VERIFY EMAIL] Resending verification to:", userEmail);
     setIsResendingEmail(true);
     setResendMessage("");
     setError(null);
 
     try {
-      const response = await authAPI.resendVerification(userEmail);
+      const response = await resendVerificationEmail({ email: userEmail });
 
       if (response.success) {
-        console.log("[VERIFY EMAIL] ✅ Verification email resent");
+        // console.log("[VERIFY EMAIL] ✅ Verification email resent");
         setResendMessage("✓ Verification email sent! Check your inbox.");
         toast.success("Verification email sent!");
       } else {
@@ -140,9 +162,8 @@ export default function VerifyEmail() {
         toast.error(errorMsg);
       }
     } catch (err) {
-      const errorMessage =
-        err.data?.message || err.message || "Failed to resend email";
-      console.error("[VERIFY EMAIL] ❌ Resend error:", errorMessage);
+      const errorMessage = getConvexErrorMessage(err, "Failed to resend verification email.");
+      console.error("[VERIFY EMAIL] Resend Cleaned Error:", errorMessage);
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -153,7 +174,7 @@ export default function VerifyEmail() {
   const handleLogout = useCallback(async () => {
     try {
       sessionStorage.removeItem("pendingVerifyEmail");
-      await authAPI.logout();
+      logout();
       navigate("/login");
     } catch (err) {
       console.error("Logout error:", err);
@@ -197,11 +218,11 @@ export default function VerifyEmail() {
   useEffect(() => {
     if (!urlToken || autoVerifyAttempted) return;
 
-    console.log(
-      "[VERIFY EMAIL COMPONENT] Token found - urlToken:",
-      urlToken.substring(0, 20) + "...",
-    );
-    console.log("[VERIFY EMAIL] Starting auto-verify...");
+    // console.log(
+    //   "[VERIFY EMAIL COMPONENT] Token found - urlToken:",
+    //   urlToken.substring(0, 20) + "...",
+    // );
+    // console.log("[VERIFY EMAIL] Starting auto-verify...");
 
     setAutoVerifyAttempted(true);
     handleAutoVerify(urlToken);

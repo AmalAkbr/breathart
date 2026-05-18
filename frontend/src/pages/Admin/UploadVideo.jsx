@@ -9,13 +9,18 @@ import {
   Link2,
   Loader,
 } from "lucide-react";
-import { io } from "socket.io-client";
-import { API_URL,getAuthToken } from "../../utils/apiClient";
+import { useVideoFunctions } from "../../hooks/useConvexFunctions";
+import { useUserStore } from "../../store/userStore";
 import { toast } from "../../utils/toast";
 import { getVideoDurationInSecondsFromFile } from "../../utils/videoDuration";
 import "../../styles/UploadVideo.css";
 
+// Convex HTTP actions endpoint (handles multipart file uploads)
+const CONVEX_SITE_URL = (import.meta.env.VITE_CONVEX_SITE_URL || "").replace(/\/$/, "");
+
 const UploadVideo = () => {
+  const { createVideo, generateVideoUploadUrl } = useVideoFunctions();
+  const user = useUserStore((s) => s.user);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -40,6 +45,7 @@ const UploadVideo = () => {
     thumbnailUrl: "",
     thumbnailFileId: "",
     videoUrl: "",
+    videoKey: "", // R2 object key — needed to delete on cancel
   });
   const [urlInputs, setUrlInputs] = useState({ thumbnail: "", video: "" });
   const [previews, setPreviews] = useState({ thumbnail: "", video: "" });
@@ -65,7 +71,6 @@ const UploadVideo = () => {
   const allowedCategories = ["course", "tutorial", "webinar", "demo", "lecture", "other"];
 
   const activeVideoXhrRef = useRef(null);
-  const socketRef = useRef(null);
   const currentVideoUploadIdRef = useRef("");
   const isMountedRef = useRef(true);
 
@@ -153,10 +158,6 @@ const UploadVideo = () => {
     return `${value.toFixed(unitIndex === 0 ? 0 : 1)} ${units[unitIndex]}`;
   };
 
-  const getSocketServerUrl = () => {
-    return API_URL.replace(/\/api\/?$/, "");
-  };
-
   const createUploadId = () => {
     if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
       return crypto.randomUUID();
@@ -165,99 +166,10 @@ const UploadVideo = () => {
     return `upload_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
   };
 
-  const mapClientProgressToUi = (percent) => {
-    const clamped = Math.max(0, Math.min(100, percent));
-    return Math.round((clamped / 100) * 45);
-  };
+  // Progress trackers
 
-  const mapR2ProgressToUi = (percent) => {
-    const clamped = Math.max(0, Math.min(100, percent));
-    return Math.min(99, 45 + Math.round((clamped / 100) * 54));
-  };
 
-  useEffect(() => {
-    const token = getAuthToken();
-    if (!token) {
-      return undefined;
-    }
-
-    const socket = io(getSocketServerUrl(), {
-      transports: ["websocket", "polling"],
-      auth: { token },
-      withCredentials: true,
-    });
-
-    socketRef.current = socket;
-
-    const onStage = (payload = {}) => {
-      if (!payload.uploadId || payload.uploadId !== currentVideoUploadIdRef.current) {
-        return;
-      }
-
-      if (payload.stage === "r2_uploading") {
-        setVideoUploadStage("processing");
-      } else if (payload.stage === "cancelled") {
-        setVideoUploadStage("cancelled");
-      }
-    };
-
-    const onProgress = (payload = {}) => {
-      if (!payload.uploadId || payload.uploadId !== currentVideoUploadIdRef.current) {
-        return;
-      }
-
-      if (payload.phase !== "r2") {
-        return;
-      }
-
-      const backendPercent = Number(payload.percent) || 0;
-      const mapped = mapR2ProgressToUi(backendPercent);
-
-      setVideoUploadStage("processing");
-      setVideoTransfer({
-        loaded: Number(payload.loaded) || 0,
-        total: Number(payload.total) || 0,
-      });
-      setProgress((prev) => ({
-        ...prev,
-        video: Math.max(prev.video, mapped),
-      }));
-    };
-
-    const onCompleted = (payload = {}) => {
-      if (!payload.uploadId || payload.uploadId !== currentVideoUploadIdRef.current) {
-        return;
-      }
-
-      setVideoUploadStage("completed");
-      setProgress((prev) => ({ ...prev, video: Math.max(prev.video, 99) }));
-    };
-
-    const onError = (payload = {}) => {
-      if (!payload.uploadId || payload.uploadId !== currentVideoUploadIdRef.current) {
-        return;
-      }
-
-      setVideoUploadStage("error");
-      if (payload.message) {
-        setError(payload.message);
-      }
-    };
-
-    socket.on("upload:stage", onStage);
-    socket.on("upload:progress", onProgress);
-    socket.on("upload:completed", onCompleted);
-    socket.on("upload:error", onError);
-
-    return () => {
-      socket.off("upload:stage", onStage);
-      socket.off("upload:progress", onProgress);
-      socket.off("upload:completed", onCompleted);
-      socket.off("upload:error", onError);
-      socket.disconnect();
-      socketRef.current = null;
-    };
-  }, []);
+  // Socket.IO removed — upload progress tracked via XHR onprogress only
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -379,6 +291,7 @@ const UploadVideo = () => {
         "video/x-msvideo",
         "video/quicktime",
       ];
+      // 500 MB client-side guard (server enforces same limit)
       const maxSize = 500 * 1024 * 1024;
       if (!validMimes.includes(file.type)) {
         setError("Video must be MP4, WebM, AVI, or MOV");
@@ -386,8 +299,8 @@ const UploadVideo = () => {
         return;
       }
       if (file.size > maxSize) {
-        setError("Video must be less than 500MB");
-        toast.error("Video must be less than 500MB");
+        setError("Video must be less than 500 MB");
+        toast.error("Video must be less than 500 MB");
         return;
       }
     }
@@ -458,16 +371,20 @@ const UploadVideo = () => {
   const uploadWithProgress = (
     url,
     formDataObj,
-    token,
     onProgress,
     onStageChange,
     onXhrReady,
+    method = "POST",
+    headers = {}
   ) =>
     new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
       onXhrReady?.(xhr);
-      xhr.open("POST", url, true);
-      xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+      xhr.open(method, url, true);
+      
+      for (const [key, value] of Object.entries(headers)) {
+        xhr.setRequestHeader(key, value);
+      }
 
       xhr.upload.onloadstart = () => {
         onStageChange?.("uploading");
@@ -495,6 +412,9 @@ const UploadVideo = () => {
           try {
             onProgress({ percent: 100, loaded: 1, total: 1 });
             onStageChange?.("completed");
+            
+            // AWS returns empty body on PUT. Handle it securely without JSON parse fail
+            if (!xhr.responseText) return resolve({ success: true });
             resolve(JSON.parse(xhr.responseText));
           } catch (err) {
             console.log(err);
@@ -538,67 +458,60 @@ const UploadVideo = () => {
       xhr.send(formDataObj);
     });
 
-  const cleanupCancelledUpload = async () => {
-    const token = getAuthToken();
-    if (!token) {
-      return;
-    }
-
-    const shouldCleanup =
-      Boolean(uploadedUrls.thumbnailFileId) ||
-      Boolean(uploadedUrls.thumbnailUrl) ||
-      Boolean(uploadedUrls.videoUrl);
-
-    if (!shouldCleanup) {
-      return;
-    }
-
-    await fetch(`${API_URL}/upload/cancel-upload`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        thumbnailFileId: uploadedUrls.thumbnailFileId || null,
-        thumbnailUrl: uploadedUrls.thumbnailUrl || null,
-        videoUrl: uploadedUrls.videoUrl || null,
-      }),
-    }).catch((cleanupError) => {
-      console.error("Cleanup request failed:", cleanupError.message);
-    });
-  };
+  // ---------------------------------------------------------------------------
+  // Cancel upload
+  //
+  // 1. Aborts the in-flight XHR (browser stops sending bytes)
+  //    – R2 receives an incomplete PUT and discards it automatically.
+  // 2. If the thumbnail was already fully uploaded to ImageKit, calls
+  //    /upload/cancel to delete it immediately.
+  // 3. If the video was already fully uploaded but DB save hadn't happened yet,
+  //    passes the videoKey so /upload/cancel deletes it from R2 too.
+  // 4. The 12-hour orphan-cleanup cron (cleanups.ts) is the final safety net
+  //    for anything that slips through (e.g. a crash mid-submit).
+  // ---------------------------------------------------------------------------
 
   const cancelUpload = async () => {
-    if (isCancellingUpload) {
-      return;
-    }
-
+    if (isCancellingUpload) return;
     setIsCancellingUpload(true);
-
     try {
-      const activeUploadId = currentVideoUploadIdRef.current;
-      if (activeUploadId && socketRef.current?.connected) {
-        socketRef.current.emit("upload:cancel", { uploadId: activeUploadId });
-      }
-
+      // 1. Abort in-flight XHR (video mid-upload → R2 discards partial)
       if (activeVideoXhrRef.current) {
         activeVideoXhrRef.current.abort();
+        activeVideoXhrRef.current = null;
       }
 
-      await cleanupCancelledUpload();
+      // 2. Delete already-uploaded assets from storage
+      const { thumbnailFileId, videoKey } = uploadedUrls;
+      if (thumbnailFileId || videoKey) {
+        try {
+          await fetch(`${CONVEX_SITE_URL}/upload/cancel`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              thumbnailFileId: thumbnailFileId || undefined,
+              videoKey: videoKey || undefined,
+            }),
+          });
+          console.log("🧹 Cancel cleanup sent.");
+        } catch (cleanupErr) {
+          // Non-fatal: the 12h orphan cron will catch anything missed
+          console.warn("Cancel cleanup request failed:", cleanupErr);
+        }
+      }
 
+      // 3. Reset all UI state
       setUploading({ thumbnail: false, video: false });
       setProgress({ thumbnail: 0, video: 0 });
       setVideoTransfer({ loaded: 0, total: 0 });
       setVideoUploadStage("uploading");
-      setUploadedUrls({ thumbnailUrl: "", thumbnailFileId: "", videoUrl: "" });
+      setUploadedUrls({ thumbnailUrl: "", thumbnailFileId: "", videoUrl: "", videoKey: "" });
       setFiles({ thumbnail: null, video: null });
       setPreviews({ thumbnail: "", video: "" });
-      toast.info("Upload cancelled. Partial uploaded files were cleaned.");
+      toast.info("Upload cancelled.");
     } catch (error) {
       console.error("Cancel upload error:", error.message);
-      toast.error("Upload cancelled, but cleanup could not be fully verified.");
+      toast.error("Could not cancel cleanly — files will be cleaned up automatically.");
     } finally {
       setIsCancellingUpload(false);
     }
@@ -625,15 +538,13 @@ const UploadVideo = () => {
     try {
       setUploading((prev) => ({ ...prev, thumbnail: true }));
       setProgress((prev) => ({ ...prev, thumbnail: 0 }));
-      const token = getAuthToken();
 
       const formDataObj = new FormData();
       formDataObj.append("thumbnail", files.thumbnail);
 
       const data = await uploadWithProgress(
-        `${API_URL}/upload/thumbnail`,
+        `${CONVEX_SITE_URL}/upload/thumbnail`,
         formDataObj,
-        token,
         ({ percent }) =>
           setProgress((prev) => ({ ...prev, thumbnail: Math.min(percent, 99) })),
       );
@@ -682,28 +593,26 @@ const UploadVideo = () => {
       setProgress((prev) => ({ ...prev, video: 0 }));
       setVideoUploadStage("uploading");
       setVideoTransfer({ loaded: 0, total: files.video?.size || 0 });
-      const token = getAuthToken();
       const uploadId = createUploadId();
 
       currentVideoUploadIdRef.current = uploadId;
-      if (socketRef.current?.connected) {
-        socketRef.current.emit("upload:subscribe", { uploadId });
-      }
 
-      const formDataObj = new FormData();
-      formDataObj.append("video", files.video);
-      formDataObj.append("title", formData.title);
-      formDataObj.append("uploadId", uploadId);
+      // 1. Generate Presigned URL from Convex (Bypasses 20MB limits)
+      const { uploadUrl, videoKey } = await generateVideoUploadUrl({
+        fileName: files.video.name,
+        fileType: files.video.type,
+      });
 
-      const data = await uploadWithProgress(
-        `${API_URL}/upload/video-file`,
-        formDataObj,
-        token,
+      // 2. Upload actual file bytes securely direct to Cloudflare R2
+      await uploadWithProgress(
+        uploadUrl,
+        files.video,
         ({ percent, loaded, total }) => {
-          const mappedClientPercent = mapClientProgressToUi(percent);
+          const mappedPercent = Math.round(percent);
+
           setProgress((prev) => ({
             ...prev,
-            video: Math.max(prev.video, mappedClientPercent),
+            video: Math.max(prev.video, mappedPercent),
           }));
           setVideoTransfer({ loaded, total });
         },
@@ -711,12 +620,16 @@ const UploadVideo = () => {
         (xhr) => {
           activeVideoXhrRef.current = xhr;
         },
+        "PUT",
+        { "Content-Type": files.video.type }
       );
 
-      const videoUrl = data.data.videoUrl;
+      const publicBaseUrl = import.meta.env.VITE_CLOUDFLARE_R2_PUBLIC_URL;
+      const videoUrl = `${publicBaseUrl}/${videoKey}`;
+      
       setProgress((prev) => ({ ...prev, video: 100 }));
-      setUploadedUrls((prev) => ({ ...prev, videoUrl: videoUrl }));
-      return { success: true, url: videoUrl };
+      setUploadedUrls((prev) => ({ ...prev, videoUrl, videoKey }));
+      return { success: true, url: videoUrl, videoKey };
     } catch (err) {
       if (err?.isCancelled) {
         setVideoUploadStage("cancelled");
@@ -773,6 +686,7 @@ const UploadVideo = () => {
     let thumbUrl = uploadedUrls.thumbnailUrl || "";
     let thumbFileId = uploadedUrls.thumbnailFileId || "";
     let videoUrl = uploadedUrls.videoUrl || "";
+    let videoKey = uploadedUrls.videoKey || "";
 
     // Upload files if they exist and haven't been uploaded yet
     if (
@@ -800,6 +714,7 @@ const UploadVideo = () => {
         return;
       }
       videoUrl = result.url;
+      videoKey = result.videoKey || videoKey;
     }
 
     // Validate using the actual URLs we now have
@@ -835,76 +750,25 @@ const UploadVideo = () => {
     setSuccess(false);
 
     try {
-      const token = getAuthToken();
-      if (!token) {
-        // console.error("🔴 No auth token found in localStorage");
-
+      if (!user?._id) {
         throw new Error("Session expired. Please login again.");
       }
 
-      // console.log("💾 Saving to database:", {
-      //   title: formData.title,
-      //   category: formData.category,
-      //   thumbnailUrl: finalThumb.substring(0, 50) + "...",
-      //   videoUrl: finalVideo.substring(0, 50) + "...",
-      //   tokenPresent: !!token,
-      //   tokenLength: token?.length,
-      // });
+      // Save video metadata directly to Convex — no backend needed
+      await createVideo({
+        title: formData.title,
+        description: formData.description || undefined,
+        thumbnail: finalThumb,
+        thumbnailFileId: finalThumbFileId || undefined,
+        videoUrl: finalVideo,
+        videoKey: videoKey || undefined,
+        duration: parseInt(formData.duration) || undefined,
+        category: formData.category || "tutorial",
+        createdBy: user._id,
+      });
 
-      const response = await fetch(
-        `${API_URL}/upload/video`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            title: formData.title,
-            description: formData.description,
-            category: formData.category,
-            thumbnailUrl: finalThumb,
-            thumbnailFileId: finalThumbFileId,
-            videoUrl: finalVideo,
-            duration: parseInt(formData.duration) || null,
-          }),
-        },
-      );
-
-      // console.log(
-      //   `📡 Database save response: ${response.status} ${response.statusText}`,
-      // );
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-
-        if (response.status === 401) {
-          console.error("🔴 Authentication failed (401):", errorData);
-          throw new Error("Session expired. Please login again.");
-        }
-
-        if (response.status === 403) {
-          console.error(
-            "🔴 Authorization failed (403) - Not admin:",
-            errorData,
-          );
-          throw new Error("You do not have admin privileges to upload videos.");
-        }
-
-        if (response.status === 429) {
-          const retryAfter = Number(errorData?.retryAfterSec);
-          const message = retryAfter > 0
-            ? `Upload limit reached. Try again in ${retryAfter} seconds.`
-            : "Upload limit reached. Please wait a bit and try again.";
-          throw new Error(message);
-        }
-
-        console.error("🔴 Server error:", errorData);
-        throw new Error(errorData.message || errorData.error || "Failed to create video");
-      }
-
-      const result = await response.json();
-      console.log("✅ Video saved to database:", result);
+      // Video is now in the DB — clear the videoKey so cancel won't try to delete it
+      setUploadedUrls((prev) => ({ ...prev, videoKey: "" }));
 
       setSuccess(true);
       toast.success("Video uploaded successfully");
@@ -918,7 +782,7 @@ const UploadVideo = () => {
       });
       setDurationParts({ hours: "", minutes: "", seconds: "" });
       setFiles({ thumbnail: null, video: null });
-      setUploadedUrls({ thumbnailUrl: "", thumbnailFileId: "", videoUrl: "" });
+      setUploadedUrls({ thumbnailUrl: "", thumbnailFileId: "", videoUrl: "", videoKey: "" });
       setUrlInputs({ thumbnail: "", video: "" });
       setPreviews({ thumbnail: "", video: "" });
       setProgress({ thumbnail: 0, video: 0 });

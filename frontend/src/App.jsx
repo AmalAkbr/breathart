@@ -15,6 +15,7 @@ import RouteMeta from "./components/RouteMeta";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
 import PublicRoute from "./components/PublicRoute";
+import ConvexClientProvider from "./components/ConvexClientProvider";
 import { validateEnvironmentVariables } from "./utils/envValidator";
 import { useUserStore } from "./store/userStore";
 import { getAuthToken } from "./utils/apiClient";
@@ -119,48 +120,48 @@ function App() {
     const initializeAuth = () => {
       try {
         const token = getAuthToken();
-        console.log("[APP INIT] Token from storage:", token ? "✓" : "✗");
+        // console.log("[APP INIT] Token from storage:", token ? "✓" : "✗");
 
         // Check localStorage for persisted user state
         const storedState = localStorage.getItem("user-store");
-        console.log(
-          "[APP INIT] Stored state:",
-          storedState ? "✓ found" : "✗ not found",
-        );
+        // // console.log(
+        //   "[APP INIT] Stored state:",
+        //   storedState ? "✓ found" : "✗ not found",
+        // );
 
         if (token && storedState) {
           const parsed = JSON.parse(storedState);
           const storedUser = parsed?.state?.user;
           const storedIsLoggedIn = parsed?.state?.isLoggedIn;
 
-          console.log(
-            "[APP INIT] Hydrating from storage - user:",
-            storedUser?.email,
-            "isLoggedIn:",
-            storedIsLoggedIn,
-          );
+          // console.log(
+          //   "[APP INIT] Hydrating from storage - user:",
+          //   storedUser?.email,
+          //   "isLoggedIn:",
+          //   storedIsLoggedIn,
+          // );
 
           if (storedUser && storedIsLoggedIn) {
-            console.log(
-              "[APP INIT] ✅ Restored user state from localStorage:",
-              storedUser.email,
-              "Role:",
-              storedUser.role,
-            );
+            //  console.log(
+            //   "[APP INIT] ✅ Restored user state from localStorage:",
+            //   storedUser.email,
+            //   "Role:",
+            //   storedUser.role,
+            // );
             setUser(storedUser);
           }
         } else if (!token && storedState) {
           // Token missing but state persisted - clear storage
-          console.log("[APP INIT] ⚠️ Token missing, clearing stored state");
+          // console.log("[APP INIT] ⚠️ Token missing, clearing stored state");
           localStorage.removeItem("user-store");
           logout();
         } else {
-          console.log("[APP INIT] ℹ️ No token or stored state available");
+          // console.log("[APP INIT] ℹ️ No token or stored state available");
         }
       } catch (error) {
         console.error("[APP INIT] Error restoring auth state:", error);
       } finally {
-        console.log("[APP INIT] Setting loading to false");
+        // console.log("[APP INIT] Setting loading to false");
         setLoading(false);
       }
     };
@@ -172,7 +173,7 @@ function App() {
   useEffect(() => {
     const handleStorageChange = (e) => {
       if (e.key === "auth_token" && !e.newValue) {
-        console.log("[APP] Auth token removed, clearing user store");
+        // console.log("[APP] Auth token removed, clearing user store");
         logout();
         localStorage.removeItem("user-store");
       }
@@ -221,11 +222,12 @@ function App() {
   }, []);
 
   return (
-    <Router>
-      <RouteMeta />
-      <ScrollToTop />
-      <div className="min-h-screen text-white font-sans selection:bg-accent-cyan/30 overflow-x-hidden w-full max-w-[100vw]">
-        <Routes>
+    <ConvexClientProvider>
+      <Router>
+        <RouteMeta />
+        <ScrollToTop />
+        <div className="min-h-screen text-white font-sans selection:bg-accent-cyan/30 overflow-x-hidden w-full max-w-[100vw]">
+          <Routes>
           {/* Isolated Landing Page (No Navbar/Footer) */}
           <Route
             path="/landing"
@@ -363,9 +365,9 @@ function App() {
             }
           />
 
-          {/* Reset Password - Standalone page (no navbar/footer) */}
+          {/* Reset Password routes */}
           <Route
-            path="/auth/reset-password"
+            path="/reset-password"
             element={
               <>
                 <Navbar />
@@ -374,6 +376,11 @@ function App() {
                 </Suspense>
               </>
             }
+          />
+
+          <Route
+            path="/auth/reset-password"
+            element={<Navigate to="/reset-password" replace />}
           />
 
           {/* Admin Dashboard - Protected by Zustand role check */}
@@ -408,6 +415,7 @@ function App() {
         </Routes>
       </div>
     </Router>
+    </ConvexClientProvider>
   );
 }
 

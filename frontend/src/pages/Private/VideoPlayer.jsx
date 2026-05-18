@@ -9,8 +9,9 @@ import {
   Maximize2,
   Minimize2,
 } from "lucide-react";
-import { getAuthToken, videoAPI } from "../../utils/apiClient";
+import { getAuthToken } from "../../utils/apiClient";
 import { toast } from "../../utils/toast";
+import { useVideoById } from "../../hooks/useConvexFunctions";
 
 // ─── Devtools detection ───────────────────────────────────────────────────────
 function useDevtoolsDetection() {
@@ -22,7 +23,7 @@ function useDevtoolsDetection() {
       const sizeOpen = widthDiff > 160 || heightDiff > 160;
       let timingOpen = false;
       const t = performance.now();
-      console.log("%c", "");
+      // console.log("%c", "");
       if (performance.now() - t > 20) timingOpen = true;
       setIsOpen(sizeOpen || timingOpen);
     };
@@ -242,6 +243,7 @@ function useControlsVisibility(isPlaying) {
 const VideoPlayer = () => {
   const { videoId } = useParams();
   const navigate = useNavigate();
+  const convexVideo = useVideoById(videoId || null);
 
   const devtoolsOpen = useDevtoolsDetection();
 
@@ -307,39 +309,44 @@ const VideoPlayer = () => {
 
   // ─── Auth + fetch ───────────────────────────────────────────────────────
   useEffect(() => {
-    (async () => {
-      try {
-        const token = getAuthToken();
-        if (!token) {
-          navigate("/auth", { replace: true });
-          return;
-        }
-        if (!videoId) {
-          setError("No video selected");
-          setLoading(false);
-          return;
-        }
-        const res = await videoAPI.getById(videoId);
-        const videoData = res.data || res.video;
-        if (!videoData) {
-          setError("Video not found");
-          setLoading(false);
-          return;
-        }
-        if (!videoData.videoUrl && !videoData.video_url) {
-          setError("Video URL is missing");
-          setLoading(false);
-          return;
-        }
-        setVideo(videoData);
-      } catch (err) {
-        setError(err.message || "Failed to load video");
-        toast.error(err.message || "Failed to load video");
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, [videoId, navigate]);
+    const token = getAuthToken();
+    if (!token) {
+      navigate("/login", { replace: true });
+      return;
+    }
+
+    if (!videoId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setError("No video selected");
+      setLoading(false);
+      return;
+    }
+
+    if (convexVideo === undefined) {
+      setLoading(true);
+      return;
+    }
+
+    if (!convexVideo) {
+      const message = "Video not found";
+      setError(message);
+      setLoading(false);
+      toast.error(message);
+      return;
+    }
+
+    if (!convexVideo.videoUrl && !convexVideo.video_url) {
+      const message = "Video URL is missing";
+      setError(message);
+      setLoading(false);
+      toast.error(message);
+      return;
+    }
+
+    setVideo(convexVideo);
+    setError(null);
+    setLoading(false);
+  }, [videoId, navigate, convexVideo]);
 
   // ─── Wire video element ─────────────────────────────────────────────────
   useEffect(() => {

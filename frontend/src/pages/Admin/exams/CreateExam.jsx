@@ -1,8 +1,13 @@
 // frontend/src/pages/Admin/exams/CreateExam.jsx
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import { Users, AlertCircle, CheckCircle, Search } from "lucide-react";
-import { API_URL, getAuthToken } from "../../../utils/apiClient";
+import {
+  useSearchStudents,
+  useExamFunctions,
+} from "../../../hooks/useConvexFunctions";
+import { useUserStore } from "../../../store/userStore";
 import { toast } from "../../../utils/toast";
+import { getConvexErrorMessage } from "../../../utils/convexError";
 import "../../../styles/CreateExam.css";
 
 const CreateExam = () => {
@@ -14,7 +19,6 @@ const CreateExam = () => {
     endDate: "",
   });
 
-  const [students, setStudents] = useState([]);
   const [selectedStudents, setSelectedStudents] = useState(new Set());
   const [studentSearch, setStudentSearch] = useState("");
   const [loading, setLoading] = useState(false);
@@ -23,44 +27,20 @@ const CreateExam = () => {
   const [inviteResult, setInviteResult] = useState(null);
   const [createdExamTitle, setCreatedExamTitle] = useState("");
 
-  const getAuthHeaders = (includeJson = false) => {
-    const token = getAuthToken();
-    const headers = {};
-    if (includeJson) headers["Content-Type"] = "application/json";
-    if (token) headers.Authorization = `Bearer ${token}`;
-    return headers;
-  };
+  const { user } = useUserStore();
+  const adminId = user?._id || user?.id;
 
-  const normalizeStudent = (student) => ({
-    id: student?._id || student?.id,
-    fullName: student?.fullName || student?.full_name || "Unknown",
-    email: student?.email || "",
-  });
+  // Reactive student list from Convex
+  const allStudents = useSearchStudents(studentSearch || undefined);
+  const students = useMemo(() => {
+    return (allStudents || []).map((s) => ({
+      id: s._id,
+      fullName: s.fullName || "Unknown",
+      email: s.email || "",
+    }));
+  }, [allStudents]);
 
-  useEffect(() => {
-    const loadStudents = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch(
-          `${API_URL}/admin/students`,
-          {
-            headers: getAuthHeaders(),
-          },
-        );
-
-        if (!response.ok) throw new Error("Failed to fetch students");
-
-        const data = await response.json();
-        const list = data?.data || data?.students || [];
-        setStudents(Array.isArray(list) ? list.map(normalizeStudent) : []);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadStudents();
-  }, []);
+  const { createExam, addParticipants, sendInvitations } = useExamFunctions();
 
   const handleExamInputChange = (e) => {
     const { name, value } = e.target;
@@ -126,94 +106,48 @@ const CreateExam = () => {
     setInviteResult(null);
 
     try {
-      const createResponse = await fetch(
-        `${API_URL}/admin/exams`,
-        {
-          method: "POST",
-          headers: getAuthHeaders(true),
-          body: JSON.stringify({
-            title: examData.title.trim(),
-            googleFormLink: examData.googleFormLink.trim(),
-            description: examData.description.trim(),
-            startDate: examData.startDate,
-            endDate: examData.endDate,
-          }),
-        },
-      );
+      if (!adminId) throw new Error("Admin ID is missing. Please log in again.");
 
-      if (!createResponse.ok) {
-        throw new Error(
-          await parseApiError(createResponse, "Failed to create exam"),
-        );
-      }
+      // 1. Create the exam
+      const startMs = new Date(examData.startDate).getTime();
+      const endMs = new Date(examData.endDate).getTime();
 
-      const created = await createResponse.json();
-      const exam = created?.data || created?.exam;
-      const examId = exam?._id || exam?.id;
+      const created = await createExam({
+        title: examData.title.trim(),
+        googleFormLink: examData.googleFormLink.trim(),
+        description: examData.description.trim(),
+        startDate: startMs,
+        endDate: endMs,
+        adminId: adminId,
+      });
 
-      if (!examId) {
-        throw new Error("Exam created but ID not returned");
-      }
+      const examId = created?.examId || created?._id || created?.id;
+      if (!examId) throw new Error("Exam created but ID not returned");
 
       const studentIds = Array.from(selectedStudents);
 
-      const addParticipantsResponse = await fetch(
-        `${API_URL}/admin/exams/${examId}/add-participants`,
-        {
-          method: "POST",
-          headers: getAuthHeaders(true),
-          body: JSON.stringify({ studentIds }),
-        },
-      );
+      // 2. Add participants
+      await addParticipants({ examId, studentIds, adminId });
 
-      if (!addParticipantsResponse.ok) {
-        throw new Error(
-          await parseApiError(
-            addParticipantsResponse,
-            "Failed to add participants",
-          ),
-        );
-      }
-
-      const sendResponse = await fetch(
-        `${API_URL}/admin/exams/${examId}/send-invitations`,
-        {
-          method: "POST",
-          headers: getAuthHeaders(true),
-          body: JSON.stringify({ studentIds }),
-        },
-      );
-
-      if (!sendResponse.ok) {
-        throw new Error(
-          await parseApiError(sendResponse, "Failed to send invitations"),
-        );
-      }
-
-      const invitationPayload = await sendResponse.json();
-      const results = invitationPayload?.data?.results ||
-        invitationPayload?.results || { success: [], failed: [] };
+      // 3. Send invitations
+      const invPayload = await sendInvitations({ examId, studentIds, adminId });
+      const results = invPayload?.results || { success: [], failed: [] };
 
       setInviteResult(results);
-      setCreatedExamTitle(exam.title || examData.title.trim());
+      setCreatedExamTitle(examData.title.trim());
       setSuccess(true);
 
       toast.success(
         `Exam created and invitations sent. Success: ${results.success?.length || 0}, Failed: ${results.failed?.length || 0}`,
       );
 
-      setExamData({
-        title: "",
-        googleFormLink: "",
-        description: "",
-        startDate: "",
-        endDate: "",
-      });
+      setExamData({ title: "", googleFormLink: "", description: "", startDate: "", endDate: "" });
       setStudentSearch("");
       setSelectedStudents(new Set());
     } catch (err) {
-      setError(err.message);
-      toast.error(err.message || "Failed to create exam and send invitations");
+      const msg = getConvexErrorMessage(err, "Failed to create exam and send invitations");
+      setError(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }

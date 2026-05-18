@@ -1,53 +1,32 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import VideoCard from "../../components/VideoCard";
 import SkeletonLoader from "../../components/SkeletonLoader";
-import { getAuthToken, videoAPI } from "../../utils/apiClient";
-import { toast } from "../../utils/toast";
+import { getAuthToken } from "../../utils/apiClient";
 import { FileVideo, FolderX } from "lucide-react";
 import { motion } from "framer-motion";
+import { useAllVideos } from "../../hooks/useConvexFunctions";
 // import { useDevtoolsShield } from "../../hooks/useDevtoolsShield";
 const VideoViewer = () => {
-  const [videos, setVideos] = useState([]);
+  const allVideos = useAllVideos();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
-  // const { isProduction, isDevtoolsOpen } = useDevtoolsShield();
 
-  // Check authentication and fetch videos
-  const loadVideos = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const token = getAuthToken();
-      if (!token) {
-        navigate("/auth", { replace: true });
-        return;
-      }
-
-      // Cache-bust list request so returning from player always gets fresh data.
-      const res = await videoAPI.getAll({ noCache: true });
-      const list = Array.isArray(res?.data)
-        ? res.data
-        : Array.isArray(res?.videos)
-          ? res.videos
-          : [];
-
-      setVideos(list);
-    } catch (err) {
-      console.error("Error fetching videos:", err);
-      setError(err.message || "Failed to load videos");
-      toast.error(err.message || "Failed to load videos");
-    } finally {
-      setLoading(false);
-    }
-  }, [navigate]);
+  const videos = allVideos || [];
 
   useEffect(() => {
-    loadVideos();
-  }, [loadVideos, location.key]);
+    const token = getAuthToken();
+    if (!token) {
+      navigate("/login", { replace: true });
+      return;
+    }
+
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setError(null);
+    setLoading(allVideos === undefined);
+  }, [navigate, location.key, allVideos]);
 
   const handleCardClick = (videoId) => {
     navigate(`/player/${videoId}`);
