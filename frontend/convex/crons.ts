@@ -5,7 +5,7 @@ const crons = cronJobs();
 
 crons.interval(
   "orphan-cleanup",
-  { hours: 12 }, // Runs every 12 hours based on backend requirements
+  { hours: 168 }, // Runs every 12 hours based on backend requirements
   internal.cleanups.runOrphanCleanup,
 );
 
