@@ -14,30 +14,62 @@ import { toast } from "../../utils/toast";
 import { useVideoById } from "../../hooks/useConvexFunctions";
 
 // ─── Devtools detection ───────────────────────────────────────────────────────
+// function useDevtoolsDetection() {
+//   const [isOpen, setIsOpen] = useState(false);
+//   useEffect(() => {
+//     const check = () => {
+//       const widthDiff = window.outerWidth - window.innerWidth;
+//       const heightDiff = window.outerHeight - window.innerHeight;
+//       const sizeOpen = widthDiff > 160 || heightDiff > 160;
+//       let timingOpen = false;
+//       const t = performance.now();
+//       // console.log("%c", "");
+//       if (performance.now() - t > 20) timingOpen = true;
+//       setIsOpen(sizeOpen || timingOpen);
+//     };
+//     check();
+//     const id = setInterval(check, 800);
+//     window.addEventListener("resize", check);
+//     return () => {
+//       clearInterval(id);
+//       window.removeEventListener("resize", check);
+//     };
+//   }, []);
+//   return import.meta.env.VITE_NODE_ENV === "development" ? false : isOpen;
+// }
+
 function useDevtoolsDetection() {
   const [isOpen, setIsOpen] = useState(false);
+
   useEffect(() => {
+    if (import.meta.env.VITE_NODE_ENV === "development") return;
+
+    const threshold = 160;
+
     const check = () => {
-      const widthDiff = window.outerWidth - window.innerWidth;
-      const heightDiff = window.outerHeight - window.innerHeight;
-      const sizeOpen = widthDiff > 160 || heightDiff > 160;
-      let timingOpen = false;
-      const t = performance.now();
-      // console.log("%c", "");
-      if (performance.now() - t > 20) timingOpen = true;
-      setIsOpen(sizeOpen || timingOpen);
+      const widthOpen =
+        window.outerWidth - window.innerWidth > threshold;
+
+      const heightOpen =
+        window.outerHeight - window.innerHeight > threshold;
+
+      setIsOpen(widthOpen || heightOpen);
     };
+
     check();
-    const id = setInterval(check, 800);
+
     window.addEventListener("resize", check);
+
+    const interval = setInterval(check, 1000);
+
     return () => {
-      clearInterval(id);
+      clearInterval(interval);
       window.removeEventListener("resize", check);
     };
   }, []);
+
   return isOpen;
 }
-
 // ─── Format helper ────────────────────────────────────────────────────────────
 const formatDuration = (s) => {
   const t = Number(s);
@@ -397,7 +429,7 @@ const VideoPlayer = () => {
     el.addEventListener("dragstart", noDrag);
 
     if (normalSlotRef.current) normalSlotRef.current.appendChild(el);
-    el.play().catch(() => {});
+    el.play().catch(() => { });
 
     return () => {
       el.removeEventListener("loadedmetadata", onMeta);
@@ -416,7 +448,7 @@ const VideoPlayer = () => {
   const togglePlay = useCallback(() => {
     const el = videoRef.current;
     if (!el) return;
-    el.paused ? el.play().catch(() => {}) : el.pause();
+    el.paused ? el.play().catch(() => { }) : el.pause();
   }, []);
 
   const handleSeek = useCallback((value) => {
@@ -457,7 +489,7 @@ const VideoPlayer = () => {
 
     document.documentElement.style.overflow = "";
     if (document.fullscreenElement) {
-      document.exitFullscreen?.().catch(() => {});
+      document.exitFullscreen?.().catch(() => { });
     }
 
     window.location.assign("/videos");
@@ -468,11 +500,11 @@ const VideoPlayer = () => {
       const next = !prev;
       if (next) {
         document.documentElement.style.overflow = "hidden";
-        document.documentElement.requestFullscreen?.().catch(() => {});
+        document.documentElement.requestFullscreen?.().catch(() => { });
       } else {
         document.documentElement.style.overflow = "";
         if (document.fullscreenElement)
-          document.exitFullscreen?.().catch(() => {});
+          document.exitFullscreen?.().catch(() => { });
       }
       return next;
     });
@@ -507,7 +539,7 @@ const VideoPlayer = () => {
             setIsFullscreen(false);
             document.documentElement.style.overflow = "";
             if (document.fullscreenElement)
-              document.exitFullscreen?.().catch(() => {});
+              document.exitFullscreen?.().catch(() => { });
           }
           break;
         default:
@@ -542,7 +574,7 @@ const VideoPlayer = () => {
 
       document.documentElement.style.overflow = "";
       if (document.fullscreenElement) {
-        document.exitFullscreen?.().catch(() => {});
+        document.exitFullscreen?.().catch(() => { });
       }
     },
     [],

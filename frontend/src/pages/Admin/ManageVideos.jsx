@@ -23,7 +23,7 @@ const CONVEX_SITE_URL = (import.meta.env.VITE_CONVEX_SITE_URL || "").replace(/\/
 const ManageVideos = () => {
   // Convex reactive data
   const allVideos = useAllVideos();
-  const { updateVideo, deleteVideo } = useVideoFunctions();
+  const { updateVideo, deleteVideo, generateVideoUploadUrl } = useVideoFunctions();
 
   const convexLoading = allVideos === undefined;
   const [search, setSearch] = useState("");
@@ -38,6 +38,7 @@ const ManageVideos = () => {
     duration: "",
     thumbnail: "",
     videoUrl: "",
+    videoKey: "",
     thumbnailFileId: "",
   });
   const [editDurationParts, setEditDurationParts] = useState({
@@ -161,6 +162,7 @@ const ManageVideos = () => {
       duration: durationSeconds > 0 ? String(durationSeconds) : "",
       thumbnail: video.thumbnail || video.thumbnail_url || "",
       videoUrl: video.videoUrl || video.video_url || "",
+      videoKey: video.videoKey || "",
       thumbnailFileId: video.thumbnailFileId || "",
     });
     setEditDurationParts(toDurationParts(durationSeconds));
@@ -188,25 +190,32 @@ const ManageVideos = () => {
     formDataObj,
     onProgress,
     onStageChange,
+    onXhrReady,
+    method = "POST",
+    headers = {}
   ) =>
     new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
-      xhr.open("POST", url, true);
-      // No auth header — Convex HTTP actions authenticate via env secrets server-side
+      onXhrReady?.(xhr);
+      xhr.open(method, url, true);
+      
+      for (const [key, value] of Object.entries(headers)) {
+        xhr.setRequestHeader(key, value);
+      }
 
       xhr.upload.onloadstart = () => {
         onStageChange?.("uploading");
       };
 
       xhr.upload.onprogress = (event) => {
-        if (!event.lengthComputable) return;
-
-        const percent = Math.round((event.loaded / event.total) * 100);
-        onProgress?.({
-          percent,
-          loaded: event.loaded,
-          total: event.total,
-        });
+        if (event.lengthComputable) {
+          const percent = Math.min(100, Math.round((event.loaded / event.total) * 100));
+          onProgress({
+            percent,
+            loaded: event.loaded,
+            total: event.total,
+          });
+        }
       };
 
       xhr.upload.onload = () => {
@@ -214,29 +223,42 @@ const ManageVideos = () => {
       };
 
       xhr.onload = () => {
-        if (xhr.status >= 200 && xhr.status < 300) {
+        onXhrReady?.(null);
+        const isSuccess = xhr.status >= 200 && xhr.status < 300;
+        if (isSuccess) {
           try {
+            onProgress({ percent: 100, loaded: 1, total: 1 });
             onStageChange?.("completed");
+            
+            // AWS returns empty body on PUT. Handle it securely without JSON parse fail
+            if (!xhr.responseText) return resolve({ success: true });
             resolve(JSON.parse(xhr.responseText));
-          } catch {
+          } catch (err) {
+            console.log(err);
             reject(new Error("Invalid response from server"));
           }
-          return;
-        }
-
-        let message = `Upload failed (${xhr.status})`;
-        try {
-          const parsed = JSON.parse(xhr.responseText);
-          if (parsed?.error) {
-            message = parsed.error;
+        } else {
+          let message = `Upload failed (${xhr.status})`;
+          try {
+            const parsed = JSON.parse(xhr.responseText);
+            if (parsed?.message) message = parsed.message;
+            else if (parsed?.error) message = parsed.error;
+          } catch (err) {
+            // ignore
           }
-        } catch {
-          // Ignore JSON parse errors and keep default message
+          reject(new Error(message));
         }
-        reject(new Error(message));
       };
 
-      xhr.onerror = () => reject(new Error("Network error during upload"));
+      xhr.onerror = () => {
+        onXhrReady?.(null);
+        reject(new Error("Network error during upload"));
+      };
+      xhr.onabort = () => {
+        onXhrReady?.(null);
+        const cancelledError = new Error("Upload cancelled by user");
+        reject(cancelledError);
+      };
       xhr.send(formDataObj);
     });
 
@@ -254,6 +276,7 @@ const ManageVideos = () => {
         thumbnail: editForm.thumbnail,
         thumbnailFileId: editForm.thumbnailFileId || undefined,
         videoUrl: editForm.videoUrl,
+        videoKey: editForm.videoKey || undefined,
         ...cleanOverride,
       };
 
@@ -318,39 +341,41 @@ const ManageVideos = () => {
         total: file.size || 0,
       });
 
-      const fd = new FormData();
-      fd.append("video", file);
-      fd.append("title", editForm.title || "video");
-      fd.append("uploadId", uploadId);
-
-      // XHR progress tracks client→server; no Socket.IO needed
-
       const shouldAutoFillDuration = !Number(editForm.duration);
       const detectedDuration = shouldAutoFillDuration
         ? await getVideoDurationInSecondsFromFile(file)
         : 0;
 
-      const data = await uploadWithProgress(
-        `${CONVEX_SITE_URL}/upload/video-file`,
-        fd,
+      // 1. Generate Presigned URL from Convex (Bypasses 20MB limits)
+      const { uploadUrl, videoKey } = await generateVideoUploadUrl({
+        fileName: file.name,
+        fileType: file.type,
+      });
+
+      // 2. Upload actual file bytes securely direct to Cloudflare R2
+      await uploadWithProgress(
+        uploadUrl,
+        file,
         ({ percent, loaded, total }) => {
-          const mapped = mapClientProgressToUi(percent);
           setUploadProgress({
-            video: Math.min(mapped, 45),
+            video: Math.round(percent),
             loaded,
             total,
           });
         },
         (stage) => setUploadStage(stage),
+        null,
+        "PUT",
+        { "Content-Type": file.type }
       );
 
-      if (!data?.success) {
-        throw new Error(data?.error || "Video upload failed");
-      }
+      const publicBaseUrl = import.meta.env.VITE_CLOUDFLARE_R2_PUBLIC_URL;
+      const videoUrl = `${publicBaseUrl}/${videoKey}`;
 
       setEditForm((prev) => ({
         ...prev,
-        videoUrl: data.data.videoUrl,
+        videoUrl,
+        videoKey,
         duration:
           !Number(prev.duration) && detectedDuration > 0
             ? String(detectedDuration)
@@ -360,8 +385,12 @@ const ManageVideos = () => {
         setEditDurationParts(toDurationParts(detectedDuration));
       }
 
-      // Persist immediately so the new video URL is saved
-      const savePayload = { videoUrl: data.data.videoUrl, __silent: true };
+      // Persist immediately so the new video URL and key are saved
+      const savePayload = { 
+        videoUrl, 
+        videoKey, 
+        __silent: true 
+      };
       if (shouldAutoFillDuration && detectedDuration > 0) {
         savePayload.duration = detectedDuration;
       }
@@ -604,13 +633,48 @@ const ManageVideos = () => {
                 </div>
               </label>
               <label className="modal-field">
-                <span>Video URL</span>
-                <input
-                  name="videoUrl"
-                  value={editForm.videoUrl}
-                  onChange={handleEditChange}
-                  placeholder="https://...video.mp4"
-                />
+                <span>Video File</span>
+                {editForm.videoUrl ? (
+                  <div style={{
+                    background: "rgba(255, 255, 255, 0.02)",
+                    border: "1px solid var(--border)",
+                    borderRadius: "10px",
+                    padding: "10px",
+                    fontSize: "12px",
+                    color: "var(--muted)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: "8px"
+                  }}>
+                    <span style={{
+                      textOverflow: "ellipsis",
+                      overflow: "hidden",
+                      whiteSpace: "nowrap",
+                      flex: 1
+                    }}>
+                      {editForm.videoKey || editForm.videoUrl.split("/").pop()}
+                    </span>
+                    <a
+                      href={editForm.videoUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="ghost-btn"
+                      style={{
+                        padding: "4px 8px",
+                        fontSize: "11px",
+                        textDecoration: "none",
+                        color: "var(--accent)"
+                      }}
+                    >
+                      View
+                    </a>
+                  </div>
+                ) : (
+                  <div style={{ color: "rgba(255,255,255,0.3)", fontSize: "13px", fontStyle: "italic" }}>
+                    No video file uploaded yet.
+                  </div>
+                )}
                 <div className="inline-upload">
                   <input
                     type="file"

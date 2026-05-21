@@ -9,7 +9,7 @@ export const getDbVideoKeys = internalQuery({
   args: {},
   handler: async (ctx) => {
     const records = await ctx.db.query("videos").collect();
-    
+
     // R2 uses publicUrl checking to find keys
     const r2PublicUrl = process.env.VITE_CLOUDFLARE_R2_PUBLIC_URL || "";
     const normalizedPrefix = r2PublicUrl.replace(/\/$/, "");
@@ -25,21 +25,21 @@ export const getDbVideoKeys = internalQuery({
       if (record.videoUrl) {
         const url = record.videoUrl.trim();
         if (url.startsWith(normalizedPrefix)) {
-            r2keySet.add(normalizeKey(url.substring(normalizedPrefix.length)));
+          r2keySet.add(normalizeKey(url.substring(normalizedPrefix.length)));
         }
       }
 
       if (record.thumbnailFileId) {
-          imagekitFileIdSet.add(record.thumbnailFileId);
+        imagekitFileIdSet.add(record.thumbnailFileId);
       }
       if (record.thumbnail) {
-          imagekitUrlSet.add(record.thumbnail.trim());
+        imagekitUrlSet.add(record.thumbnail.trim());
       }
     }
 
     return {
       r2VideoKeys: Array.from(r2keySet),
-      imagekitFileIds: Array.from(imagekitFileIdSet), 
+      imagekitFileIds: Array.from(imagekitFileIdSet),
       imagekitUrls: Array.from(imagekitUrlSet)
     };
   },
@@ -162,6 +162,7 @@ export const updateVideo = mutation({
     thumbnailFileId: v.optional(v.string()),
     thumbnailPath: v.optional(v.string()),
     videoUrl: v.optional(v.string()),
+    videoKey: v.optional(v.string()),
     duration: v.optional(v.number()),
     category: v.optional(
       v.union(
@@ -302,7 +303,7 @@ export const generateVideoUploadUrl = action({
 
     // URL valid for 3 hours. 
     // We explicitly set checksumAlgorithm to undefined to prevent the SDK from adding 403-triggering checksums
-    const uploadUrl = await getSignedUrl(s3Client, command, { 
+    const uploadUrl = await getSignedUrl(s3Client, command, {
       expiresIn: 10800,
       signableHeaders: new Set(["host", "content-type"]), // Only sign essential headers to avoid mismatches
     });
