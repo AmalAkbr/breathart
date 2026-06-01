@@ -5,16 +5,16 @@
  */
 
 const REQUIRED_ENV_VARS = {
-  // Web3Forms for contact forms (optional)
-  VITE_WEB3FORMS_KEY: {
-    label: 'Web3Forms Key',
+  // Formspree endpoint for contact forms (optional override)
+  VITE_FORMSPREE_ENDPOINT: {
+    label: "Formspree Endpoint",
     required: false,
-    description: 'Web3Forms key for contact form submissions',
+    description: "Formspree form endpoint for contact form submissions",
   },
   VITE_NODE_ENV: {
-    label: 'Node Environment',
+    label: "Node Environment",
     required: true,
-    description: 'Node environment (e.g., development, production)',
+    description: "Node environment (e.g., development, production)",
   },
 };
 
@@ -29,15 +29,15 @@ export const validateEnvironmentVariables = () => {
   Object.entries(REQUIRED_ENV_VARS).forEach(([varName, config]) => {
     const value = import.meta.env[varName];
 
-    if (!value || value.startsWith('your_')) {
+    if (!value || value.startsWith("your_")) {
       if (config.allowMissingInProd && import.meta.env.PROD) {
         return;
       }
 
-      const message = config.errorMessage 
+      const message = config.errorMessage
         ? `${config.label}: ${config.errorMessage}`
         : `Missing or invalid ${config.label}: ${config.description}`;
-      
+
       if (config.required) {
         errors.push(message);
       } else {
@@ -48,10 +48,10 @@ export const validateEnvironmentVariables = () => {
 
     // Custom validation if provided
     if (config.validate && !config.validate(value)) {
-      const message = config.errorMessage 
+      const message = config.errorMessage
         ? `${config.label}: ${config.errorMessage}`
         : `Invalid ${config.label}: ${config.description}`;
-      
+
       if (config.required) {
         errors.push(message);
       } else {
@@ -72,19 +72,19 @@ export const validateEnvironmentVariables = () => {
  */
 export const printEnvValidation = () => {
   const validation = validateEnvironmentVariables();
-  
+
   if (validation.errors.length > 0) {
-    console.error('❌ ENVIRONMENT VARIABLES MISSING:');
-    validation.errors.forEach(err => console.error(`   • ${err}`));
+    console.error("❌ ENVIRONMENT VARIABLES MISSING:");
+    validation.errors.forEach((err) => console.error(`   • ${err}`));
   }
 
   if (validation.warnings.length > 0) {
-    console.warn('⚠️  OPTIONAL ENVIRONMENT VARIABLES NOT CONFIGURED:');
-    validation.warnings.forEach(warn => console.warn(`   • ${warn}`));
+    console.warn("⚠️  OPTIONAL ENVIRONMENT VARIABLES NOT CONFIGURED:");
+    validation.warnings.forEach((warn) => console.warn(`   • ${warn}`));
   }
 
   if (validation.errors.length === 0 && validation.warnings.length === 0) {
-    console.log('✅ All required environment variables are configured');
+    console.log("✅ All required environment variables are configured");
   }
 
   return validation;
@@ -107,10 +107,10 @@ export const getEnvVar = (varName, fallback = null) => {
  */
 export const showEnvConfig = () => {
   const validation = validateEnvironmentVariables();
-  
+
   return {
     isConfigured: validation.isValid,
-    status: validation.isValid ? 'READY' : 'INCOMPLETE',
+    status: validation.isValid ? "READY" : "INCOMPLETE",
     missingCount: validation.errors.length,
     warningCount: validation.warnings.length,
   };

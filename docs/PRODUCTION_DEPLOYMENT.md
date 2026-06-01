@@ -86,6 +86,7 @@ LOG_LEVEL=info
 ```
 
 **Security Tips:**
+
 - Never commit `.env` to git
 - Add `.env` to `.gitignore`
 - Rotate secrets regularly
@@ -100,8 +101,8 @@ Create `frontend/.env.local` with production values:
 # Backend API endpoint (must match FRONTEND_URL from backend)
 VITE_API_URL=https://yourdomain.com/api
 
-# Web3Forms key (for contact forms, optional)
-VITE_WEB3FORMS_KEY=your_web3forms_key_here
+# Formspree endpoint for contact forms
+VITE_FORMSPREE_ENDPOINT=https://formspree.io/f/myyagyqg
 
 # Token expiry (same as backend)
 JWT_MAX_AGE=7d
@@ -111,6 +112,7 @@ VITE_NODE_ENV=production
 ```
 
 **Important:**
+
 - `VITE_API_URL` must be `https://yourdomain.com/api` in production (not localhost)
 - This value is baked into the compiled JavaScript during build
 - If blank/missing, build will fail with "VITE_API_URL environment variable is not set"
@@ -149,12 +151,12 @@ build:
     VITE_API_URL: ${VITE_API_URL:-http://localhost:8080/api}
 
 env_file:
-  - backend/.env  # Runtime backend secrets
+  - backend/.env # Runtime backend secrets
 
 ports:
-  - "8080:8080"   # Container exposes 8080
+  - "8080:8080" # Container exposes 8080
 
-restart: unless-stopped  # Auto-restart on crash
+restart: unless-stopped # Auto-restart on crash
 
 volumes:
   # Optional: persist uploads if not using cloud storage
@@ -191,7 +193,6 @@ nano frontend/.env.local
 ls -la backend/.env frontend/.env.local
 ```
 
-
 ### Step 3: Build & Start Containers (Production Docker Workflow)
 
 ```bash
@@ -217,6 +218,7 @@ docker compose ps
 ```
 
 Expected log output:
+
 ```
 ✓ NODE_ENV: production
 ✓ PORT: 8080
@@ -282,7 +284,7 @@ upstream backend {
 server {
   listen 80;
   server_name yourdomain.com www.yourdomain.com;
-  
+
   # Redirect HTTP to HTTPS
   return 301 https://$server_name$request_uri;
 }
@@ -290,12 +292,12 @@ server {
 server {
   listen 443 ssl http2;
   server_name yourdomain.com www.yourdomain.com;
-  
+
   ssl_certificate /path/to/cert.pem;
   ssl_certificate_key /path/to/key.pem;
   ssl_protocols TLSv1.2 TLSv1.3;
   ssl_ciphers HIGH:!aNULL:!MD5;
-  
+
   # Proxy to Docker container
   location / {
     proxy_pass http://backend;
@@ -305,7 +307,7 @@ server {
     proxy_set_header X-Forwarded-Proto $scheme;
     proxy_buffering off;
   }
-  
+
   # WebSocket support (for upload progress)
   location /socket.io {
     proxy_pass http://backend;
@@ -320,6 +322,7 @@ server {
 ```
 
 Enable site:
+
 ```bash
 sudo ln -s /etc/nginx/sites-available/breathart /etc/nginx/sites-enabled/
 sudo nginx -t
@@ -327,6 +330,7 @@ sudo systemctl restart nginx
 ```
 
 Get HTTPS cert with Let's Encrypt:
+
 ```bash
 sudo certbot certonly --standalone -d yourdomain.com -d www.yourdomain.com
 ```
@@ -340,6 +344,7 @@ sudo certbot certonly --standalone -d yourdomain.com -d www.yourdomain.com
 **Cause:** Frontend build ran without VITE_API_URL in docker-compose or frontend/.env.local
 
 **Fix:**
+
 ```bash
 # Ensure frontend/.env.local exists with VITE_API_URL
 cat frontend/.env.local
@@ -355,6 +360,7 @@ docker compose up -d app
 **Cause:** VITE_API_URL not injected into compiled code
 
 **Fix:**
+
 ```bash
 # Check built code in container
 docker exec brt_app cat frontend/dist/index-*.js | grep "http" | head -5
@@ -368,6 +374,7 @@ docker exec brt_app cat frontend/dist/index-*.js | grep "http" | head -5
 **Cause:** CORS_ORIGIN not matching frontend requests
 
 **Fix:**
+
 ```bash
 # Check backend logs
 docker compose logs app | grep -i "cors\|csp"
@@ -382,6 +389,7 @@ cat backend/.env | grep CORS_ORIGIN
 **Cause:** MongoDB host unreachable or credentials wrong
 
 **Fix:**
+
 ```bash
 # Verify connection string
 docker exec brt_app node -e "console.log(process.env.MONGODB_URI)"
@@ -399,6 +407,7 @@ docker ps | grep mongo
 ### Issue: Container crashes on startup
 
 **Fix:**
+
 ```bash
 # View detailed logs
 docker compose logs app -n 100
@@ -476,18 +485,18 @@ docker compose logs app | grep -i "error\|warn"
 
 ## 8. Environment Variable Reference
 
-| Variable | Backend | Frontend | Type | Required | Example |
-|----------|---------|----------|------|----------|---------|
-| NODE_ENV | ✓ | ✗ | string | Yes | production |
-| PORT | ✓ | ✗ | number | Yes | 8080 |
-| MONGODB_URI | ✓ | ✗ | string | Yes | mongodb://... |
-| CORS_ORIGIN | ✓ | ✗ | string | Yes | https://domain.com |
-| FRONTEND_URL | ✓ | ✗ | string | Yes | https://domain.com |
-| VITE_API_URL | ✗ | ✓ (build-time) | string | Yes | https://domain.com/api |
-| JWT_SECRET | ✓ | ✗ | string | Yes | random_min_32_chars |
-| SENDGRID_API_KEY | ✓ | ✗ | string | Yes | key_... |
-| IMAGEKIT_PRIVATE_KEY | ✓ | ✗ | string | Yes | private_... |
-| CLOUDFLARE_ACCESS_KEY_ID | ✓ | ✗ | string | No | ... |
+| Variable                 | Backend | Frontend       | Type   | Required | Example                |
+| ------------------------ | ------- | -------------- | ------ | -------- | ---------------------- |
+| NODE_ENV                 | ✓       | ✗              | string | Yes      | production             |
+| PORT                     | ✓       | ✗              | number | Yes      | 8080                   |
+| MONGODB_URI              | ✓       | ✗              | string | Yes      | mongodb://...          |
+| CORS_ORIGIN              | ✓       | ✗              | string | Yes      | https://domain.com     |
+| FRONTEND_URL             | ✓       | ✗              | string | Yes      | https://domain.com     |
+| VITE_API_URL             | ✗       | ✓ (build-time) | string | Yes      | https://domain.com/api |
+| JWT_SECRET               | ✓       | ✗              | string | Yes      | random_min_32_chars    |
+| SENDGRID_API_KEY         | ✓       | ✗              | string | Yes      | key\_...               |
+| IMAGEKIT_PRIVATE_KEY     | ✓       | ✗              | string | Yes      | private\_...           |
+| CLOUDFLARE_ACCESS_KEY_ID | ✓       | ✗              | string | No       | ...                    |
 
 ---
 
@@ -507,7 +516,6 @@ docker compose logs app | grep -i "error\|warn"
 - [ ] Monitor logs for suspicious activity
 
 ---
-
 
 ## 10. Quick Reference Docker Commands
 
@@ -545,4 +553,3 @@ docker image rm breathart-app
 - Verify env files: `cat backend/.env` and `cat frontend/.env.local`
 - Test connectivity: `curl http://localhost:8080/api/health`
 - Rebuild: `docker compose build --no-cache --pull app`
-

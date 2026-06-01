@@ -79,10 +79,10 @@ RUN npm ci --include=dev
 
 FROM builder AS frontend-build
 ARG VITE_API_URL=http://localhost:8080/api
-ARG VITE_WEB3FORMS_KEY=
+ARG VITE_FORMSPREE_ENDPOINT=https://formspree.io/f/myyagyqg
 ARG VITE_NODE_ENV=production
 ENV VITE_API_URL=${VITE_API_URL}
-ENV VITE_WEB3FORMS_KEY=${VITE_WEB3FORMS_KEY}
+ENV VITE_FORMSPREE_ENDPOINT=${VITE_FORMSPREE_ENDPOINT}
 ENV VITE_NODE_ENV=${VITE_NODE_ENV}
 WORKDIR /app/frontend
 COPY --from=frontend-deps /app/frontend/node_modules ./node_modules

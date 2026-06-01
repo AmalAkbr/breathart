@@ -4,7 +4,7 @@ services:
       context: .
       args:
         VITE_API_URL: ${VITE_API_URL:-http://localhost:8080/api}
-        VITE_WEB3FORMS_KEY: ${VITE_WEB3FORMS_KEY:-4061c748-3472-46d4-b2db-b814c914677a}
+        VITE_FORMSPREE_ENDPOINT: ${VITE_FORMSPREE_ENDPOINT:-https://formspree.io/f/myyagyqg}
         VITE_NODE_ENV: ${VITE_NODE_ENV:-production}
     container_name: brt_app
     env_file:
