@@ -75,10 +75,6 @@ const ScrollToTop = () => {
         window.scrollTo(0, 0);
       }
     }
-
-    const handleBeforeUnload = () => window.scrollTo(0, 0);
-    window.addEventListener("beforeunload", handleBeforeUnload);
-    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [pathname]);
 
   return null;
@@ -100,7 +96,10 @@ const MainLayout = () => {
           <Route path="/brochure" element={<Brochure />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-          <Route path="/privacy" element={<Navigate to="/privacy-policy" replace />} />
+          <Route
+            path="/privacy"
+            element={<Navigate to="/privacy-policy" replace />}
+          />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
@@ -228,193 +227,193 @@ function App() {
         <ScrollToTop />
         <div className="min-h-screen text-white font-sans selection:bg-accent-cyan/30 overflow-x-hidden w-full max-w-[100vw]">
           <Routes>
-          {/* Isolated Landing Page (No Navbar/Footer) */}
-          <Route
-            path="/landing"
-            element={
-              <Suspense fallback={<PageLoader />}>
-                <LandingPage />
-              </Suspense>
-            }
-          />
+            {/* Isolated Landing Page (No Navbar/Footer) */}
+            <Route
+              path="/landing"
+              element={
+                <Suspense fallback={<PageLoader />}>
+                  <LandingPage />
+                </Suspense>
+              }
+            />
 
-          {/* SEO Redirects - Root Level */}
-          <Route
-            path="/best-digital-marketing-courses"
-            element={<Navigate to="/courses" replace />}
-          />
-          <Route
-            path="/best-digital-marketing-course-in-trivandrum"
-            element={<Navigate to="/courses" replace />}
-          />
-          <Route
-            path="/best-institute-for-digital-marketing-with-placement-in-kerala"
-            element={<Navigate to="/#placement" replace />}
-          />
-          <Route
-            path="/breathart-group"
-            element={<Navigate to="/about" replace />}
-          />
-          <Route
-            path="/google-digital-marketing-certification"
-            element={<Navigate to="/#certifications" replace />}
-          />
-          <Route
-            path="/best-digital-marketing-institute-in-kerala"
-            element={<Navigate to="/" replace />}
-          />
-          <Route
-            path="/best-digital-marketing-academy-in-kerala"
-            element={<Navigate to="/" replace />}
-          />
-          <Route
-            path="/graphic-design-course-in-trivandrum"
-            element={<Navigate to="/#graphic-design" replace />}
-          />
-          <Route
-            path="/traditional-marketing-vs-digital-marketing"
-            element={<Navigate to="/#digital-marketing-courses" replace />}
-          />
-          <Route
-            path="/digital-marketing-blogs"
-            element={<Navigate to="/blogs" replace />}
-          />
+            {/* SEO Redirects - Root Level */}
+            <Route
+              path="/best-digital-marketing-courses"
+              element={<Navigate to="/courses" replace />}
+            />
+            <Route
+              path="/best-digital-marketing-course-in-trivandrum"
+              element={<Navigate to="/courses" replace />}
+            />
+            <Route
+              path="/best-institute-for-digital-marketing-with-placement-in-kerala"
+              element={<Navigate to="/#placement" replace />}
+            />
+            <Route
+              path="/breathart-group"
+              element={<Navigate to="/about" replace />}
+            />
+            <Route
+              path="/google-digital-marketing-certification"
+              element={<Navigate to="/#certifications" replace />}
+            />
+            <Route
+              path="/best-digital-marketing-institute-in-kerala"
+              element={<Navigate to="/" replace />}
+            />
+            <Route
+              path="/best-digital-marketing-academy-in-kerala"
+              element={<Navigate to="/" replace />}
+            />
+            <Route
+              path="/graphic-design-course-in-trivandrum"
+              element={<Navigate to="/#graphic-design" replace />}
+            />
+            <Route
+              path="/traditional-marketing-vs-digital-marketing"
+              element={<Navigate to="/#digital-marketing-courses" replace />}
+            />
+            <Route
+              path="/digital-marketing-blogs"
+              element={<Navigate to="/blogs" replace />}
+            />
 
-          {/* Protected Video Routes */}
-          <Route
-            path="/videos"
-            element={
-              <Suspense fallback={<PageLoader />}>
-                <VideoViewer />
-              </Suspense>
-            }
-          />
-          <Route
-            path="/player/:videoId"
-            element={
-              <Suspense fallback={<PageLoader />}>
-                <VideoPlayer />
-              </Suspense>
-            }
-          />
+            {/* Protected Video Routes */}
+            <Route
+              path="/videos"
+              element={
+                <Suspense fallback={<PageLoader />}>
+                  <VideoViewer />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/player/:videoId"
+              element={
+                <Suspense fallback={<PageLoader />}>
+                  <VideoPlayer />
+                </Suspense>
+              }
+            />
 
-          {/* MongoDB Auth Routes - Separate login and register pages (with Navbar) */}
-          <Route
-            path="/login"
-            element={
-              <PublicRoute>
+            {/* MongoDB Auth Routes - Separate login and register pages (with Navbar) */}
+            <Route
+              path="/login"
+              element={
+                <PublicRoute>
+                  <>
+                    <Navbar />
+                    <Suspense fallback={<PageLoader />}>
+                      <Login />
+                    </Suspense>
+                  </>
+                </PublicRoute>
+              }
+            />
+
+            <Route
+              path="/register"
+              element={
+                <PublicRoute>
+                  <>
+                    <Navbar />
+                    <Suspense fallback={<PageLoader />}>
+                      <Register />
+                    </Suspense>
+                  </>
+                </PublicRoute>
+              }
+            />
+
+            {/* Keep /auth for backward compatibility - redirect to /login */}
+            <Route path="/auth" element={<Navigate to="/login" replace />} />
+
+            <Route
+              path="/verify-email"
+              element={
                 <>
                   <Navbar />
                   <Suspense fallback={<PageLoader />}>
-                    <Login />
+                    <VerifyEmail />
                   </Suspense>
                 </>
-              </PublicRoute>
-            }
-          />
+              }
+            />
 
-          <Route
-            path="/register"
-            element={
-              <PublicRoute>
+            <Route
+              path="/forgot-password"
+              element={
+                <Suspense fallback={<PageLoader />}>
+                  <ForgotPassword />
+                </Suspense>
+              }
+            />
+
+            {/* Legacy Auth Routes (to be deprecated) */}
+            {/* Forgot Password - Standalone page (no navbar/footer) */}
+            <Route
+              path="/auth/forgot-password"
+              element={
                 <>
                   <Navbar />
                   <Suspense fallback={<PageLoader />}>
-                    <Register />
+                    <OldForgotPassword />
                   </Suspense>
                 </>
-              </PublicRoute>
-            }
-          />
+              }
+            />
 
-          {/* Keep /auth for backward compatibility - redirect to /login */}
-          <Route path="/auth" element={<Navigate to="/login" replace />} />
-
-          <Route
-            path="/verify-email"
-            element={
-              <>
-                <Navbar />
-                <Suspense fallback={<PageLoader />}>
-                  <VerifyEmail />
-                </Suspense>
-              </>
-            }
-          />
-
-          <Route
-            path="/forgot-password"
-            element={
-              <Suspense fallback={<PageLoader />}>
-                <ForgotPassword />
-              </Suspense>
-            }
-          />
-
-          {/* Legacy Auth Routes (to be deprecated) */}
-          {/* Forgot Password - Standalone page (no navbar/footer) */}
-          <Route
-            path="/auth/forgot-password"
-            element={
-              <>
-                <Navbar />
-                <Suspense fallback={<PageLoader />}>
-                  <OldForgotPassword />
-                </Suspense>
-              </>
-            }
-          />
-
-          {/* Reset Password routes */}
-          <Route
-            path="/reset-password"
-            element={
-              <>
-                <Navbar />
-                <Suspense fallback={<PageLoader />}>
-                  <ResetPassword />
-                </Suspense>
-              </>
-            }
-          />
-
-          <Route
-            path="/auth/reset-password"
-            element={<Navigate to="/reset-password" replace />}
-          />
-
-          {/* Admin Dashboard - Protected by Zustand role check */}
-          <Route
-            path="/admin/*"
-            element={
-              <ProtectedAdminRoute>
-                <Suspense fallback={<PageLoader />}>
-                  <AdminDashboard />
-                </Suspense>
-              </ProtectedAdminRoute>
-            }
-          />
-
-          {/* User Profile - Protected */}
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoute>
+            {/* Reset Password routes */}
+            <Route
+              path="/reset-password"
+              element={
                 <>
                   <Navbar />
                   <Suspense fallback={<PageLoader />}>
-                    <Profile />
+                    <ResetPassword />
                   </Suspense>
                 </>
-              </ProtectedRoute>
-            }
-          />
+              }
+            />
 
-          {/* Main Website Routes (Wrapped with Navbar/Footer) */}
-          <Route path="/*" element={<MainLayout />} />
-        </Routes>
-      </div>
-    </Router>
+            <Route
+              path="/auth/reset-password"
+              element={<Navigate to="/reset-password" replace />}
+            />
+
+            {/* Admin Dashboard - Protected by Zustand role check */}
+            <Route
+              path="/admin/*"
+              element={
+                <ProtectedAdminRoute>
+                  <Suspense fallback={<PageLoader />}>
+                    <AdminDashboard />
+                  </Suspense>
+                </ProtectedAdminRoute>
+              }
+            />
+
+            {/* User Profile - Protected */}
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <>
+                    <Navbar />
+                    <Suspense fallback={<PageLoader />}>
+                      <Profile />
+                    </Suspense>
+                  </>
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Main Website Routes (Wrapped with Navbar/Footer) */}
+            <Route path="/*" element={<MainLayout />} />
+          </Routes>
+        </div>
+      </Router>
     </ConvexClientProvider>
   );
 }

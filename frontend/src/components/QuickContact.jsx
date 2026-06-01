@@ -21,14 +21,15 @@ const QuickContact = () => {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitStatus(null);
+    const formElement = e.currentTarget;
 
     try {
-      await submitToFormspree(e.currentTarget, {
+      await submitToFormspree(formElement, {
         subject: "Quick Contact Request",
       });
 
       setSubmitStatus("success");
-      e.currentTarget.reset(); // Clear the form
+      formElement.reset(); // Clear the form
       setTimeout(() => setSubmitStatus(null), 5000); // Reset success message after 5s
     } catch (error) {
       console.error("Error submitting form:", error);
