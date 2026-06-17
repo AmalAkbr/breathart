@@ -4,6 +4,22 @@ import PillSlider from '../components/PillSlider';
 import BlogModal from '../components/BlogModal';
 const blogs = [
     {
+        title: "Future of Digital Marketing Careers in Kerala: Opportunities, Skills, and Growth in 2026",
+        date: "June 12, 2026",
+        summary: "Discover the future of digital marketing careers in Kerala and the opportunities available for students and professionals.",
+        category: "Career",
+        content: [
+            "Digital marketing has become one of the fastest-growing career fields in India, and Kerala is no exception. As businesses increasingly move online, the demand for skilled digital marketing professionals continues to rise. Whether you're a student, graduate, entrepreneur, or working professional, pursuing a digital marketing course in Kerala can open the door to exciting career opportunities.",
+            "At BreathArt Institute of Creative Technology (BICT), we help students build industry-ready skills through practical training, live projects, and expert guidance. In this article, we'll explore the future of digital marketing careers in Kerala, the skills employers are looking for, and why now is the perfect time to start your journey.",
+            "Why Digital Marketing is Growing Rapidly in Kerala. Kerala has witnessed significant digital transformation over the past few years. Businesses across industries including healthcare, tourism, education, real estate, e-commerce, and retail are investing heavily in online marketing.",
+            "As more companies compete online, the need for professionals with expertise in Search Engine Optimization (SEO), Google Ads (PPC), Social Media Marketing, Content Marketing, Email Marketing, Web Analytics, and AI-Powered Marketing continues to increase.",
+            "This trend has created a strong demand for candidates who have completed a digital marketing certification course in Kerala and possess practical industry skills.",
+            "Future Scope of Digital Marketing Careers in Kerala. The future of digital marketing in Kerala looks extremely promising. Businesses are focusing on online visibility, lead generation, brand awareness, and customer engagement, making digital marketing an essential business function.",
+            "High-Demand Digital Marketing Jobs in Kerala include Digital Marketing Executive, SEO Specialist, Google Ads Expert, Social Media Manager, Content Marketing Specialist, Performance Marketing Executive, Email Marketing Specialist, Web Analyst, E-commerce Marketing Manager, and Digital Marketing Strategist.",
+            "These roles are available across startups, agencies, multinational companies, educational institutions, healthcare organizations, and tourism businesses."
+        ]
+    },
+    {
         title: "Start Your Journey with the Best Digital Marketing Academy in Attingal Today",
         date: "February 20, 2026",
         summary: "The digital world is transforming at a rapid pace. Businesses are moving from traditional to digital-first models, creating a massive demand for skilled SEO and digital marketing professionals.",
@@ -324,6 +340,7 @@ const blogs = [
             "Located accessibly for aspirants in and around Trivandrum, BICT provides state-of-the-art lab facilities, interactive masterclasses with industry leaders, and a collaborative environment that fosters creativity.",
             "If you are looking to build a high-income skill set in the capital city, BICT's Digital Marketing Course is the definitive choice. Start your journey with us and transform your potential into professional excellence."
         ]
+    },
     }
 ];
 
