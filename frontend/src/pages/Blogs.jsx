@@ -341,7 +341,6 @@ const blogs = [
             "If you are looking to build a high-income skill set in the capital city, BICT's Digital Marketing Course is the definitive choice. Start your journey with us and transform your potential into professional excellence."
         ]
     },
-    }
 ];
 
 const Blogs = () => {
@@ -349,6 +348,7 @@ const Blogs = () => {
     const [selectedBlog, setSelectedBlog] = useState(null);
     const blogsPerPage = window.innerWidth >= 768 ? 4 : 2;
     const totalSlides = Math.ceil(blogs.length / blogsPerPage);
+
 
     useEffect(() => {
         // Pause sliding animation when a blog popup is open
