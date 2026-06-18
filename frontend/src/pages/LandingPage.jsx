@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { useState, useEffect, lazy, Suspense } from "react";
+import { Helmet } from "react-helmet";
 import { Award, MapPin, Phone, Mail, Zap } from "lucide-react";
 import { Link } from "react-router-dom";
 import Logo from "../components/Logo";
@@ -42,7 +43,6 @@ const LandingPage = () => {
   const [scrolled, setScrolled] = useState(false);
   const [isWhiteNav, setIsWhiteNav] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
-
   useEffect(() => {
     let isThrottled = false;
     const handleScroll = () => {
@@ -77,7 +77,6 @@ const LandingPage = () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
-
   // Shared animation variants
   const fadeInUp = {
     hidden: { opacity: 0, y: 30 },
@@ -97,6 +96,22 @@ const LandingPage = () => {
   };
 
   return (
+  <>
+    <Helmet>
+      <script>
+        {`
+          (function(w,d,s,l,i){w[l]=w[l]||[];
+          w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});
+          var f=d.getElementsByTagName(s)[0],
+          j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';
+          j.async=true;
+          j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+          f.parentNode.insertBefore(j,f);
+          })(window,document,'script','dataLayer','GTM-K3NQB6MG');
+        `}
+      </script>
+    </Helmet>
+
     <div className="min-h-screen w-full max-w-[100vw] flex flex-col bg-bg-dark text-white font-sans selection:bg-accent-cyan/30 overflow-x-hidden">
       {/* Ambient Background Accents are removed as per request for a darker background behind Plasma */}
 
@@ -247,8 +262,6 @@ const LandingPage = () => {
               className="relative w-auto h-full max-h-[500px] flex items-center justify-center"
             >
               {/* Glow effect behind */}
-              <div className="absolute inset-0 bg-accent-blue/20 blur-[80px] rounded-full scale-75" />
-
               <img
                 src={heroCharacter}
                 alt="3D Student Character"
@@ -703,7 +716,7 @@ const LandingPage = () => {
         />
       </Suspense>
     </div>
-  );
-};
-
+</>
+);
+}
 export default LandingPage;
