@@ -590,6 +590,7 @@ const Navbar = () => {
                           className={`grid grid-cols-2 gap-x-12 gap-y-4 text-base font-medium ${isWhiteNav ? "text-blue-900" : "text-white"}`}
                         >
                           {[
+                            "Future of Digital Marketing Careers in Kerala: Opportunities, Skills, and Growth in 2026",
                             "Start Your Journey with the Best Digital Marketing Academy in Attingal Today",
                             "Best Digital Marketing Courses in Attingal with 100% Practical Training",
                             "Enroll at the Best Digital Marketing Academy in Attingal for 100% Practical Learning",
