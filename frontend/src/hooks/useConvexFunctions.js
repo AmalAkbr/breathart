@@ -101,8 +101,8 @@ export const useAllExams = (adminId) => {
 };
 
 export const useExamDetail = (examId, adminId) => {
-  if (!examId) return useQuery(api.exams.getExamDetail, "skip");
-  return useQuery(api.exams.getExamDetail, adminId ? { examId, adminId } : { examId });
+  const args = !examId ? "skip" : adminId ? { examId, adminId } : { examId };
+  return useQuery(api.exams.getExamDetail, args);
 };
 
 export const useSearchStudents = (search) => {

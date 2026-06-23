@@ -6,10 +6,6 @@ import Logo from "../components/Logo";
 
 import Plasma from "../components/Plasma";
 import insta from "../assets/instagram.webp";
-
-// Lazy loaded below-the-fold components
-const ToolsCovered = lazy(() => import("../components/ToolsCovered"));
-const Footer = lazy(() => import("../components/Footer"));
 import face from "../assets/facebook.webp";
 import heroCharacter from "../assets/hero.webp";
 import photographyImage from "../assets/photography.webp";
@@ -23,6 +19,8 @@ import globeBg from "../assets/globe.webp";
 import bg2 from "../assets/bg2.jpg";
 
 // Lazy loaded below-the-fold components
+const ToolsCovered = lazy(() => import("../components/ToolsCovered"));
+const Footer = lazy(() => import("../components/Footer"));
 const ScrollToTopButton = lazy(() => import("../components/ScrollToTopButton"));
 const WhatsAppButton = lazy(() => import("../components/WhatsAppButton"));
 const ContactUsModal = lazy(() => import("../components/ContactUsModal"));

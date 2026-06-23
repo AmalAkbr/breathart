@@ -87,14 +87,7 @@ const CreateExam = () => {
     return true;
   };
 
-  const parseApiError = async (response, fallback) => {
-    try {
-      const payload = await response.json();
-      return payload?.message || payload?.error || fallback;
-    } catch {
-      return fallback;
-    }
-  };
+
 
   const handleCreateExam = async (e) => {
     e.preventDefault();

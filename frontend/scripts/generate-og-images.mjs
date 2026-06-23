@@ -21,7 +21,6 @@ const executableCandidates = [
   "/usr/bin/chromium-browser",
   "/usr/bin/chromium",
 ].filter(Boolean);
-
 const executablePath = executableCandidates.find((candidate) =>
   fs.existsSync(candidate),
 );

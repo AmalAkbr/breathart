@@ -127,10 +127,6 @@ const ManageVideos = () => {
     return `upload_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
   };
 
-  const mapClientProgressToUi = (percent) => {
-    const clamped = Math.max(0, Math.min(100, percent));
-    return Math.round((clamped / 100) * 45);
-  };
 
   // No fetchVideos needed — useAllVideos() is reactive
   // File uploads go to Convex HTTP actions which forward to R2 / ImageKit
@@ -243,7 +239,8 @@ const ManageVideos = () => {
             const parsed = JSON.parse(xhr.responseText);
             if (parsed?.message) message = parsed.message;
             else if (parsed?.error) message = parsed.error;
-          } catch (err) {
+          } catch (e) {
+            // eslint-disable-next-line no-unused-vars
             // ignore
           }
           reject(new Error(message));
