@@ -30,7 +30,6 @@ const QuickContact = () => {
 
       setSubmitStatus("success");
       formElement.reset(); // Clear the form
-      setTimeout(() => setSubmitStatus(null), 5000); // Reset success message after 5s
     } catch (error) {
       console.error("Error submitting form:", error);
       setSubmitStatus("error");
@@ -188,12 +187,34 @@ const QuickContact = () => {
             transition={{ delay: 0.2 }}
             className="w-full lg:w-[400px] xl:w-[450px] shrink-0"
           >
-            <form
-              onSubmit={handleSubmit}
-              action="https://formspree.io/f/myyagyqg"
-              method="POST"
-              className="relative bg-[#0a192f] backdrop-blur-2xl p-6 md:p-8 rounded-2xl border border-accent-blue/30 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5),0_0_40px_-10px_rgba(0,180,255,0.15)] flex flex-col gap-4 overflow-hidden"
-            >
+            {submitStatus === "success" ? (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="relative bg-[#0a192f] backdrop-blur-2xl p-6 md:p-8 rounded-2xl border border-green-500/30 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5),0_0_40px_-10px_rgba(34,197,94,0.15)] flex flex-col items-center justify-center gap-4 overflow-hidden text-center h-full min-h-[380px]"
+              >
+                <div className="absolute top-0 right-0 w-64 h-64 bg-green-500/10 blur-[60px] rounded-full pointer-events-none -translate-y-1/2 translate-x-1/2"></div>
+                <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mb-2 z-10">
+                  <CheckCircle2 className="w-8 h-8 text-green-400" />
+                </div>
+                <h3 className="text-2xl font-bold text-white relative z-10">Thank You!</h3>
+                <p className="text-slate-300 text-sm relative z-10">
+                  We've successfully received your request. Our team will get back to you shortly.
+                </p>
+                <button
+                  onClick={() => setSubmitStatus(null)}
+                  className="mt-4 px-6 py-2.5 rounded-xl border border-white/10 text-white hover:bg-white/5 transition-colors font-medium text-sm relative z-10"
+                >
+                  Send another request
+                </button>
+              </motion.div>
+            ) : (
+              <form
+                onSubmit={handleSubmit}
+                action="https://formspree.io/f/myyagyqg"
+                method="POST"
+                className="relative bg-[#0a192f] backdrop-blur-2xl p-6 md:p-8 rounded-2xl border border-accent-blue/30 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5),0_0_40px_-10px_rgba(0,180,255,0.15)] flex flex-col gap-4 overflow-hidden h-full"
+              >
               {/* Inner Glass Glow */}
               <div className="absolute top-0 right-0 w-64 h-64 bg-accent-blue/10 blur-[60px] rounded-full pointer-events-none -translate-y-1/2 translate-x-1/2"></div>
 
@@ -300,7 +321,8 @@ const QuickContact = () => {
               <p className="text-[10px] text-slate-500 text-center mt-2">
                 We'll never share your information with anyone else.
               </p>
-            </form>
+              </form>
+            )}
           </motion.div>
         </div>
       </div>

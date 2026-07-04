@@ -30,6 +30,7 @@ const Careers = lazy(() => import("./pages/Careers"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Brochure = lazy(() => import("./pages/Brochure"));
 const Admission = lazy(() => import("./pages/Admission"));
+const ThankYou = lazy(() => import("./pages/ThankYou"));
 const CoursesPage = lazy(() => import("./pages/CoursesPage"));
 const LandingPage = lazy(() => import("./pages/LandingPage"));
 const Profile = lazy(() => import("./pages/profile/Profile"));
@@ -93,6 +94,7 @@ const MainLayout = () => {
           <Route path="/blogs" element={<Blogs />} />
           <Route path="/careers" element={<Careers />} />
           <Route path="/admission" element={<Admission />} />
+          <Route path="/thank-you" element={<ThankYou />} />
           <Route path="/brochure" element={<Brochure />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
