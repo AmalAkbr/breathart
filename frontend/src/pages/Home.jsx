@@ -1,5 +1,6 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useState, useEffect } from 'react';
 import Hero from '../components/Hero';
+import EnrollModal from '../components/EnrollModal';
 
 // Eagerly loaded: Hero is the LCP element, must render immediately
 // Everything below the fold is lazy-loaded — downloaded only when needed
@@ -24,10 +25,25 @@ const Location = lazy(() => import('../components/Location'));
 const SectionLoader = () => <div className="min-h-[200px]" aria-hidden="true" />;
 
 const Home = () => {
+    const [isPopupOpen, setIsPopupOpen] = useState(false);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setIsPopupOpen(true);
+        }, 5000);
+
+        return () => clearTimeout(timer);
+    }, []);
+
     return (
         <main>
             {/* Hero renders immediately — it is the LCP element */}
             <Hero />
+
+            <EnrollModal 
+                open={isPopupOpen} 
+                onClose={() => setIsPopupOpen(false)} 
+            />
 
             {/* All below-fold sections are lazily loaded */}
             <Suspense fallback={<SectionLoader />}>

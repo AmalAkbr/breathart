@@ -4,7 +4,7 @@ import { CheckCircle, ArrowLeft } from "lucide-react";
 
 const ThankYou = () => {
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center py-24 px-4 relative overflow-hidden">
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center py-24 px-4 relative overflow-hidden theme-light-section">
       {/* Background Elements */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-3xl aspect-square bg-accent-cyan/5 rounded-full blur-[100px] pointer-events-none" />
       <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-accent-blue/5 rounded-full blur-[80px] pointer-events-none" />
@@ -40,12 +40,7 @@ const ThankYou = () => {
             <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
             Back to Home
           </Link>
-          <Link
-            to="/courses"
-            className="flex items-center gap-2 px-8 py-3.5 bg-slate-100 text-slate-700 rounded-xl font-bold hover:bg-slate-200 transition-all w-full sm:w-auto justify-center"
-          >
-            Explore Courses
-          </Link>
+
         </div>
       </motion.div>
     </div>

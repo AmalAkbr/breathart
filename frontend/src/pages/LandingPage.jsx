@@ -17,6 +17,7 @@ import CountUp from "../components/CountUp";
 import Aurora from "../components/Aurora";
 import globeBg from "../assets/globe.webp";
 import bg2 from "../assets/bg2.jpg";
+import EnrollModal from "../components/EnrollModal";
 
 // Lazy loaded below-the-fold components
 const ToolsCovered = lazy(() => import("../components/ToolsCovered"));
@@ -40,6 +41,15 @@ const LandingPage = () => {
   const [scrolled, setScrolled] = useState(false);
   const [isWhiteNav, setIsWhiteNav] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsPopupOpen(true);
+    }, 5000);
+    return () => clearTimeout(timer);
+  }, []);
+
   useEffect(() => {
     let isThrottled = false;
     const handleScroll = () => {
@@ -96,6 +106,11 @@ const LandingPage = () => {
     <>
      <div className="min-h-screen w-full max-w-[100vw] flex flex-col bg-bg-dark text-white font-sans selection:bg-accent-cyan/30 overflow-x-hidden">
         {/* Ambient Background Accents are removed as per request for a darker background behind Plasma */}
+
+        <EnrollModal 
+            open={isPopupOpen} 
+            onClose={() => setIsPopupOpen(false)} 
+        />
 
         {/* Minimal Header (Dynamic Scroll & Theme) */}
         <header

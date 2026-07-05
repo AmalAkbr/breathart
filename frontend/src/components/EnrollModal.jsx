@@ -9,33 +9,39 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
+import { useNavigate } from "react-router-dom";
 import { submitToFormspree } from "../utils/formspree";
 
 const inputClass =
-  "w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-3.5 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-accent-blue focus:ring-1 focus:ring-accent-blue transition-all text-sm";
+  "w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-accent-blue focus:ring-1 focus:ring-accent-blue transition-all text-sm";
 
 const EnrollModal = ({ open, onClose, defaultCourse = "" }) => {
   const [form, setForm] = useState({
     name: "",
     email: "",
     phone: "",
+    course: defaultCourse || "",
     message: "",
   });
   const [status, setStatus] = useState("idle");
+  const navigate = useNavigate();
 
   // Reset form + status and lock scroll every time the modal opens
   useEffect(() => {
     if (open) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      setForm({ name: "", email: "", phone: "", message: "" });
+      setForm({ name: "", email: "", phone: "", course: defaultCourse || "", message: "" });
 
       setStatus("idle");
       document.body.style.overflow = "hidden";
+      if (window.__lenis) window.__lenis.stop();
     } else {
       document.body.style.overflow = "";
+      if (window.__lenis) window.__lenis.start();
     }
     return () => {
       document.body.style.overflow = "";
+      if (window.__lenis) window.__lenis.start();
     };
   }, [open]);
 
@@ -47,13 +53,14 @@ const EnrollModal = ({ open, onClose, defaultCourse = "" }) => {
     setStatus("loading");
     try {
       await submitToFormspree(e.currentTarget, {
-        subject: `Course Enrollment - ${defaultCourse || "Not specified"}`,
+        subject: `Course Enrollment - ${form.course || defaultCourse || "Not specified"}`,
         from_name: form.name,
-        course: defaultCourse || "Not specified",
+        course: form.course || defaultCourse || "Not specified",
         message: form.message || "—",
       });
-      setStatus("success");
-      setForm({ name: "", email: "", phone: "", message: "" });
+      setForm({ name: "", email: "", phone: "", course: defaultCourse || "", message: "" });
+      onClose();
+      navigate("/thank-you");
     } catch (error) {
       console.error("Enrollment form submission failed:", error);
       setStatus("error");
@@ -139,9 +146,9 @@ const EnrollModal = ({ open, onClose, defaultCourse = "" }) => {
                         <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">
                           Selected Program
                         </p>
-                        <p className="text-white font-semibold text-base leading-snug">
-                          {defaultCourse || "Not specified"}
-                        </p>
+                        <h4 className="text-white font-bold leading-tight line-clamp-2">
+                          {form.course || defaultCourse || "Not specified"}
+                        </h4>
                         <div className="mt-3 inline-flex items-center gap-1.5 bg-accent-cyan/20 text-accent-cyan text-xs font-bold px-3 py-1 rounded-full">
                           <span className="w-1.5 h-1.5 rounded-full bg-accent-cyan animate-pulse" />
                           Admissions Open
@@ -159,7 +166,7 @@ const EnrollModal = ({ open, onClose, defaultCourse = "" }) => {
                 {/* ── Right panel: Form ───────────────────────────────── */}
                 <div
                   data-lenis-prevent="true"
-                  className="flex-1 p-5 md:p-10 overflow-y-auto"
+                  className="flex-1 p-5 md:p-6 overflow-y-auto"
                 >
                   {/* Close on desktop */}
                   <div className="hidden md:flex justify-end mb-2">
@@ -217,7 +224,7 @@ const EnrollModal = ({ open, onClose, defaultCourse = "" }) => {
                   {/* Form */}
                   {status !== "success" && (
                     <form
-                      className="space-y-5"
+                      className="space-y-3"
                       onSubmit={handleSubmit}
                       action="https://formspree.io/f/myyagyqg"
                       method="POST"
@@ -271,6 +278,29 @@ const EnrollModal = ({ open, onClose, defaultCourse = "" }) => {
 
                       <div className="space-y-2">
                         <label className="text-xs font-bold text-slate-600 ml-1 uppercase tracking-wide">
+                          Interested Course *
+                        </label>
+                        <select
+                          name="course"
+                          value={form.course}
+                          onChange={handleChange}
+                          className={inputClass + " appearance-none cursor-pointer"}
+                          required
+                        >
+                          <option value="" disabled>Select a course</option>
+                          <option value="Advanced Digital Marketing">Advanced Digital Marketing</option>
+                          <option value="Creative Education">Creative Education</option>
+                          <option value="Master Diploma in AI Digital Marketing">Master Diploma in AI Digital Marketing</option>
+                          <option value="Diploma in AI Digital Marketing">Diploma in AI Digital Marketing</option>
+                          <option value="Diploma in Graphic Design & Photography">Diploma in Graphic Design & Photography</option>
+                          <option value="SEO Mastery">SEO Mastery</option>
+                          <option value="Social Media Management">Social Media Management</option>
+                          <option value="Other">Other / Not Sure</option>
+                        </select>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-slate-600 ml-1 uppercase tracking-wide">
                           Message{" "}
                           <span className="font-normal normal-case text-slate-400">
                             (optional)
@@ -280,7 +310,7 @@ const EnrollModal = ({ open, onClose, defaultCourse = "" }) => {
                           name="message"
                           value={form.message}
                           onChange={handleChange}
-                          className={inputClass + " resize-none min-h-[100px]"}
+                          className={inputClass + " resize-none min-h-[60px]"}
                           placeholder="Any questions or special requirements?"
                         />
                       </div>
@@ -288,7 +318,7 @@ const EnrollModal = ({ open, onClose, defaultCourse = "" }) => {
                       <button
                         type="submit"
                         disabled={status === "loading"}
-                        className="w-full py-4 rounded-xl bg-gradient-to-r from-accent-cyan to-accent-blue text-white font-bold text-base hover:shadow-xl hover:shadow-accent-blue/30 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 group disabled:opacity-70 disabled:cursor-not-allowed"
+                        className="w-full py-3 rounded-xl bg-gradient-to-r from-accent-cyan to-accent-blue text-white font-bold text-base hover:shadow-xl hover:shadow-accent-blue/30 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 group disabled:opacity-70 disabled:cursor-not-allowed"
                       >
                         {status === "loading" ? (
                           <>

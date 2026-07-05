@@ -8,7 +8,7 @@ import {
   AlertCircle,
   Loader2,
 } from "lucide-react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { submitToFormspree } from "../utils/formspree";
 
@@ -17,6 +17,7 @@ const inputClass =
 
 const Admission = () => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   const [form, setForm] = useState({
     firstName: "",
@@ -43,15 +44,7 @@ const Admission = () => {
         course: form.course || "Not specified",
         message: form.message || "—",
       });
-      setStatus("success");
-      setForm({
-        firstName: "",
-        lastName: "",
-        email: "",
-        phone: "",
-        course: "",
-        message: "",
-      });
+      navigate("/thank-you");
     } catch (error) {
       console.error("Admission form submission failed:", error);
       setStatus("error");

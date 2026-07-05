@@ -9,12 +9,14 @@ import {
   Briefcase,
 } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { submitToFormspree } from "../utils/formspree";
 
 const JobApplicationModal = ({ isOpen, onClose, jobTitle }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isError, setIsError] = useState(false);
+  const navigate = useNavigate();
 
   // Form state
   const [formData, setFormData] = useState({
@@ -65,11 +67,8 @@ const JobApplicationModal = ({ isOpen, onClose, jobTitle }) => {
         job_role: jobTitle,
       });
       setIsSuccess(true);
-      // Auto close after success
-      setTimeout(() => {
-        setIsSuccess(false);
-        onClose();
-      }, 3000);
+      onClose();
+      navigate("/thank-you");
     } catch (error) {
       console.error("Job application submission failed:", error);
       setIsError(true);
