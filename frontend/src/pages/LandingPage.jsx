@@ -50,6 +50,33 @@ const LandingPage = () => {
     return () => clearTimeout(timer);
   }, []);
 
+  // Google Tag Manager for Ads (landing page only)
+  useEffect(() => {
+    // Inject GTM script into <head>
+    const script = document.createElement("script");
+    script.innerHTML = `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-WC4T2QKM');`;
+    script.id = "gtm-ads-script";
+    document.head.appendChild(script);
+
+    // Inject noscript iframe into <body>
+    const noscript = document.createElement("noscript");
+    noscript.id = "gtm-ads-noscript";
+    noscript.innerHTML = `<iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WC4T2QKM" height="0" width="0" style="display:none;visibility:hidden"></iframe>`;
+    document.body.insertBefore(noscript, document.body.firstChild);
+
+    return () => {
+      // Cleanup on unmount
+      const s = document.getElementById("gtm-ads-script");
+      if (s) s.remove();
+      const ns = document.getElementById("gtm-ads-noscript");
+      if (ns) ns.remove();
+    };
+  }, []);
+
   useEffect(() => {
     let isThrottled = false;
     const handleScroll = () => {
