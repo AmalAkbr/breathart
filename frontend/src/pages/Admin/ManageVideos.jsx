@@ -239,8 +239,7 @@ const ManageVideos = () => {
             const parsed = JSON.parse(xhr.responseText);
             if (parsed?.message) message = parsed.message;
             else if (parsed?.error) message = parsed.error;
-          } catch (e) {
-            // eslint-disable-next-line no-unused-vars
+          } catch {
             // ignore
           }
           reject(new Error(message));
