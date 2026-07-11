@@ -59,6 +59,9 @@ const BlogModal = ({ blog, onClose }) => {
                     className="p-8 overflow-y-auto overscroll-contain w-full custom-scrollbar flex-1 bg-white"
                 >
                     <div className="prose prose-lg prose-slate max-w-none">
+                        {blog.image && (
+                            <img src={blog.image} alt={blog.title} className="w-full h-auto rounded-xl mb-8 object-cover shadow-sm" />
+                        )}
                         {blog.content ? (
                             blog.content.map((paragraph, idx) => (
                                 <p key={idx} className="text-slate-600 leading-relaxed mb-6 last:mb-0">

@@ -280,6 +280,10 @@ function App() {
               path="/digital-marketing-blogs"
               element={<Navigate to="/blogs" replace />}
             />
+            <Route
+              path="/diploma-courses-after-plus-two-trivandrum-full-list"
+              element={<Navigate to="/blogs" replace />}
+            />
 
             {/* Protected Video Routes */}
             <Route

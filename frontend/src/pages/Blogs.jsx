@@ -2,7 +2,54 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import PillSlider from '../components/PillSlider';
 import BlogModal from '../components/BlogModal';
+import diplomaImage from '../assets/diploma-courses.png';
 const blogs = [
+    {
+        title: "Diploma Courses After +2 in Trivandrum: Full List of Career-Oriented Options (2026)",
+        date: "July 11, 2026",
+        summary: "Finishing Plus Two in Trivandrum and not sure what's next? You're not alone — and a four-year degree isn't the only serious option anymore. Diploma courses after +2 in Trivandrum have become one of the fastest, most practical ways to build real, employable skills, often in 3 to 12 months instead of 3 to 4 years.",
+        category: "Career Guidance",
+        image: diplomaImage,
+        content: [
+            "Finishing Plus Two in Trivandrum and not sure what's next? You're not alone — and a four-year degree isn't the only serious option anymore. Diploma courses after +2 in Trivandrum have become one of the fastest, most practical ways to build real, employable skills, often in 3 to 12 months instead of 3 to 4 years.",
+            "This guide organizes every major category of diploma and job-oriented course available to Plus Two students in Trivandrum right now — whether you're from Science, Commerce, Arts, or Humanities — so you can compare options properly instead of picking the first ad you see.",
+            "Why Consider a Diploma Course Instead of (or Alongside) a Degree?",
+            "• Faster entry into the job market — most diploma courses run 3–12 months versus 3+ years for a degree.\n• More affordable — significantly lower cost than most professional degree programs.\n• Practical, not just theoretical — good diploma courses are built around hands-on training, live projects, and internships.\n• Open to any stream — Science, Commerce, Arts, and Humanities students can all qualify for most diploma programs; you don't need a technical background for most of these.\n• Can be combined with a degree — many students do a diploma alongside or right after a parallel/regular degree to stay ahead in the job market.",
+            "Here's the full breakdown by category.",
+            "1. Creative & Digital Media Diplomas",
+            "This is one of the fastest-growing categories in Trivandrum right now, driven by the explosion of AI tools, social media marketing, and content-driven business.",
+            "• Diploma in AI Digital Marketing — covers SEO, Google Ads, social media marketing, analytics, and AI-powered marketing tools (content generation, automated ad bidding, AI SEO). Typically 3 months, open to all streams.\n• Diploma in Photography — camera fundamentals, studio and natural lighting, portrait and newborn/studio photography, portfolio building. Usually 3 months including a practical internship.\n• Diploma in Graphic Design — branding, digital ad creatives, and design software (including AI-assisted design tools). Typically 3 months.\n• 360° Creative Media Diploma — combined photography, graphic design, and social media content creation for students who want an all-round creative skill set rather than one narrow specialization.",
+            "These are especially attractive right now because digital marketing and content roles are hiring faster than institutes can train people for them — industry estimates suggest the digital marketing skills gap in India exceeded 59% in 2025.",
+            "2. IT, Software & Data Diplomas",
+            "Trivandrum's Technopark and IT corridor drive strong, consistent demand here.",
+            "• Diploma in Software Development / Programming (Python, Java, full-stack)\n• Data Analytics & Power BI Diploma — Excel, Power BI, dashboard reporting, increasingly paired with basic AI tools\n• SQL & Database Management Course\n• Diploma in AI Prompting / Applied AI — a newer but fast-growing short course category\n• Cybersecurity Fundamentals Diploma\n• CCTV & Networking Technician Course",
+            "Salaries for freshers in entry-level IT-adjacent diploma roles in Kerala commonly start in the ₹2.4–3.5 lakh per annum range, rising with specialization and experience.",
+            "3. Business, Office & Finance Diplomas",
+            "Good options for Commerce and Arts stream students who want office-ready, corporate-facing skills.",
+            "• Office Administration Diploma — MS Office/Google Workspace, front office handling, workflow management\n• Accounting & GST / Tally Diploma — including Gulf-focused variants (VAT, Zoho, Sage50) for students eyeing UAE/GCC accounting roles\n• HR Management Diploma — recruitment, payroll, labour law basics\n• Business Administration Diploma\n• Banking & Financial Services Diploma",
+            "These pair well with Trivandrum's growing corporate and Gulf-facing job market, especially for students without a technical stream background.",
+            "4. Healthcare & Hospital Administration Diplomas",
+            "• Hospital & Healthcare Administration Diploma — patient records, hospital operations, healthcare documentation\n• Medical Billing & Coding Course\n• Diploma in Nursing Assistance / Paramedical Courses",
+            "Healthcare administration is one of the more recession-resistant categories, with consistent hiring across hospitals, diagnostic centers, and insurance companies.",
+            "5. Hospitality, Travel & Airport Management Diplomas",
+            "• Diploma in Airline & Airport Management\n• Hotel Management & Hospitality Diploma\n• Travel & Tourism Management Course",
+            "Popular with students drawn to customer-facing, travel-heavy careers, including openings tied to Trivandrum's international airport and the broader Kerala tourism sector.",
+            "6. Technical & Vocational (ITI-Aligned) Diplomas",
+            "For students who prefer hands-on technical trades over office-based roles:",
+            "• Diploma in Automation (PLC/SCADA)\n• Building Management System (BMS) Diploma\n• Embedded Systems Diploma\n• AutoCAD 2D & 3D Course (widely offered through Government ITI centers, including Attingal)",
+            "These are especially relevant for students from a Science or Vocational Higher Secondary background looking for manufacturing, electrical, or industrial careers.",
+            "How to Choose the Right Diploma Course in Trivandrum",
+            "• Match it to genuine interest, not just trend — \"AI\" and \"digital marketing\" are hot right now, but you'll do better long-term in a field you're actually drawn to.\n• Check for practical training, not just lectures — ask specifically how much of the course is hands-on/project-based versus classroom theory.\n• Look for an internship component — courses with a built-in internship (commonly structured as 2 months classes + 1 month internship) tend to produce far more job-ready graduates.\n• Ask about placement support specifically — not just \"100% placement assistance\" as a slogan, but what that support actually involves.\n• Confirm eligibility — most diploma courses in Trivandrum accept students from any Plus Two stream (Science, Commerce, Arts/Humanities), so don't rule options out based on your stream alone.",
+            "Final Thoughts",
+            "Plus Two doesn't have to be followed immediately by a four-year degree if that's not the right fit for you. Trivandrum now has a genuinely wide range of career-oriented diploma courses — from AI-powered digital marketing and photography to IT, healthcare, and technical trades — that can get you job-ready in months, not years. The right choice depends less on what's trending and more on matching the course to your interests, checking for real hands-on training, and confirming there's a genuine path to employment at the end of it.",
+            "FAQs",
+            "Which diploma course is best after Plus Two in Trivandrum?\nThere's no single \"best\" course — it depends on your interests and stream. Creative/digital fields (AI digital marketing, photography, graphic design) suit students interested in marketing and media; IT and data courses suit those drawn to Technopark-style careers; business and accounting diplomas suit Commerce-oriented students.",
+            "Can Arts and Commerce students join technical diploma courses?\nMost diploma courses — including digital marketing, photography, graphic design, business, and healthcare administration — are open to all Plus Two streams. Only certain core technical/engineering diplomas may prefer a Science background.",
+            "How long do diploma courses after +2 usually take?\nMost job-oriented diploma courses run between 3 months and 1 year, depending on the field and depth of practical training included.",
+            "Are diploma courses a good alternative to a degree?\nFor many career paths — especially in digital marketing, design, IT, and vocational trades — yes. Diplomas get you job-ready faster and at lower cost, though some fields (medicine, law, engineering) still require a full degree.",
+            "Do diploma courses in Trivandrum include internships?\nMany well-structured diploma programs do — commonly a format of 2 months of classroom training followed by 1 month of internship — which significantly improves job-readiness compared to classroom-only courses."
+        ]
+    },
     {
         title: "Future of Digital Marketing Careers in Kerala: Opportunities, Skills, and Growth in 2026",
         date: "June 12, 2026",

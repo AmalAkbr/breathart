@@ -46,6 +46,13 @@ const META_BY_ROUTE = [
     imageAlt: "Breathart Institute terms page preview",
   },
   {
+    match: (pathname) => pathname === "/diploma-courses-after-plus-two-trivandrum-full-list",
+    title: "Diploma Courses After +2 in Trivandrum: Full List of Career-Oriented Options",
+    description: "Confused about what to do after Plus Two in Trivandrum? Here's a complete, categorized list of job-oriented diploma courses — digital marketing, photography, IT, healthcare, business, and more — with fees, duration, and career scope.",
+    image: `${SITE_URL}/app/og-blogs.png?v=1`,
+    imageAlt: "Diploma Courses After Plus Two in Trivandrum",
+  },
+  {
     match: (pathname) =>
       pathname.startsWith("/privacy-policy") || pathname.startsWith("/privacy"),
     title: "Privacy Policy | Breathart Institute",
