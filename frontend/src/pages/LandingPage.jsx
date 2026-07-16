@@ -44,6 +44,27 @@ const LandingPage = () => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
 
   useEffect(() => {
+    // Initialize dataLayer
+    window.dataLayer = window.dataLayer || [];
+
+    const scriptId = "gtm-script-tag";
+    const existingScript = document.getElementById(scriptId);
+
+    if (!existingScript) {
+      window.dataLayer.push({
+        "gtm.start": new Date().getTime(),
+        event: "gtm.js",
+      });
+
+      const script = document.createElement("script");
+      script.id = scriptId;
+      script.async = true;
+      script.src = "https://www.googletagmanager.com/gtm.js?id=GTM-KLCJS5V3";
+      document.head.appendChild(script);
+    }
+  }, []);
+
+  useEffect(() => {
     const timer = setTimeout(() => {
       setIsPopupOpen(true);
     }, 5000);
@@ -105,7 +126,17 @@ const LandingPage = () => {
 
   return (
     <>
-     <div className="min-h-screen w-full max-w-[100vw] flex flex-col bg-bg-dark text-white font-sans selection:bg-accent-cyan/30 overflow-x-hidden">
+      {/* Google Tag Manager (noscript) */}
+      <noscript>
+        <iframe
+          src="https://www.googletagmanager.com/ns.html?id=GTM-KLCJS5V3"
+          height="0"
+          width="0"
+          style={{ display: "none", visibility: "hidden" }}
+          title="gtm-noscript"
+        />
+      </noscript>
+      <div className="min-h-screen w-full max-w-[100vw] flex flex-col bg-bg-dark text-white font-sans selection:bg-accent-cyan/30 overflow-x-hidden">
         {/* Ambient Background Accents are removed as per request for a darker background behind Plasma */}
 
         <EnrollModal 
